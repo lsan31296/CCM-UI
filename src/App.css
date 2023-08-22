@@ -1,38 +1,38 @@
-.App {
-  text-align: center;
+
+.main {
+  margin-bottom: 150px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/*
+RESPONSIBLE FOR DISPLAYING 'LEGEND' DROPDOWN CONTENTS 
+HORIZONTALLY AS OPPOSED TO VERTICALLY. 
+*/
+#horizontal-dropdown-list.dropdown-menu.show {
+  display: contents;
+} /*RESPONSIBLE FOR TOGGLING DIRECTION OF DROPDOWN ICON*/
+#horizontal-dropdown-btn.dropdown-toggle.show::before {
+  border-top: .3em solid transparent;
+  border-right: 0;
+  border-bottom: .3em solid transparent;
+  border-left: .3em solid;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+#legend-position-button {
+  background-color: #1c298c;
+  color: #fefefe;
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+#legend-risk-button {
+  background-color: #4d1c8c;
+  color: #fefefe;
 }
-
-.App-link {
-  color: #61dafb;
+#legend-rating-button {
+  background-color: #8c1c54;
+  color: #fefefe;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+#legend-krd-button {
+  background-color: #1c8c63;
+  color: #fefefe;
+}
+#legend-performance-button {
+  background-color: black;
+  color: #fefefe;
 }

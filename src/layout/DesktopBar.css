@@ -1,0 +1,36 @@
+.desktop-top-bar {
+    /* border: red solid 2px; */
+    text-align: right;
+    display: block;
+    padding-left: 0.9375rem;
+    padding-right: 0.9375rem;
+    background-color: #1B3668;
+}
+
+a {
+    padding-right: 10px;
+}
+
+/* unvisited link */
+a:link {
+    color: #fefefe;
+    text-decoration: none;
+}
+
+/* visited link */
+a:visited {
+    color: lightblue;
+    text-decoration: none;
+}
+
+/* mouse over link */
+a:hover {
+    color: #00b0f0;
+    text-decoration: none;
+}
+
+/* selected link */
+a:active {
+    color: grey;
+    text-decoration: none;
+}
