@@ -1,3 +1,5 @@
+import "./RiskHoldings.css";
+
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getRiskHoldings } from "../utils/api";
@@ -7,7 +9,8 @@ import ExportCSV from "./ExportCSV";
 import CustomMaterialMenu from "./CustomMaterialMenu";
 import SubHeaderComponent from "./SubHeaderComponent";
 import PopModal from "./PopModal";
-import { formatAccountName, numberFormatter0, numberFormatter2, dollarFormatter, dollarFormatter0, formatWeight, dateFormatter, dataTableStyles } from "../utils/helperFunctions";
+import { formatAccountName, numberFormatter0, numberFormatter2, dollarFormatter, dollarFormatter0, formatWeight, dateFormatter, dataTableStyles, aggRowFilter, sqlDateToDateString } from "../utils/helperFunctions";
+import CustomLoader from "./CustomLoader";
 
 export default function RiskHoldings() {
     let params = useParams();
@@ -16,6 +19,13 @@ export default function RiskHoldings() {
     const [modalData, setModalData] = useState(null);
     const [modalTitle, setModalTitle] = useState(null);
     const [modalColumns, setModalColumns] = useState([]);
+    const [pending, setPending] = useState(true);
+    const bodyReq = {
+        accounts: [params.accounts], 
+        aoDate: params.aoDate, 
+        positionView: params.positionView, 
+        aggregateRows: (params.aggregateRows && params.aggregateRows !== 'n') ? 'ys' : 'n'
+    };
 //HANDLER FUNCTIONS DECLARED HERE
     //MODAL HANDLERS HERE
     const handleRecentTradeModalOpen = (uspTradeRes, title, recentTradeModalColumns) => {
@@ -54,30 +64,88 @@ export default function RiskHoldings() {
 
     const columnHeaders = [
         //Currently account_name and ticker are not working when being called to the middle-tier from its database.
+        /*
         { 
-            name: "Account Name", 
-            selector: (row) => formatAccountName(row.account_name),
+            name: "Sort Order", 
+            selector: (row) => numberFormatter0.format(row.sortOrder),
             sortable: true,
             minWidth: "135px",
             center: true,
         },
+        */
         {
-            cell: row => 
-            <div>
-                <CustomMaterialMenu size="small" row={row} handleModalOption1Open={handleRecentTradeModalOpen} 
-                    handleModalOption2Open={handleSecurityDetailModalOpen} handleModalOption3Open={handlePriceHistoryModalOpen}
-                    handleModalOption4Open={handleShowLoansModalOpen} handleModalOption5Open={handleAccountDetailsModalOpen}
-                />
-            </div>,
+            name: <div>Marketing Asset Group</div>,
+            selector: (row) => row.marketingAssetGroup,
+            center: true,
+            compact: true,
+            conditionalCellStyles: [
+                {
+                    when: (row) => (row.sortOrder !== 1 && bodyReq.aggregateRows !== "n") || row.marketingAssetGroup === '-no data-',
+                    style: {
+                        color: "transparent"
+                    }
+                }
+            ],
+        },
+        {
+            name: <div>CS Group</div>,
+            selector: (row) => row.carlton_SecurityGroup,
+            center: true,
+            compact: true,
+            conditionalCellStyles: [
+                {
+                    when: (row) => (row.sortOrder !== 2 && bodyReq.aggregateRows !== "n") || row.carlton_SecurityGroup === '-no data-',
+                    style: {
+                        color: "transparent"
+                    }
+                }
+            ]
+        },
+        {
+            name: <div>CS Type</div>,
+            selector: (row) => row.carlton_SecurityType,
+            compact: true,
+            wrap: true,
+            conditionalCellStyles: [
+                {
+                    when: (row) => (row.sortOrder !== 3 && bodyReq.aggregateRows !== "n") || row.carlton_SecurityType === '-no data-',
+                    style: {
+                        color: "transparent"
+                    }
+                }
+            ]
+        },
+        {
+            name: <div>CS Sector</div>,
+            selector: (row) => row.carlton_SecuritySector,
+            compact: true,
+            wrap: true,
+            conditionalCellStyles: [
+                {
+                    when: (row) => (row.sortOrder !== 4 && bodyReq.aggregateRows !== "n") || row.carlton_SecuritySector === '-no data-',
+                    style: {
+                        color: "transparent"
+                    }
+                }
+            ]
+        },
+        {
+            cell: row =>
+                <div>
+                    <CustomMaterialMenu size="small" row={row} handleModalOption1Open={handleRecentTradeModalOpen}
+                        handleModalOption2Open={handleSecurityDetailModalOpen} handleModalOption3Open={handlePriceHistoryModalOpen}
+                        handleModalOption4Open={handleShowLoansModalOpen} handleModalOption5Open={handleAccountDetailsModalOpen}
+                    />
+                </div>,
             allowOverFlow: true,
             button: true,
             minWidth: "40px",
             compact: true,
             center: true,
         },
-        { 
-            name: "BBG Cusip", 
-            selector: (row) => row.bbg_cusip, 
+        {
+            name: "BBG Cusip",
+            selector: (row) => row.bbg_cusip,
             sortable: true,
             maxWidth: "10px",
             compact: true,
@@ -88,8 +156,9 @@ export default function RiskHoldings() {
             selector: (row) => row.sec_name,
             sortable: true,
             compact: true,
-            minWidth: "125px",
-            center: true,
+            //minWidth: "125px",
+            //center: true,
+            wrap: true,
         },
         {
             name: "Coupon",
@@ -125,28 +194,26 @@ export default function RiskHoldings() {
             center: true,
         },
         {
-            name: "Orig Face",
-            selector: (row) => row.orig_face,
+            name: <div>Orig Face</div>,
+            selector: (row) => dollarFormatter0.format(row.orig_face),
             sortable: true,
             compact: true,
-            minWidth: "80px",
-            format: (row) => dollarFormatter0.format(row.orig_face),
             center: true,
         },
         {
-            name: "Curr Face",
+            name: <div>Curr Face</div>,
             selector: (row) => dollarFormatter0.format(row.curent_face),
             sortable: true,
             compact: true,
-            minWidth: "80px",
+            //minWidth: "80px",
             center: true,
         },
         {
-            name: "MKT Val",
+            name: <div>MKT Val</div>,
             selector: (row) => dollarFormatter0.format(row.mv),
             sortable: true,
             compact: true,
-            minWidth: '110px',
+            //minWidth: '110px',
             center: true,
         },
         {
@@ -238,20 +305,20 @@ export default function RiskHoldings() {
             center: true,
         },
         {
-            name: "SP",
+            name: <div>SP</div>,
             selector: (row) => row.carlton_SPRating,
             sortable: true,
             compact: true,
-            minWidth: "30px",
+            minWidth: "40px",
             center: true,
             //maxWidth: "60px",
         },
         {
-            name: "Fitch",
+            name: <div>Fitch</div>,
             selector: (row) => row.carlton_FitchRating,
             sortable: true,
             compact: true,
-            minWidth: "40px",
+            minWidth: "50px",
             center: true,
         },
         {
@@ -327,11 +394,11 @@ export default function RiskHoldings() {
             center: true,
         },
         {
-            name: "Book G/L",
+            name: <div>Book G/L</div>,
             selector: (row) => numberFormatter0.format(row.book_gain_loss),
             sortable: true,
             compact: true,
-            minWidth: "80px",
+            //minWidth: "80px",
             conditionalCellStyles: [
                 {
                     when: (row) => row.book_gain_loss < 0,
@@ -341,11 +408,11 @@ export default function RiskHoldings() {
             center: true,
         },
         {
-            name: "DOD G/L",
+            name: <div>DOD G/L</div>,
             selector: (row) => numberFormatter0.format(row.dod_gain_loss),
             sortable: true,
             compact: true,
-            minWidth: "80px",
+            //minWidth: "80px",
             conditionalCellStyles: [
                 {
                     when: (row) => row.dod_gain_loss < 0,
@@ -355,16 +422,22 @@ export default function RiskHoldings() {
             center: true,
         },
         {
-            name: "Orig Trd Date",
-            selector: (row) => dateFormatter(row.original_trade_date),
+            name: <div>DOD Return</div>,
+            selector: (row) => numberFormatter2.format(row.dod_return),
             sortable: true,
             compact: true,
-            minWidth: "120px",
+            //minWidth: "90px",
+            conditionalCellStyles: [
+                {
+                    when: (row) => row.dod_gain_loss < 0,
+                    style: { color: 'red' }
+                }
+            ],
             center: true,
         },
     ];
     const customStyles = {
-        header : {
+        header: {
             style: {
                 backgroundColor: dataTableStyles[params.positionView].bannerColor
             }
@@ -403,15 +476,38 @@ export default function RiskHoldings() {
     //Set conditional row styles for aggregate row
     const conditionalRowStyles = [
         {
-            when: row => row.weight >= 0.9,
+            when: row => row.sortOrder === 0,
             style: {
-                fontWeight: 700
+                fontWeight: 700,
+                backgroundColor: dataTableStyles[params.positionView].aggMaGroupRowColor0,
+                color: "white",
             }
         },
         {
-            when: row => row.weight < 0.99 && row.aggregate_rating === "" && row.sec_name === "",//identifies the aggregate rows
+            when: row => (row.sortOrder === 1),//identifies the aggregate rows
             style: {
-                backgroundColor: dataTableStyles[params.positionView].aggMaGroupRowColor
+                backgroundColor: dataTableStyles[params.positionView].aggMaGroupRowColor1,
+                color: "white",
+            }
+        },
+        {
+            when: row => (row.sortOrder === 2),//identifies the aggregate rows
+            style: {
+                backgroundColor: dataTableStyles[params.positionView].aggMaGroupRowColor2,
+                color: "white",
+            }
+        },
+        {
+            when: row => (row.sortOrder === 3),//identifies the aggregate rows
+            style: {
+                backgroundColor: dataTableStyles[params.positionView].aggMaGroupRowColor3,
+                color: "white",
+            }
+        },
+        {
+            when: row => row.sortOrder === 4,//identifies the aggregate rows
+            style: {
+                backgroundColor: dataTableStyles[params.positionView].aggMaGroupRowColor4
             }
         },
     ]
@@ -419,22 +515,24 @@ export default function RiskHoldings() {
     async function loadTable() {
         console.log("Loading Table!");
         const abortController = new AbortController();
-        const response = await getRiskHoldings({accounts: [params.accounts], aoDate: params.aoDate, positionView: params.positionView, aggregateRows: params.aggregateRows ? params.aggregateRows : 'n'}, abortController.signal)
-        setTableData(response);
+        const response = await getRiskHoldings(bodyReq, abortController.signal)
+        const filteredRes = aggRowFilter(response, bodyReq.aggregateRows);
+        setTableData(filteredRes);
+        setPending(false);
         return () => abortController.abort();
     }
     useEffect(() => {loadTable()}, [params]);
 
-    console.log("From RiskHoldings Component: ", params);
+    console.log("From RiskHoldings Component: ", bodyReq);
 
     if (!tableData) {
         <h1>Loading...</h1>
     } else {
         return (
-            <div style={{ padding: "30px 2% 100px", backgroundColor: "#F2F2F2" }}>
+            <div id="data-table-container" style={{ padding: "0px 2% 2% 2%", backgroundColor: "#F2F2F2" }}>
                 <PopModal data={modalData} isOpen={isModalOpen} onClose={handleModalClose} columns={modalColumns} modalTitle={modalTitle}/>
                 <DataTable
-                    title={<div style={{ display: "flex", justifyContent: "space-between"}}> <h3 style={{ color: "white" }}>Risk Holdings: {dataTableStyles[params.positionView].title} View</h3> <h3 style={{ color: 'white'}}>{params.aoDate}</h3> </div>}
+                    title={<div style={{ display: "flex", justifyContent: "space-between"}}> <h3 style={{ color: "white" }}>Risk Holdings: {dataTableStyles[params.positionView].title} View</h3> <h3 style={{ color: 'white'}}>{sqlDateToDateString(dateFormatter(params.aoDate))}</h3> </div>}
                     subHeader subHeaderComponent={SubHeaderComponent}  
                     columns={columnHeaders}
                     data={tableData}
@@ -443,9 +541,12 @@ export default function RiskHoldings() {
                     customStyles={customStyles}
                     conditionalRowStyles={conditionalRowStyles}
                     expandableRows expandableRowsComponent={ExpandedTable}
-                    fixedHeader fixedHeaderScrollHeight="710px"
+                    fixedHeader //fixedHeaderScrollHeight="710px"
                     //onRowDoubleClicked={handleDoubleClick}
-                    pagination
+                    pagination paginationPerPage={1000}
+                    paginationRowsPerPageOptions={[100, 200, 300, 400, 500, 1000, 10000]}
+                    paginationComponentOptions={{ selectAllRowsItem: true, selectAllRowsItemText: "All" }}
+                    progressPending={pending} progressComponent={<CustomLoader/>}
                 /> 
             </div>
         )

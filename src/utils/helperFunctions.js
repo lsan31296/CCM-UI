@@ -1,24 +1,42 @@
+import dayjs from "dayjs";
 
 export const dataTableStyles = {
     TD: {
         title: "Trade Date",
         bannerColor: "#1B3668",
-        aggMaGroupRowColor: "#9ad4e6"
+        aggMaGroupRowColor0: "#045787",
+        aggMaGroupRowColor1: "#0776a6",
+        aggMaGroupRowColor2: "#138bb0",
+        aggMaGroupRowColor3: "#26a1c7",
+        aggMaGroupRowColor4: "#9ad4e6",
     },
     SD: {
         title: "Settlement Date",
         bannerColor: "#0b850d",
-        aggMaGroupRowColor: "#c1f7c2"
+        aggMaGroupRowColor0: "#0e8c19",
+        aggMaGroupRowColor1: "#139e16",
+        aggMaGroupRowColor2: "#25c428",
+        aggMaGroupRowColor3: "#40de43",
+        aggMaGroupRowColor4: "#c1f7c2",
     },
     ID: {
         title: "Trade Date Intraday",
-        bannerColor: "#e37005",
-        aggMaGroupRowColor: "#edd2b9"
+        bannerColor: "#590396",
+        aggMaGroupRowColor0: "#540185",
+        aggMaGroupRowColor1: "#6105a3",
+        aggMaGroupRowColor2: "#770cc4",
+        aggMaGroupRowColor3: "#9027db",
+        aggMaGroupRowColor4: "#ce98f5",
     },
     LT: {
         title: "Lot-Level Trade Date",
-        bannerColor: "#590396",
-        aggMaGroupRowColor: "#ce98f5"
+        bannerColor: "#e37005",
+        aggMaGroupRowColor0: "#8c4b0e",
+        aggMaGroupRowColor1: "#994f09",
+        aggMaGroupRowColor2: "#b3651d",
+        aggMaGroupRowColor3: "#cc7e35",
+        aggMaGroupRowColor4: "#edd2b9",
+
     }
 }
 
@@ -334,4 +352,89 @@ export function dateFormatter(date) {
     } else {
         return date.slice(0,10);
     }
+}
+export function sqlDateToDateString(date) {
+    if(date === "") return;
+    return dayjs(date).format("MM/DD/YYYY");
+}
+
+export function aggRowFilter(resData, aggregateRows) {
+    let newResData = [];
+    switch (aggregateRows) {
+        case "n"://No Aggregate Rows
+            newResData = resData;
+            break;
+        case "y"://Aggregate by Marketing Asset Group
+            newResData = resData.filter((row) => row.sortOrder === 0 || row.sortOrder === 1 || row.sortOrder === 100);
+            break;
+        case "yg"://Agregate by Carlton Security Group
+            newResData = resData.filter((row) => row.sortOrder === 0 || row.sortOrder === 1 || row.sortOrder === 2
+            || row.sortOrder === 100);
+            break;
+        case "yt"://Aggregate by Carlton Security Type
+            newResData = resData.filter((row) => row.sortOrder === 0 || row.sortOrder === 1 || row.sortOrder === 2 
+            || row.sortOrder === 3 || row.sortOrder === 100);
+            break;
+        case "ys"://Aggregate by Carlton Security Sector
+            newResData = resData.filter((row) => row.sortOrder === 0 || row.sortOrder === 1 || row.sortOrder === 2 
+            || row.sortOrder === 3 || row.sortOrder === 4 || row.sortOrder === 100);
+            break;
+        default:
+            console.log(`Ran out of Aggregate Row options for: ${aggregateRows}`);
+    }
+
+    return newResData;
+}
+
+export function moveElementInArray(arr, old_index, new_index) {
+    if (new_index >= arr.length) {
+        var k = new_index - arr.length + 1;
+        while (k--) {
+            arr.push(undefined);
+        }
+    }
+    arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+    return arr; // for testing
+};
+
+export const dateSorterMMDDYYY = (rowA, rowB) => {
+    const a = sqlDateToDateString(dateFormatter(rowA.aoDate));
+    const b = sqlDateToDateString(dateFormatter(rowB.aoDate));
+
+    let aa = a.split('/');
+    let bb = b.split('/');
+    //console.log(`Comparing a: ${aa} to b: ${bb}.`);
+    //console.log(`${aa[2] - bb[2]}, ${aa[0] - bb[0]}, ${aa[1] - bb[1]}`);
+
+    return aa[2] - bb[2] || aa[0] - bb[0] || aa[1] - bb[1];
+}
+
+export function omitNullColumns(data, columns) {
+    const allColNames = Object.keys(data[0]); //Array of all column names
+    const emptyColNames = []; //Array of arrays, each array represent 
+    const colNamesOmitted = []; //Keys that are declared null/empty columns
+
+    data.forEach((row) => {
+        const colsNoData = [];
+        Object.entries(row).forEach(([key, value]) => {
+            if(!value || [value].includes("0001-01-01T00:00:00")) {
+                colsNoData.push(key);
+            }
+        })
+        emptyColNames.push(colsNoData);
+    })
+
+    allColNames.forEach((nameKey) => {
+        if (emptyColNames.every((currArr) => currArr.includes(nameKey))) {
+            colNamesOmitted.push(nameKey)
+        }
+    })
+
+    console.log("Total Number of Columns: ", allColNames.length);
+
+    colNamesOmitted.forEach((colName) => {
+        const indexToOmit = columns.findIndex((row) => row.id === colName);
+        indexToOmit >= 0 ? columns[indexToOmit].omit = true : console.log(`${colName} doesn't need to be omitted.`);
+    })
+    return columns;
 }

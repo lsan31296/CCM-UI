@@ -13,7 +13,8 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 1400,
+    width: '95%',
+    minHeight: '20%',
     bgcolor: 'background.paper', 
     border: '2px solid #000',
     boxShadow: 12,
@@ -23,7 +24,7 @@ const style = {
 export default function PopModal({ data, isOpen, onClose, columns, modalTitle }) {
 
     return (
-        <div>
+        <div id="pop-modal">
         <Modal
             open={isOpen}
             onClose={onClose}

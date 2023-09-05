@@ -4,6 +4,7 @@ import RiskHoldings from './components/RiskHoldings';
 import DesktopBar from './layout/DesktopBar';
 import Header from './layout/Header';
 import Footer from './layout/Footer';
+import Dashboard from './DashBoard/Dashboard';
 
 function App() {
 
@@ -17,7 +18,7 @@ function App() {
 
       <main>
         <Routes>
-          <Route path='/' element={<h1>DashBoard Landing Page</h1>} />
+          <Route path='/' element={<Dashboard />} />
           <Route path='/risk/:aoDate/:positionView/:accounts/:aggregateRows?' element={<RiskHoldings />} />
         </Routes>
       </main>

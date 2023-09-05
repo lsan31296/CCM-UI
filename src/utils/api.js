@@ -1,6 +1,6 @@
 /* This file represents the API we would be using to fetch our data from */
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000"
-//const API_BASE_URL = "http://localhost:5000";
+//const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000"
+const API_BASE_URL = "http://localhost:5000";
 
 //Defines the default headers for these function to work with 'json-server'
 const headers = new Headers();
