@@ -1,0 +1,28 @@
+#dashboard-container {
+    padding: 0% 1% 0% 1%;
+    background-color: rgb(242, 242, 242);
+}
+
+/* unvisited link */
+#dashboard-data-table-container a:link {
+    color: blue;
+}
+
+/* visited link */
+#dashboard-data-table-container a:visited {
+    color: #1c298c;
+}
+
+/* mouse over link */
+#dashboard-data-table-container a:hover {
+    color: hotpink;
+}
+
+/* selected link */
+#dashboard-data-table-container a:active {
+    color: #f0b207;
+}
+
+#dashboard-data-table-container > div:nth-child(2) {
+    max-height: 77vh !important;
+}
