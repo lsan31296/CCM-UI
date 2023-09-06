@@ -1,9 +1,9 @@
 /*  SELECTS THE MAIN DATA TABLE WINDOW
     ALLOWS YOU TO CHANGE THE HEIGHT OF THE TABLE
 */
-#data-table-container > div:nth-child(4) {
-    /*border: orange solid 3px;*/
-    max-height: 74vh !important;
+#data-table-container > div:nth-child(5) {
+    /* border: orange solid 3px; */
+    max-height: 70vh !important;
 }
 /*  SELECTS TABLE HEADER WHERE TITLE LIVES  */
 /* .rdt_TableHeader {
@@ -154,4 +154,12 @@ DOD GAIN LOSS REPRESENTS 'PERFORMANCE' SUBHEADER */
 .rdt_TableHead > div:nth-child(1) > div:nth-child(n+35):nth-child(-n+40) {
     background-color: black;
     color: #fefefe;
+}
+
+#filter-bar {
+    float: right;
+}
+
+#modal-modal-description > div > div > div > .rdt_TableHead > div:nth-child(1) > div:nth-child(n){
+    background-color: black;
 }

@@ -14,7 +14,8 @@ import CustomLoader from "./CustomLoader";
 
 export default function RiskHoldings() {
     let params = useParams();
-    const [tableData, setTableData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
+    const [response, setResponse] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalData, setModalData] = useState(null);
     const [modalTitle, setModalTitle] = useState(null);
@@ -60,6 +61,13 @@ export default function RiskHoldings() {
     };
     const handleModalClose = () => {
         setIsModalOpen(false);
+    }
+    const handleFilter = ({target}) => {
+        //console.log("Typing: ", target.value);
+        const newTableData = response.filter((row) => {
+            return row.bbg_cusip.toLowerCase().includes(target.value.toLowerCase())
+        });
+        setFilteredData(newTableData);
     }
 
     const columnHeaders = [
@@ -510,32 +518,40 @@ export default function RiskHoldings() {
                 backgroundColor: dataTableStyles[params.positionView].aggMaGroupRowColor4
             }
         },
+        {
+            when: row => row.sortOrder === 5,//identifies the aggregate rows
+            style: {
+                backgroundColor: dataTableStyles[params.positionView].aggMaGroupRowColor5
+            }
+        },
     ]
 
     async function loadTable() {
         console.log("Loading Table!");
         const abortController = new AbortController();
-        const response = await getRiskHoldings(bodyReq, abortController.signal)
-        const filteredRes = aggRowFilter(response, bodyReq.aggregateRows);
-        setTableData(filteredRes);
+        const res = await getRiskHoldings(bodyReq, abortController.signal)
+        const formattedRes = aggRowFilter(res, bodyReq.aggregateRows);
+        setResponse(formattedRes);
+        setFilteredData(formattedRes);
         setPending(false);
         return () => abortController.abort();
     }
     useEffect(() => {loadTable()}, [params]);
 
-    console.log("From RiskHoldings Component: ", bodyReq);
+    //console.log("From RiskHoldings Component: ", bodyReq);
 
-    if (!tableData) {
+    if (!response) {
         <h1>Loading...</h1>
     } else {
         return (
             <div id="data-table-container" style={{ padding: "0px 2% 2% 2%", backgroundColor: "#F2F2F2" }}>
                 <PopModal data={modalData} isOpen={isModalOpen} onClose={handleModalClose} columns={modalColumns} modalTitle={modalTitle}/>
+                <input id="filter-bar" placeholder="Filter..." type="text" onChange={handleFilter} />
                 <DataTable
                     title={<div style={{ display: "flex", justifyContent: "space-between"}}> <h3 style={{ color: "white" }}>Risk Holdings: {dataTableStyles[params.positionView].title} View</h3> <h3 style={{ color: 'white'}}>{sqlDateToDateString(dateFormatter(params.aoDate))}</h3> </div>}
                     subHeader subHeaderComponent={SubHeaderComponent}  
                     columns={columnHeaders}
-                    data={tableData}
+                    data={filteredData}
                     highlightOnHover
                     striped
                     customStyles={customStyles}

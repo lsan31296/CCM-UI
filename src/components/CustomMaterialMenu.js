@@ -125,6 +125,7 @@ export default function CustomMaterialMenu({ row, handleModalOption1Open, handle
                 selector: (row) => row.dealer,
                 compact: true,
                 reorder: true,
+                wrap: true,
             },
         ];
 
