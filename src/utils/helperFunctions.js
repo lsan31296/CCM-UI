@@ -289,8 +289,18 @@ export async function addDataIntoCache(cacheName, url, response) {
 }
 
 export function formatAccountName(accountString) {
-    const dashIndex = accountString.indexOf("-");
-    return accountString.slice(dashIndex + 2);
+    const closedParenthesisIndex = accountString.indexOf(")");
+
+    if(closedParenthesisIndex < 0) return accountString;
+
+    return accountString.slice(closedParenthesisIndex + 4);
+}
+
+export function formatAccountTicker(ticker) {
+    if (ticker.includes("(")) {
+        return ticker.slice(1,-1);
+    }
+    return ticker;
 }
 
 const unwantedElements = ["CCM_INTERNAL_SMA", "CCMNX-Adjusted", "Alternative Impact Fund - Cash Sleeve", "Alternative Impact Fund - FI Sleeve", "Equity Impact Core Fund", "Equity IMact SMID Fund", "Test Acct"];
@@ -411,6 +421,14 @@ export const dateSorterMMDDYYY = (rowA, rowB) => {
     //console.log(`${aa[2] - bb[2]}, ${aa[0] - bb[0]}, ${aa[1] - bb[1]}`);
 
     return aa[2] - bb[2] || aa[0] - bb[0] || aa[1] - bb[1];
+}
+
+export const accountNameSorter = (rowA, rowB) => {
+    const a = formatAccountTicker(rowA.ticker);
+    const b = formatAccountTicker(rowB.ticker);
+    //console.log(`Comparing ${a} to ${b}`);
+
+    return ('' + a).localeCompare(b);
 }
 
 export function omitNullColumns(data, columns) {

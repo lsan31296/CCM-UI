@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getRiskHoldings } from "../utils/api";
 import DataTable from "react-data-table-component";
-import ExpandedTable from "./ExpandedTable";
+//import ExpandedTable from "./ExpandedTable";
 import ExportCSV from "./ExportCSV";
 import CustomMaterialMenu from "./CustomMaterialMenu";
 import SubHeaderComponent from "./SubHeaderComponent";
 import PopModal from "./PopModal";
 import { formatAccountName, numberFormatter0, numberFormatter2, dollarFormatter, dollarFormatter0, formatWeight, dateFormatter, dataTableStyles, aggRowFilter, sqlDateToDateString } from "../utils/helperFunctions";
 import CustomLoader from "./CustomLoader";
+import ExpandedDetailsTable from "./ExpandedDetailsTable";
 
 export default function RiskHoldings() {
     let params = useParams();
@@ -330,76 +331,130 @@ export default function RiskHoldings() {
             center: true,
         },
         {
-            name: "6M",
+            name: <div>KRD 6M</div>,
             selector: (row) => numberFormatter2.format(row.krD_6M),
             sortable: true,
             compact: true,
             minWidth: "50px",
             center: true,
+            conditionalCellStyles: [
+                {
+                    when: (row) => row.krD_6M < 0,
+                    style: { color: 'red' }
+                }
+            ],
         },
         {
-            name: "1YR",
+            name: <div>KRD 1YR</div>,
             selector: (row) => numberFormatter2.format(row.krD_1YR),
             sortable: true,
             compact: true,
             minWidth: "50px",
             center: true,
+            conditionalCellStyles: [
+                {
+                    when: (row) => row.krD_1YR < 0,
+                    style: { color: 'red' }
+                }
+            ],
         },
         {
-            name: "2YR",
+            name: <div>KRD 2YR</div>,
             selector: (row) => numberFormatter2.format(row.krD_2YR),
             sortable: true,
             compact: true,
             minWidth: "50px",
             center: true,
+            conditionalCellStyles: [
+                {
+                    when: (row) => row.krD_2YR < 0,
+                    style: { color: 'red' }
+                }
+            ],
         },
         {
-            name: "3YR",
+            name: <div>KRD 3YR</div>,
             selector: (row) => numberFormatter2.format(row.krD_3YR),
             sortable: true,
             compact: true,
             minWidth: "50px",
             center: true,
+            conditionalCellStyles: [
+                {
+                    when: (row) => row.krD_3YR < 0,
+                    style: { color: 'red' }
+                }
+            ],
         },
         {
-            name: "5YR",
+            name: <div>KRD 5YR</div>,
             selector: (row) => numberFormatter2.format(row.krD_5YR),
             sortable: true,
             compact: true,
             minWidth: "50px",
             center: true,
+            conditionalCellStyles: [
+                {
+                    when: (row) => row.krD_5YR < 0,
+                    style: { color: 'red' }
+                }
+            ],
         },
         {
-            name: "7YR",
+            name: <div>KRD 7YR</div>,
             selector: (row) => numberFormatter2.format(row.krD_7YR),
             sortable: true,
             compact: true,
             minWidth: "50px",
             center: true,
+            conditionalCellStyles: [
+                {
+                    when: (row) => row.krD_7YR < 0,
+                    style: { color: 'red' }
+                }
+            ],
         },
         {
-            name: "10YR",
+            name: <div>KRD 10YR</div>,
             selector: (row) => numberFormatter2.format(row.krD_10YR),
             sortable: true,
             compact: true,
             minWidth: "50px",
             center: true,
+            conditionalCellStyles: [
+                {
+                    when: (row) => row.krD_10YR < 0,
+                    style: { color: 'red' }
+                }
+            ],
         },
         {
-            name: "20YR",
+            name: <div>KRD 20YR</div>,
             selector: (row) => numberFormatter2.format(row.krD_20YR),
             sortable: true,
             compact: true,
             minWidth: "50px",
             center: true,
+            conditionalCellStyles: [
+                {
+                    when: (row) => row.krD_20YR < 0,
+                    style: { color: 'red' }
+                }
+            ],
         },
         {
-            name: "30YR",
+            name: <div>KRD 30YR</div>,
             selector: (row) => numberFormatter2.format(row.krD_30YR),
             sortable: true,
             compact: true,
             minWidth: "50px",
             center: true,
+            conditionalCellStyles: [
+                {
+                    when: (row) => row.krD_30YR < 0,
+                    style: { color: 'red' }
+                }
+            ],
         },
         {
             name: <div>Book G/L</div>,
@@ -556,7 +611,7 @@ export default function RiskHoldings() {
                     striped
                     customStyles={customStyles}
                     conditionalRowStyles={conditionalRowStyles}
-                    expandableRows expandableRowsComponent={ExpandedTable}
+                    expandableRows expandableRowsComponent={ExpandedDetailsTable}
                     fixedHeader //fixedHeaderScrollHeight="710px"
                     //onRowDoubleClicked={handleDoubleClick}
                     pagination paginationPerPage={1000}

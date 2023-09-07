@@ -1,10 +1,10 @@
 import "./Dashboard.css";
 
 import { useEffect, useState } from "react";
-import { API_BASE_URL, getAllAccounts } from "../utils/api";
+import { getAllAccounts } from "../utils/api";
 import DataTable from "react-data-table-component";
 import CustomLoader from "../components/CustomLoader";
-import { today } from "../utils/helperFunctions";
+import { accountNameSorter, removeUnwanteds, today } from "../utils/helperFunctions";
 
 //Responsible for displaying a form which should list out all potential risk holdings accounts,
 //and general user input regarding ao_Date, position view, aggregate rows, etc.
@@ -24,7 +24,7 @@ export default function Dashboard({ previousBD }) {
         const abortController = new AbortController();
 
         const res = await getAllAccounts(abortController.signal);
-        setAccounts([...res]);
+        setAccounts([...removeUnwanteds(res).sort(accountNameSorter)]);
         setPending(false);
         return () => abortController.abort();
     }
@@ -53,6 +53,8 @@ export default function Dashboard({ previousBD }) {
             selector: row => <a href={`/risk/${formState.aoDate}/${formState.positionView}/${row.apx_portfolio_code}/${formState.aggregateRows}`}>{row.name}</a>,
             compact: true,
             minWidth: "350px",
+            sortable: true,
+            sortFunction: accountNameSorter,
         },
         {
             id: "daily",
@@ -93,7 +95,7 @@ export default function Dashboard({ previousBD }) {
             id: "ytdActive",
             name: "Active",
             compact: true,
-        }
+        },
     ];
     const customStyles = {
         header: {
