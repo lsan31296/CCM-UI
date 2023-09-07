@@ -601,6 +601,7 @@ export default function RiskHoldings() {
         return (
             <div id="data-table-container" style={{ padding: "0px 2% 2% 2%", backgroundColor: "#F2F2F2" }}>
                 <PopModal data={modalData} isOpen={isModalOpen} onClose={handleModalClose} columns={modalColumns} modalTitle={modalTitle}/>
+                <ExportCSV id={"risk-holdings-export"} csvData={response} fileName={`RiskHoldings-${dataTableStyles[params.positionView].title}-${bodyReq.accounts.toString()}-Agg_${bodyReq.aggregateRows}-${bodyReq.aoDate}`}/>
                 <input id="filter-bar" placeholder="Filter..." type="text" onChange={handleFilter} />
                 <DataTable
                     title={<div style={{ display: "flex", justifyContent: "space-between"}}> <h3 style={{ color: "white" }}>Risk Holdings: {dataTableStyles[params.positionView].title} View</h3> <h3 style={{ color: 'white'}}>{sqlDateToDateString(dateFormatter(params.aoDate))}</h3> </div>}
