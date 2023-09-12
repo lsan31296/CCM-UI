@@ -173,3 +173,8 @@ export async function getAccountDetails(params) {
     })
     return await fetchJson(url, {headers}, []);
 }
+
+export async function getAllShareholders(signal) {
+    const url = `${API_BASE_URL}/get-all-shareholders`;
+    return await fetchJson(url, signal);
+}

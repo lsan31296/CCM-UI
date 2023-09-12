@@ -410,7 +410,7 @@ export function moveElementInArray(arr, old_index, new_index) {
     arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
     return arr; // for testing
 };
-
+//For Modal in CustomMaterialMenu
 export const dateSorterMMDDYYY = (rowA, rowB) => {
     const a = sqlDateToDateString(dateFormatter(rowA.aoDate));
     const b = sqlDateToDateString(dateFormatter(rowB.aoDate));
@@ -422,10 +422,44 @@ export const dateSorterMMDDYYY = (rowA, rowB) => {
 
     return aa[2] - bb[2] || aa[0] - bb[0] || aa[1] - bb[1];
 }
+//For Shareholders Page Opening Date
+export const shareholderDateSorterMMDDYYY1 = (rowA, rowB) => {
 
+    const a = sqlDateToDateString((rowA.open_date).slice(0,10));
+    const b = sqlDateToDateString((rowB.open_date).slice(0,10));
+    //console.log(`${a} and ${b}`);
+
+    let aa = a.split('/');
+    let bb = b.split('/');
+    //console.log(`Comparing a: ${aa} to b: ${bb}.`);
+    //console.log(`${aa[2] - bb[2]}, ${aa[0] - bb[0]}, ${aa[1] - bb[1]}`);
+
+    return aa[2] - bb[2] || aa[0] - bb[0] || aa[1] - bb[1];
+}
+//For Shareholders Page Closing Date
+export const shareholderDateSorterMMDDYYY2 = (rowA, rowB) => {
+    const a = sqlDateToDateString((rowA.close_date).slice(0,10));
+    const b = sqlDateToDateString((rowB.close_date).slice(0,10));
+
+    let aa = a.split('/');
+    let bb = b.split('/');
+    //console.log(`Comparing a: ${aa} to b: ${bb}.`);
+    //console.log(`${aa[2] - bb[2]}, ${aa[0] - bb[0]}, ${aa[1] - bb[1]}`);
+
+    return aa[2] - bb[2] || aa[0] - bb[0] || aa[1] - bb[1];
+}
+//For Dashboard: sorts by ticker after formatting data.
 export const accountNameSorter = (rowA, rowB) => {
     const a = formatAccountTicker(rowA.ticker);
     const b = formatAccountTicker(rowB.ticker);
+    //console.log(`Comparing ${a} to ${b}`);
+
+    return ('' + a).localeCompare(b);
+}
+//For Shareholders Page: sorts by ticker
+export const shareholderNameSorter = (rowA, rowB) => {
+    const a = (rowA.account_ticker);
+    const b = (rowB.account_ticker);
     //console.log(`Comparing ${a} to ${b}`);
 
     return ('' + a).localeCompare(b);

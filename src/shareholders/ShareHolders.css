@@ -1,0 +1,23 @@
+#filter-bar {
+    float: right;
+}
+#shareholders-export {
+    float:right;
+}
+/*  SELECTS THE MAIN DATA TABLE WINDOW
+    ALLOWS YOU TO CHANGE THE HEIGHT OF THE TABLE
+*/
+#shareholder-data-table-container > div:nth-child(4) {
+    /* border: orange solid 3px; */
+    max-height: 75vh !important;
+}
+/*  SELECTS TABLE HEADER WHERE TITLE LIVES  */
+/* .rdt_TableHeader {
+    border: red solid 2px;
+
+} */
+/*  SELECTS PAGINATION BAR  */
+#shareholder-data-table-container .rdt_Pagination {
+    /* border: pink solid 2px; */
+    min-height: 43px !important;
+}

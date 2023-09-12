@@ -8,6 +8,7 @@ import Dashboard from './dashboard/Dashboard';
 import { getBusinessDay } from './utils/api';
 import { today } from './utils/helperFunctions';
 import { useEffect, useState } from 'react';
+import ShareHolders from './shareholders/ShareHolders';
 
 function App() {
   const [previousBD, setPreviousBD] = useState(null);
@@ -36,6 +37,7 @@ function App() {
           <Routes>
             <Route path='/' element={<Dashboard previousBD={previousBD}/>} />
             <Route path='/risk/:aoDate/:positionView/:accounts/:aggregateRows' element={<RiskHoldings />} />
+            <Route path='/shareholders' element={<ShareHolders />} />
           </Routes>
         </main>
 
