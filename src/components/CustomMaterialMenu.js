@@ -4,7 +4,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { FaEllipsisV } from 'react-icons/fa';
 import { getUspTrade, getSecurityDetail, getPriceHistory, getShowLoans, getAccountDetails } from '../utils/api';
-import { dateFormatter, dateSorterMMDDYYY, dollarFormatter, dollarFormatter0, formatWeight, numberFormatter2, omitNullColumns, sqlDateToDateString } from '../utils/helperFunctions';
+import { dateFormatter, dateSorterMMDDYYY, dollarFormatter, dollarFormatter0, formatAccountName, formatWeight, numberFormatter2, omitNullColumns, sqlDateToDateString } from '../utils/helperFunctions';
 import CustomCell from './CustomCell';
 
 export default function CustomMaterialMenu({ row, handleModalOption1Open, handleModalOption2Open, handleModalOption3Open, handleModalOption4Open, handleModalOption5Open}) {
@@ -183,6 +183,7 @@ export default function CustomMaterialMenu({ row, handleModalOption1Open, handle
                 selector: (row) => row.issuer,
                 compact: true,
                 reorder: true,
+                wrap: true,
             },
             {
                 name: 'Sec Type',
@@ -1531,9 +1532,10 @@ export default function CustomMaterialMenu({ row, handleModalOption1Open, handle
             },
             {
                 name: "Name",
-                selector: (row) => row.name,
+                selector: (row) => formatAccountName(row.name),
                 compact: true,
                 reorder: true,
+                wrap: true,
             },
             {
                 name: "Number",
@@ -1552,6 +1554,7 @@ export default function CustomMaterialMenu({ row, handleModalOption1Open, handle
                 selector: (row) => row.apxPortfolioCode,
                 compact: true,
                 reorder: true,
+                wrap: true,
             },
             {
                 name: "Open Date",
@@ -1608,24 +1611,28 @@ export default function CustomMaterialMenu({ row, handleModalOption1Open, handle
                 selector: (row) => row.faxNumber,
                 compact: true,
                 reorder: true,
+                wrap: true,
             },
             {
                 name: "Fax Cover To",
                 selector: (row) => row.faxCoverTo,
                 compact: true,
                 reorder: true,
+                wrap: true,
             },
             {
                 name: "Fax Phone",
                 selector: (row) => row.faxPhone,
                 compact: true,
                 reorder: true,
+                wrap: true,
             },
             {
                 name: "Fax Cover Subject",
                 selector: (row) => row.faxCoverSubject,
                 compact: true,
                 reorder: true,
+                wrap: true,
             },
             {
                 name: "Fax Cover Body",

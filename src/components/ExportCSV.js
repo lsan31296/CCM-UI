@@ -4,7 +4,7 @@ import * as FileSaver from "file-saver";
 
 import * as XLSX from "xlsx";
 
-export const ExportCSV = ({ csvData, fileName }) => {
+export const ExportCSV = ({ csvData, fileName, id }) => {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
   const fileExtension = ".xlsx";
@@ -22,7 +22,7 @@ export const ExportCSV = ({ csvData, fileName }) => {
 
   return (
     <>
-      <button className="btn btn-secondary" onClick={(e) => exportToCSV(csvData, fileName)}>Export</button>
+      <button id={id} className="btn btn-secondary btn-sm" onClick={(e) => exportToCSV(csvData, fileName)}>Export</button>
     </>
   );
 };

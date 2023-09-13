@@ -1,7 +1,7 @@
 /*  SELECTS THE MAIN DATA TABLE WINDOW
     ALLOWS YOU TO CHANGE THE HEIGHT OF THE TABLE
 */
-#data-table-container > div:nth-child(5) {
+#data-table-container > div:nth-child(6) {
     /* border: orange solid 3px; */
     max-height: 70vh !important;
 }
@@ -183,9 +183,13 @@ REPRESENTS 'PERFORMANCE' SUBHEADER
 #filter-bar {
     float: right;
 }
+#risk-holdings-export {
+    float:right;
+}
 
 #modal-modal-description > div > div > div > .rdt_TableHead > div:nth-child(1) > div:nth-child(n){
     background-color: black;
+    color: white !important;
 }
 
 /* Select rdt_TableHead within the expanded-details-data-table-container id*/
