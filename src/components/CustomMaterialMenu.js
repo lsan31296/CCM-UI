@@ -46,6 +46,7 @@ export default function CustomMaterialMenu({ row, handleModalOption1Open, handle
                 compact: true,
                 reorder: true,
                 minWidth: "60px",
+                wrap: true,
             }, 
             {
                 name: "Advent Portfolio ID",
@@ -164,7 +165,8 @@ export default function CustomMaterialMenu({ row, handleModalOption1Open, handle
                 selector: (row) => row.name,
                 compact: true,
                 reorder: true,
-                maxWidth: '150px'
+                maxWidth: '150px',
+                wrap: true,
             },
             {
                 name: 'LT Date',
@@ -275,10 +277,11 @@ export default function CustomMaterialMenu({ row, handleModalOption1Open, handle
         const priceHistoryModalColumns = [
             {
                 name:'AO Date',
-                selector: (row) => dateFormatter(row.aoDate),
+                selector: (row) => sqlDateToDateString(dateFormatter(row.aoDate)),
                 compact: true,
                 reorder: true,
                 sortable: true,
+                sortFunction: dateSorterMMDDYYY,
             },
             {
                 name: 'CUSIP',
@@ -287,7 +290,7 @@ export default function CustomMaterialMenu({ row, handleModalOption1Open, handle
                 reorder: true,
             },
             {
-                name: 'PriceValue',
+                name: 'Price',
                 selector: (row) => dollarFormatter.format(row.priceValue),
                 compact: true,
                 reorder: true,
@@ -1550,7 +1553,7 @@ export default function CustomMaterialMenu({ row, handleModalOption1Open, handle
                 reorder: true,
             },
             {
-                name: "APX Portfolio Code",
+                name: <div>APX Portfolio Code</div>,
                 selector: (row) => row.apxPortfolioCode,
                 compact: true,
                 reorder: true,
@@ -1581,7 +1584,7 @@ export default function CustomMaterialMenu({ row, handleModalOption1Open, handle
                 reorder: true,
             },
             {
-                name: "Composite Affiliation ID",
+                name: <div>Composite Affiliation ID</div>,
                 selector: (row) => row.compositeAffiliationId,
                 compact: true,
                 reorder: true,

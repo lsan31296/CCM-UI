@@ -9,7 +9,7 @@ import ExportCSV from "./ExportCSV";
 import CustomMaterialMenu from "./CustomMaterialMenu";
 import SubHeaderComponent from "./SubHeaderComponent";
 import PopModal from "./PopModal";
-import { formatAccountName, numberFormatter0, numberFormatter2, dollarFormatter, dollarFormatter0, formatWeight, dateFormatter, dataTableStyles, aggRowFilter, sqlDateToDateString } from "../utils/helperFunctions";
+import { formatAccountName, numberFormatter0, numberFormatter2, dollarFormatter, dollarFormatter0, formatWeight, dateFormatter, dataTableStyles, aggRowFilter, sqlDateToDateString, allAccounts } from "../utils/helperFunctions";
 import CustomLoader from "./CustomLoader";
 import ExpandedDetailsTable from "./ExpandedDetailsTable";
 
@@ -28,6 +28,7 @@ export default function RiskHoldings() {
         positionView: params.positionView, 
         aggregateRows: (params.aggregateRows && params.aggregateRows !== 'n') ? 'ys' : 'n'
     };
+    const accountObj = allAccounts.find((row) => row.apx_portfolio_code === params.accounts);
 //HANDLER FUNCTIONS DECLARED HERE
     //MODAL HANDLERS HERE
     const handleRecentTradeModalOpen = (uspTradeRes, title, recentTradeModalColumns) => {
@@ -95,6 +96,7 @@ export default function RiskHoldings() {
                     }
                 }
             ],
+            minWidth: "90px",
         },
         {
             name: <div>CS Group</div>,
@@ -108,7 +110,8 @@ export default function RiskHoldings() {
                         color: "transparent"
                     }
                 }
-            ]
+            ],
+            minWidth: "90px",
         },
         {
             name: <div>CS Type</div>,
@@ -122,7 +125,8 @@ export default function RiskHoldings() {
                         color: "transparent"
                     }
                 }
-            ]
+            ],
+            minWidth: "70px",
         },
         {
             name: <div>CS Sector</div>,
@@ -136,7 +140,17 @@ export default function RiskHoldings() {
                         color: "transparent"
                     }
                 }
-            ]
+            ],
+            minWidth: "80px",
+        },
+        {
+            name: "Coupon",
+            selector: (row) => row.coupon,
+            sortable: true,
+            compact: true,
+            minWidth: "70px",
+            format: (row) => numberFormatter2.format(row.coupon),
+            center: true,
         },
         {
             cell: row =>
@@ -168,15 +182,6 @@ export default function RiskHoldings() {
             //minWidth: "125px",
             //center: true,
             wrap: true,
-        },
-        {
-            name: "Coupon",
-            selector: (row) => row.coupon,
-            sortable: true,
-            compact: true,
-            minWidth: "70px",
-            format: (row) => numberFormatter2.format(row.coupon),
-            center: true,
         },
         {
             name: "Maturity",
@@ -604,7 +609,7 @@ export default function RiskHoldings() {
                 <ExportCSV id={"risk-holdings-export"} csvData={response} fileName={`RiskHoldings-${dataTableStyles[params.positionView].title}-${bodyReq.accounts.toString()}-Agg_${bodyReq.aggregateRows}-${bodyReq.aoDate}`}/>
                 <input id="filter-bar" placeholder="Filter..." type="text" onChange={handleFilter} />
                 <DataTable
-                    title={<div style={{ display: "flex", justifyContent: "space-between"}}> <h3 style={{ color: "white" }}>Risk Holdings: {dataTableStyles[params.positionView].title} View</h3> <h3 style={{ color: 'white'}}>{sqlDateToDateString(dateFormatter(params.aoDate))}</h3> </div>}
+                    title={<div style={{ display: "flex", justifyContent: "space-between"}}> <h3 style={{ color: "white" }}>Risk Holdings: {formatAccountName(accountObj.name)} {dataTableStyles[params.positionView].title} View</h3> <h3 style={{ color: 'white'}}>{sqlDateToDateString(dateFormatter(params.aoDate))}</h3> </div>}
                     subHeader subHeaderComponent={SubHeaderComponent}  
                     columns={columnHeaders}
                     data={filteredData}
@@ -615,7 +620,7 @@ export default function RiskHoldings() {
                     expandableRows expandableRowsComponent={ExpandedDetailsTable}
                     fixedHeader //fixedHeaderScrollHeight="710px"
                     //onRowDoubleClicked={handleDoubleClick}
-                    pagination paginationPerPage={1000}
+                    pagination paginationPerPage={10000}
                     paginationRowsPerPageOptions={[100, 200, 300, 400, 500, 1000, 10000]}
                     paginationComponentOptions={{ selectAllRowsItem: true, selectAllRowsItemText: "All" }}
                     progressPending={pending} progressComponent={<CustomLoader/>}
