@@ -1,7 +1,6 @@
 import "./Dashboard.css";
 
 import { useEffect, useState } from "react";
-import { getAllAccounts } from "../utils/api";
 import DataTable from "react-data-table-component";
 import CustomLoader from "../components/CustomLoader";
 import { accountNameSorter, removeUnwanteds, today } from "../utils/helperFunctions";
