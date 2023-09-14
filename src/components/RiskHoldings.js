@@ -9,11 +9,11 @@ import ExportCSV from "./ExportCSV";
 import CustomMaterialMenu from "./CustomMaterialMenu";
 import SubHeaderComponent from "./SubHeaderComponent";
 import PopModal from "./PopModal";
-import { formatAccountName, numberFormatter0, numberFormatter2, dollarFormatter, dollarFormatter0, formatWeight, dateFormatter, dataTableStyles, aggRowFilter, sqlDateToDateString, allAccounts } from "../utils/helperFunctions";
+import { formatAccountName, numberFormatter0, numberFormatter2, dollarFormatter, dollarFormatter0, formatWeight, dateFormatter, dataTableStyles, aggRowFilter, sqlDateToDateString, isApxPortfolioCode, smartURLSearch } from "../utils/helperFunctions";
 import CustomLoader from "./CustomLoader";
 import ExpandedDetailsTable from "./ExpandedDetailsTable";
 
-export default function RiskHoldings() {
+export default function RiskHoldings({ accountsInfo }) {
     let params = useParams();
     const [filteredData, setFilteredData] = useState([]);
     const [response, setResponse] = useState([]);
@@ -23,12 +23,15 @@ export default function RiskHoldings() {
     const [modalColumns, setModalColumns] = useState([]);
     const [pending, setPending] = useState(true);
     const bodyReq = {
-        accounts: [params.accounts], 
+        accounts: isApxPortfolioCode(accountsInfo, params.accounts) ? [params.accounts] : [smartURLSearch(accountsInfo, params.accounts).apx_portfolio_code],
         aoDate: params.aoDate, 
         positionView: params.positionView, 
         aggregateRows: (params.aggregateRows && params.aggregateRows !== 'n') ? 'ys' : 'n'
     };
-    const accountObj = allAccounts.find((row) => row.apx_portfolio_code === params.accounts);
+
+
+
+    const accountObj = accountsInfo.find((row) => row.apx_portfolio_code === bodyReq.accounts[0]);
 //HANDLER FUNCTIONS DECLARED HERE
     //MODAL HANDLERS HERE
     const handleRecentTradeModalOpen = (uspTradeRes, title, recentTradeModalColumns) => {
@@ -586,10 +589,13 @@ export default function RiskHoldings() {
         },
     ]
 
+
+
     async function loadTable() {
         console.log("Loading Table!");
         const abortController = new AbortController();
         const res = await getRiskHoldings(bodyReq, abortController.signal)
+        window.history.pushState(null, '', `/risk/${bodyReq.aoDate}/${bodyReq.positionView}/${bodyReq.accounts}/${bodyReq.aggregateRows}`);
         const formattedRes = aggRowFilter(res, bodyReq.aggregateRows);
         setResponse(formattedRes);
         setFilteredData(formattedRes);

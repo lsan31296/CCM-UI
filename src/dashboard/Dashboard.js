@@ -8,7 +8,7 @@ import { accountNameSorter, removeUnwanteds, today } from "../utils/helperFuncti
 
 //Responsible for displaying a form which should list out all potential risk holdings accounts,
 //and general user input regarding ao_Date, position view, aggregate rows, etc.
-export default function Dashboard({ previousBD }) {
+export default function Dashboard({ previousBD, accountsInfo }) {
 
     const [accounts, setAccounts] = useState(null);
     const [pending, setPending] = useState(true);
@@ -23,9 +23,9 @@ export default function Dashboard({ previousBD }) {
         console.log("Loading Dashboard!");
         const abortController = new AbortController();
 
-        const res = await getAllAccounts(abortController.signal);
-        setAccounts([...removeUnwanteds(res).sort(accountNameSorter)]);
+        setAccounts([...removeUnwanteds(accountsInfo).sort(accountNameSorter)]);
         setPending(false);
+        
         return () => abortController.abort();
     }
     useEffect(() => {loadDashboard()}, []);

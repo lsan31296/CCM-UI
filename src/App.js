@@ -5,13 +5,14 @@ import DesktopBar from './layout/DesktopBar';
 import Header from './layout/Header';
 import Footer from './layout/Footer';
 import Dashboard from './dashboard/Dashboard';
-import { getBusinessDay } from './utils/api';
+import { getAllAccounts, getBusinessDay } from './utils/api';
 import { today } from './utils/helperFunctions';
 import { useEffect, useState } from 'react';
 import ShareHolders from './shareholders/ShareHolders';
 
 function App() {
   const [previousBD, setPreviousBD] = useState(null);
+  const [accountsInfo, setAccountsInfo] = useState(null);
 
   async function loadDate() {
     console.log("Loading Date");
@@ -22,10 +23,19 @@ function App() {
 
     return () => abortController.abort();
   }
+  async function loadAccounts() {
+    console.log("Loading Accounts Information!");
+    const abortController = new AbortController();
+
+    const response = await getAllAccounts(abortController.signal);
+    setAccountsInfo(response);
+    return () => abortController.abort();
+  }
   useEffect(() => {loadDate()}, []);
+  useEffect(() => {loadAccounts()}, []);
 
 
-  if (!previousBD) {
+  if (!previousBD || !accountsInfo) {
     return <h1>Loading...</h1>
   } else {
     return (
@@ -35,8 +45,8 @@ function App() {
 
         <main>
           <Routes>
-            <Route path='/' element={<Dashboard previousBD={previousBD}/>} />
-            <Route path='/risk/:aoDate/:positionView/:accounts/:aggregateRows' element={<RiskHoldings />} />
+            <Route path='/' element={<Dashboard previousBD={previousBD} accountsInfo={accountsInfo}/>} />
+            <Route path='/risk/:aoDate/:positionView/:accounts/:aggregateRows' element={<RiskHoldings accountsInfo={accountsInfo}/>} />
             <Route path='/shareholders' element={<ShareHolders />} />
           </Routes>
         </main>
