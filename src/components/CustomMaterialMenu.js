@@ -24,13 +24,13 @@ export default function CustomMaterialMenu({ row, handleModalOption1Open, handle
         const recentTradeModalColumns = [
             {
                 name: "Trade Date",
-                selector: (row) => dateFormatter(row.trade_date),
+                selector: (row) => sqlDateToDateString(dateFormatter(row.trade_date)),
                 compact: true,
                 reorder: true,
             },
             {
                 name: "Settle Date",
-                selector: (row) => dateFormatter(row.settle_date),
+                selector: (row) => sqlDateToDateString(dateFormatter(row.settle_date)),
                 compact: true,
                 reorder: true,
             },
@@ -322,6 +322,7 @@ export default function CustomMaterialMenu({ row, handleModalOption1Open, handle
                 compact: true,
                 reorder: true,
                 center: true,
+                sortable: true,
             },
             {
                 id: "issuer",
@@ -1558,16 +1559,17 @@ export default function CustomMaterialMenu({ row, handleModalOption1Open, handle
                 compact: true,
                 reorder: true,
                 wrap: true,
+                minWidth: "140px",
             },
             {
                 name: "Open Date",
-                selector: (row) => dateFormatter(row.openDate),
+                selector: (row) => sqlDateToDateString(dateFormatter(row.openDate)),
                 compact: true,
                 reorder: true,
             },
             {
                 name: "Close Date",
-                selector: (row) => dateFormatter(row.closeDate),
+                selector: (row) => sqlDateToDateString(dateFormatter(row.closeDate)),
                 compact: true,
                 reorder: true,
             },

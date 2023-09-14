@@ -609,7 +609,7 @@ export default function RiskHoldings() {
                 <ExportCSV id={"risk-holdings-export"} csvData={response} fileName={`RiskHoldings-${dataTableStyles[params.positionView].title}-${bodyReq.accounts.toString()}-Agg_${bodyReq.aggregateRows}-${bodyReq.aoDate}`}/>
                 <input id="filter-bar" placeholder="Filter..." type="text" onChange={handleFilter} />
                 <DataTable
-                    title={<div style={{ display: "flex", justifyContent: "space-between"}}> <h3 style={{ color: "white" }}>Risk Holdings: {formatAccountName(accountObj.name)} {dataTableStyles[params.positionView].title} View</h3> <h3 style={{ color: 'white'}}>{sqlDateToDateString(dateFormatter(params.aoDate))}</h3> </div>}
+                    title={<div style={{ display: "flex", justifyContent: "space-between"}}> <h3 style={{ color: "white" }}>{formatAccountName(accountObj.name)} Risk Holdings: {dataTableStyles[params.positionView].title} View</h3> <h3 style={{ color: 'white'}}>{sqlDateToDateString(dateFormatter(params.aoDate))}</h3> </div>}
                     subHeader subHeaderComponent={SubHeaderComponent}  
                     columns={columnHeaders}
                     data={filteredData}
