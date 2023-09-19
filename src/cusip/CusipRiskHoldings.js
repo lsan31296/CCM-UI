@@ -1,37 +1,39 @@
-import "./RiskHoldings.css";
+/**
+ * This component is responsible for rendering risk holdings data for a single cusip. 
+ * AKA 'Cusip Route'
+ */
 
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { getRiskHoldings } from "../utils/api";
-import DataTable from "react-data-table-component";
-//import ExpandedTable from "./ExpandedTable";
-import ExportCSV from "./ExportCSV";
-import CustomMaterialMenu from "./CustomMaterialMenu";
-import SubHeaderComponent from "./SubHeaderComponent";
-import PopModal from "./PopModal";
+import { useParams } from "react-router";
 import { formatAccountName, numberFormatter0, numberFormatter2, dollarFormatter, dollarFormatter0, formatWeight, dateFormatter, dataTableStyles, aggRowFilter, sqlDateToDateString, isApxPortfolioCode, smartURLSearch } from "../utils/helperFunctions";
-import CustomLoader from "./CustomLoader";
-import ExpandedDetailsTable from "./ExpandedDetailsTable";
+import { useEffect, useState } from "react";
+import { getRiskHoldings } from "../utils/api";
+import SubHeaderComponent from "../components/SubHeaderComponent";
+import CustomLoader from "../components/CustomLoader";
+import DataTable from "react-data-table-component";
+import PopModal from "../components/PopModal";
+import ExportCSV from "../components/ExportCSV";
+import CustomMaterialMenu from "../components/CustomMaterialMenu";
+import ExpandedDetailsTable from "../components/ExpandedDetailsTable";
+import "./CusipRiskHoldings.css";
 
-export default function RiskHoldings({ accountsInfo }) {
+
+export default function CusipRiskHoldings({ accountsInfo }) {
     let params = useParams();
-    const [filteredData, setFilteredData] = useState([]);
-    const [response, setResponse] = useState([]);
+    const [data, setData] = useState(null);
+    const [pending, setPending] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalData, setModalData] = useState(null);
     const [modalTitle, setModalTitle] = useState(null);
     const [modalColumns, setModalColumns] = useState([]);
-    const [pending, setPending] = useState(true);
+    const cusipParam = params.cusip;
     const bodyReq = {
         accounts: isApxPortfolioCode(accountsInfo, params.accounts) ? [params.accounts] : [smartURLSearch(accountsInfo, params.accounts).apx_portfolio_code],
         aoDate: params.aoDate, 
         positionView: params.positionView, 
         aggregateRows: (params.aggregateRows && params.aggregateRows !== 'n') ? 'ys' : 'n'
     };
-
-
-
     const accountObj = accountsInfo.find((row) => row.apx_portfolio_code === bodyReq.accounts[0]);
+
 //HANDLER FUNCTIONS DECLARED HERE
     //MODAL HANDLERS HERE
     const handleRecentTradeModalOpen = (uspTradeRes, title, recentTradeModalColumns) => {
@@ -67,13 +69,22 @@ export default function RiskHoldings({ accountsInfo }) {
     const handleModalClose = () => {
         setIsModalOpen(false);
     }
-    const handleFilter = ({target}) => {
-        //console.log("Typing: ", target.value);
-        const newTableData = response.filter((row) => {
-            return row.bbg_cusip.toLowerCase().includes(target.value.toLowerCase())
-        });
-        setFilteredData(newTableData);
+
+    async function loadCusipTable() {
+        console.log("Loading Cusip Table!");
+        const abortController = new AbortController();
+
+        const res = await getRiskHoldings(bodyReq, abortController.signal);
+        window.history.pushState(null, '', `/risk/${bodyReq.aoDate}/${bodyReq.positionView}/${bodyReq.accounts}/${bodyReq.aggregateRows}/${cusipParam}`);
+        //const formattedRes = aggRowFilter(res, bodyReq.aggregateRows);
+        const cusipRow = res.find((row) => row.bbg_cusip === cusipParam);
+        console.log(cusipRow);
+        setData([cusipRow]);
+        setPending(false);
+        return () => abortController.abort();
     }
+
+    useEffect(() => {loadCusipTable()}, [params]);
 
     const columnHeaders = [
         //Currently account_name and ticker are not working when being called to the middle-tier from its database.
@@ -91,14 +102,6 @@ export default function RiskHoldings({ accountsInfo }) {
             selector: (row) => row.marketingAssetGroup,
             center: true,
             compact: true,
-            conditionalCellStyles: [
-                {
-                    when: (row) => (row.sortOrder !== 1 && bodyReq.aggregateRows !== "n") || row.marketingAssetGroup === '-no data-',
-                    style: {
-                        color: "transparent"
-                    }
-                }
-            ],
             minWidth: "90px",
         },
         {
@@ -106,14 +109,6 @@ export default function RiskHoldings({ accountsInfo }) {
             selector: (row) => row.carlton_SecurityGroup,
             center: true,
             compact: true,
-            conditionalCellStyles: [
-                {
-                    when: (row) => (row.sortOrder !== 2 && bodyReq.aggregateRows !== "n") || row.carlton_SecurityGroup === '-no data-',
-                    style: {
-                        color: "transparent"
-                    }
-                }
-            ],
             minWidth: "90px",
         },
         {
@@ -121,14 +116,6 @@ export default function RiskHoldings({ accountsInfo }) {
             selector: (row) => row.carlton_SecurityType,
             compact: true,
             wrap: true,
-            conditionalCellStyles: [
-                {
-                    when: (row) => (row.sortOrder !== 3 && bodyReq.aggregateRows !== "n") || row.carlton_SecurityType === '-no data-',
-                    style: {
-                        color: "transparent"
-                    }
-                }
-            ],
             minWidth: "70px",
         },
         {
@@ -136,14 +123,6 @@ export default function RiskHoldings({ accountsInfo }) {
             selector: (row) => row.carlton_SecuritySector,
             compact: true,
             wrap: true,
-            conditionalCellStyles: [
-                {
-                    when: (row) => (row.sortOrder !== 4 && bodyReq.aggregateRows !== "n") || row.carlton_SecuritySector === '-no data-',
-                    style: {
-                        color: "transparent"
-                    }
-                }
-            ],
             minWidth: "80px",
         },
         {
@@ -540,10 +519,10 @@ export default function RiskHoldings({ accountsInfo }) {
         rows: {
             style: {
                 fontSize: "13px",
-                minHeight: "20px",
+                minHeight: "80px",
             }
         }
-    }
+    };
     //Set conditional row styles for aggregate row
     const conditionalRowStyles = [
         {
@@ -587,52 +566,31 @@ export default function RiskHoldings({ accountsInfo }) {
                 backgroundColor: dataTableStyles[params.positionView].aggMaGroupRowColor5
             }
         },
-    ]
+    ];
+    const rowsPreExpanded = (row) => row.defaultExpanded = true;
 
-
-
-    async function loadTable() {
-        console.log("Loading Table!");
-        const abortController = new AbortController();
-        const res = await getRiskHoldings(bodyReq, abortController.signal)
-        window.history.pushState(null, '', `/risk/${bodyReq.aoDate}/${bodyReq.positionView}/${bodyReq.accounts}/${bodyReq.aggregateRows}`);
-        const formattedRes = aggRowFilter(res, bodyReq.aggregateRows);
-        setResponse(formattedRes);
-        setFilteredData(formattedRes);
-        setPending(false);
-        return () => abortController.abort();
-    }
-    useEffect(() => {loadTable()}, [params]);
-
-    //console.log("From RiskHoldings Component: ", bodyReq);
-
-    if (!response) {
+    if (!data) {
         return <h1>Loading...</h1>
     } else {
         return (
-            <div id="data-table-container" style={{ padding: "0px 2% 2% 2%", backgroundColor: "#F2F2F2" }}>
+            <div id="cusip-data-table-container">
                 <PopModal data={modalData} isOpen={isModalOpen} onClose={handleModalClose} columns={modalColumns} modalTitle={modalTitle}/>
-                <ExportCSV id={"risk-holdings-export"} csvData={response} fileName={`RiskHoldings-${dataTableStyles[params.positionView].title}-${bodyReq.accounts.toString()}-Agg_${bodyReq.aggregateRows}-${bodyReq.aoDate}`}/>
-                <input id="filter-bar" placeholder="Filter..." type="text" onChange={handleFilter} />
+                <ExportCSV id={"risk-holdings-export"} csvData={data} fileName={`RiskHoldings-${cusipParam}-${dataTableStyles[params.positionView].title}-${bodyReq.accounts.toString()}-Agg_${bodyReq.aggregateRows}-${bodyReq.aoDate}`}/>
                 <DataTable
-                    title={<div style={{ display: "flex", justifyContent: "space-between"}}> <h3 style={{ color: "white" }}>{formatAccountName(accountObj.name)} Risk Holdings: {dataTableStyles[params.positionView].title} View</h3> <h3 style={{ color: 'white'}}>{sqlDateToDateString(dateFormatter(params.aoDate))}</h3> </div>}
+                    title={<div style={{ display: "flex", justifyContent: "space-between"}}> <h3 style={{ color: "white" }}>{formatAccountName(accountObj.name)} {dataTableStyles[params.positionView].title} View CUSIP: {params.cusip}</h3> <h3 style={{ color: 'white'}}>{sqlDateToDateString(dateFormatter(params.aoDate))}</h3> </div>}
                     subHeader subHeaderComponent={SubHeaderComponent}  
                     columns={columnHeaders}
-                    data={filteredData}
+                    data={data}
                     highlightOnHover
                     striped
                     customStyles={customStyles}
                     conditionalRowStyles={conditionalRowStyles}
-                    expandableRows expandableRowsComponent={ExpandedDetailsTable}
-                    fixedHeader //fixedHeaderScrollHeight="710px"
-                    //onRowDoubleClicked={handleDoubleClick}
-                    pagination paginationPerPage={10000}
-                    paginationRowsPerPageOptions={[100, 200, 300, 400, 500, 1000, 10000]}
-                    paginationComponentOptions={{ selectAllRowsItem: true, selectAllRowsItemText: "All" }}
+                    expandableRows expandableRowsComponent={ExpandedDetailsTable} 
+                    expandableRowExpanded={rowsPreExpanded}
+                    fixedHeader 
                     progressPending={pending} progressComponent={<CustomLoader/>}
-                /> 
+                />
             </div>
-        )
+        );
     }
-
 }

@@ -502,10 +502,10 @@ export function isApxPortfolioCode(accountsInfo, paramString) {
     const found = accountsInfo.find((account) => account.apx_portfolio_code === paramString);
 
     if (found) {
-        console.log("This is an apx_portfolio_code match: ", found);
+        //console.log("This is an apx_portfolio_code match: ", found);
         return true;
     } else {
-        console.log(`'${paramString}' is not an apx_portfolio_code match.`);
+        //console.log(`'${paramString}' is not an apx_portfolio_code match.`);
         return false;
     }
 }
@@ -519,7 +519,7 @@ export function smartURLSearch(accountsInfo, paramString) {
             || account.apx_portfolio_code.toLowerCase().includes(paramString.toLowerCase());
     });
 
-    console.log("Closest match: ", found);
+    //console.log("Closest match: ", found);
     return found;
 }
 /**

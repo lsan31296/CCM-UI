@@ -9,6 +9,7 @@ import { getAllAccounts, getBusinessDay } from './utils/api';
 import { today } from './utils/helperFunctions';
 import { useEffect, useState } from 'react';
 import ShareHolders from './shareholders/ShareHolders';
+import CusipRiskHoldings from './cusip/CusipRiskHoldings';
 
 function App() {
   const [previousBD, setPreviousBD] = useState(null);
@@ -46,6 +47,7 @@ function App() {
         <main>
           <Routes>
             <Route path='/' element={<Dashboard previousBD={previousBD} accountsInfo={accountsInfo}/>} />
+            <Route exact path='/risk/:aoDate/:positionView/:accounts/:aggregateRows/:cusip' element={<CusipRiskHoldings accountsInfo={accountsInfo} />} />
             <Route path='/risk/:aoDate/:positionView/:accounts/:aggregateRows' element={<RiskHoldings accountsInfo={accountsInfo}/>} />
             <Route path='/shareholders' element={<ShareHolders />} />
           </Routes>
