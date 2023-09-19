@@ -14,7 +14,7 @@ import CustomLoader from "./CustomLoader";
 import ExpandedDetailsTable from "./ExpandedDetailsTable";
 
 export default function RiskHoldings({ accountsInfo }) {
-    let params = useParams();
+    const params = useParams();
     const [filteredData, setFilteredData] = useState([]);
     const [response, setResponse] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,14 +22,18 @@ export default function RiskHoldings({ accountsInfo }) {
     const [modalTitle, setModalTitle] = useState(null);
     const [modalColumns, setModalColumns] = useState([]);
     const [pending, setPending] = useState(true);
+    //const [cusipParam, setCusipParam] = useState(null)
     const bodyReq = {
         accounts: isApxPortfolioCode(accountsInfo, params.accounts) ? [params.accounts] : [smartURLSearch(accountsInfo, params.accounts).apx_portfolio_code],
         aoDate: params.aoDate, 
         positionView: params.positionView, 
         aggregateRows: (params.aggregateRows && params.aggregateRows !== 'n') ? 'ys' : 'n'
     };
-
-
+    const cusipParam = params.cusip;
+    window.history.pushState(null, '', 
+            params.cusip ? `/risk/${bodyReq.aoDate}/${bodyReq.positionView}/${bodyReq.accounts}/${bodyReq.aggregateRows}/${cusipParam}` 
+            : `/risk/${bodyReq.aoDate}/${bodyReq.positionView}/${bodyReq.accounts}/${bodyReq.aggregateRows}`
+    );
 
     const accountObj = accountsInfo.find((row) => row.apx_portfolio_code === bodyReq.accounts[0]);
 //HANDLER FUNCTIONS DECLARED HERE
@@ -68,7 +72,7 @@ export default function RiskHoldings({ accountsInfo }) {
         setIsModalOpen(false);
     }
     const handleFilter = ({target}) => {
-        //console.log("Typing: ", target.value);
+        console.log("Typing: ", target.value);
         const newTableData = response.filter((row) => {
             return row.bbg_cusip.toLowerCase().includes(target.value.toLowerCase())
         });
@@ -589,26 +593,60 @@ export default function RiskHoldings({ accountsInfo }) {
         },
     ]
 
-
+    function filterCusip() {
+        if (cusipParam && response) {
+            console.log("Cusip exists: ", cusipParam);
+            
+            const filterBarEl = document.getElementById("filter-bar");
+            const event = new Event("change", { bubbles: true });
+            console.log("Element: ", filterBarEl)
+            filterBarEl.addEventListener("change", handleFilter);
+            //filterBarEl.click();
+            filterBarEl.value = cusipParam;
+            console.log(filterBarEl.value);
+            filterBarEl.dispatchEvent(event);
+            
+            /*
+            const input = document.querySelector("#filter-bar");
+            var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+            nativeInputValueSetter.call(input, cusipParam);
+            const event = new Event("input");
+            input.dispatchEvent(event);
+            */
+        }
+    }
 
     async function loadTable() {
         console.log("Loading Table!");
         const abortController = new AbortController();
         const res = await getRiskHoldings(bodyReq, abortController.signal)
-        window.history.pushState(null, '', `/risk/${bodyReq.aoDate}/${bodyReq.positionView}/${bodyReq.accounts}/${bodyReq.aggregateRows}`);
+        /*
+        window.history.pushState(null, '', 
+            params.cusip ? `/risk/${bodyReq.aoDate}/${bodyReq.positionView}/${bodyReq.accounts}/${bodyReq.aggregateRows}/${cusipParam}` 
+            : `/risk/${bodyReq.aoDate}/${bodyReq.positionView}/${bodyReq.accounts}/${bodyReq.aggregateRows}`);
+        */
         const formattedRes = aggRowFilter(res, bodyReq.aggregateRows);
         setResponse(formattedRes);
         setFilteredData(formattedRes);
         setPending(false);
+        //setCusipParam(params.cusip);
+        //filterCusip();
+        
         return () => abortController.abort();
     }
-    useEffect(() => {loadTable()}, [params]);
+
+    useEffect(() => {
+        loadTable() 
+    }, [params]);
+    
+    //useEffect(() => {filterCusip()}, []);
 
     //console.log("From RiskHoldings Component: ", bodyReq);
-
+    
     if (!response) {
         <h1>Loading...</h1>
     } else {
+        //filterCusip();
         return (
             <div id="data-table-container" style={{ padding: "0px 2% 2% 2%", backgroundColor: "#F2F2F2" }}>
                 <PopModal data={modalData} isOpen={isModalOpen} onClose={handleModalClose} columns={modalColumns} modalTitle={modalTitle}/>

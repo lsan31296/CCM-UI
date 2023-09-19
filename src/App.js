@@ -46,7 +46,7 @@ function App() {
         <main>
           <Routes>
             <Route path='/' element={<Dashboard previousBD={previousBD} accountsInfo={accountsInfo}/>} />
-            <Route path='/risk/:aoDate/:positionView/:accounts/:aggregateRows' element={<RiskHoldings accountsInfo={accountsInfo}/>} />
+            <Route path='/risk/:aoDate/:positionView/:accounts/:aggregateRows/:cusip?' element={<RiskHoldings accountsInfo={accountsInfo}/>} />
             <Route path='/shareholders' element={<ShareHolders />} />
           </Routes>
         </main>
