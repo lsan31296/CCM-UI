@@ -150,6 +150,11 @@ export const numberFormatter2 = new Intl.NumberFormat('en-US', {
     maximumFractionDigits: 2,
 })
 
+export const numberFormatter4 = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 4,
+    maximumFractionDigits: 4,
+})
+
 export function filterRiskAccounts(arrayOfRiskAccounts, json) {
     //const json = multiData;
     //match arrayOfApxCodes in json and return name
@@ -320,6 +325,29 @@ export function removeUnwanteds(data) {
     });
     
     return array;
+}
+/**
+ * This function is not working as expected due to the condition within if statement
+ * and the data not being as clean as we expected. 
+ * @param {*} data 
+ * @param {*} aoDate 
+ * @returns 
+ */
+export function removeUnwantedsAndFilterOut(data, aoDate) {
+    let array = [];
+    data.forEach((object, index) => {
+        if (!unwantedElements.includes(object.name)) {
+            array.push(object);
+        }
+    });
+    console.log("Array after removing unwanteds: ", array);
+    const result = array.filter((object) => {
+        if (object.open_date <= aoDate && object.close_date > aoDate) {
+            return object;
+        }
+    });
+    
+    return result;
 }
 
 /**
@@ -526,4 +554,22 @@ export function smartURLSearch(accountsInfo, paramString) {
  * This returned matching apx_portfolio_code will be used to rewrite that portion of the url. Most likely using 
  * 'window.history.pushState(null, '', newUrl);'
  */
+
+export function perfDataConstructor(accountsInfo, perfData) {
+    const result = [];
+
+    accountsInfo.forEach((row) => {
+        const found = perfData.find((perfRow) => perfRow.account === row.apx_portfolio_code);
+
+        if(found) {
+            //console.log("Found: ", found.account);
+            const newRowData = { ...found, ...row};
+            result.push(newRowData);
+        } else {
+            console.log("This account's apx_protfolio_code (from accountsInfo in perfData) was not found: ", row.apx_portfolio_code);
+        }
+    })//end of account traversal
+    console.log("Result length: ", result.length);
+    return result;
+}
 

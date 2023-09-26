@@ -3,13 +3,16 @@ import "./Dashboard.css";
 import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import CustomLoader from "../components/CustomLoader";
-import { accountNameSorter, removeUnwanteds, today } from "../utils/helperFunctions";
+import { accountNameSorter, numberFormatter2, numberFormatter4, perfDataConstructor, removeUnwanteds, removeUnwantedsAndFilterOut, today } from "../utils/helperFunctions";
+import { getAccountTDPerf } from "../utils/api";
 
 //Responsible for displaying a form which should list out all potential risk holdings accounts,
 //and general user input regarding ao_Date, position view, aggregate rows, etc.
 export default function Dashboard({ previousBD, accountsInfo }) {
 
     const [accounts, setAccounts] = useState(null);
+    const [perfData, setPerfData] = useState(null);
+    const [tableData, setTableData] = useState(null);
     const [pending, setPending] = useState(true);
     const initialFormState = {
         aoDate: previousBD,
@@ -23,11 +26,25 @@ export default function Dashboard({ previousBD, accountsInfo }) {
         const abortController = new AbortController();
 
         setAccounts([...removeUnwanteds(accountsInfo).sort(accountNameSorter)]);
-        setPending(false);
-        
+        console.log(removeUnwantedsAndFilterOut(accountsInfo, formState.aoDate))
+        //setPerfData([...getAccountTDPerf({aoDate: formState.aoDate}, abortController.signal)])
+        //setPending(false);
         return () => abortController.abort();
     }
-    useEffect(() => {loadDashboard()}, []);
+    async function loadPerfData() {
+        console.log("Loading Perf Data!");
+        const abortController = new AbortController();
+        const res = await getAccountTDPerf({aoDate: formState.aoDate}, abortController.signal);
+        console.log("Perf Data: ", res);
+        setPerfData([...perfDataConstructor(accountsInfo, res).sort(accountNameSorter)]);
+        setPending(false);
+        return () => abortController.abort();
+    }
+    useEffect(() => {
+        loadDashboard() 
+        loadPerfData()
+
+    }, []);
 
     const handleDateChange = async({target}) => {
         console.log("Date: ", target.value);
@@ -59,6 +76,7 @@ export default function Dashboard({ previousBD, accountsInfo }) {
             id: "daily",
             name: "Daily",
             compact: true,
+            selector: row => numberFormatter4.format(row.dailyReturn),
         },
         {
             id: "dailyActive",
@@ -69,6 +87,7 @@ export default function Dashboard({ previousBD, accountsInfo }) {
             id: "mtd",
             name: "MTD",
             compact: true,
+            selector: row => numberFormatter4.format(row.mtdReturn),
         },
         {
             id: "mtdActive",
@@ -79,6 +98,7 @@ export default function Dashboard({ previousBD, accountsInfo }) {
             id: "qtd",
             name: "QTD",
             compact: true,
+            selector: row => numberFormatter4.format(row.qtdReturn),
         },
         {
             id: "qtdActive",
@@ -89,6 +109,7 @@ export default function Dashboard({ previousBD, accountsInfo }) {
             id: "ytd",
             name: "YTD",
             compact: true,
+            selector: row => numberFormatter4.format(row.ytdReturn),
         },
         {
             id: "ytdActive",
@@ -122,7 +143,7 @@ export default function Dashboard({ previousBD, accountsInfo }) {
         }
     };
 
-    if (!previousBD || !accounts) {
+    if (!previousBD || !perfData) {
         return <h1>Loading...</h1>;
     } else {
         return (
@@ -169,7 +190,7 @@ export default function Dashboard({ previousBD, accountsInfo }) {
                     <DataTable
                         title={<h1>Dashboard</h1>}
                         columns={columnHeaders}
-                        data={accounts}
+                        data={perfData}
                         customStyles={customStyles}
                         highlightOnHover
                         progressPending={pending} progressComponent={<CustomLoader />}

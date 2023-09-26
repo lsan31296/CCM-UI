@@ -584,7 +584,8 @@ export default function RiskHoldings({ accountsInfo }) {
         {
             when: row => row.sortOrder === 5,//identifies the aggregate rows
             style: {
-                backgroundColor: dataTableStyles[params.positionView].aggMaGroupRowColor5
+                backgroundColor: dataTableStyles[params.positionView].aggMaGroupRowColor5,
+                fontWeight: 600,
             }
         },
     ]
