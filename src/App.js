@@ -1,11 +1,12 @@
 import './App.css';
+import 'devextreme/dist/css/dx.light.css'
 import { Route, Routes } from "react-router-dom";
 import RiskHoldings from './components/RiskHoldings';
 import DesktopBar from './layout/DesktopBar';
 import Header from './layout/Header';
 import Footer from './layout/Footer';
 import Dashboard from './dashboard/Dashboard';
-import { getAllAccounts, getBusinessDay } from './utils/api';
+import { getAllAccounts, getBusinessDay, getSecurities } from './utils/api';
 import { today } from './utils/helperFunctions';
 import { useEffect, useState } from 'react';
 import ShareHolders from './shareholders/ShareHolders';
@@ -15,6 +16,7 @@ import TradeHistoryLandingPage from './trade-history/TradeHistoryLandingPage';
 function App() {
   const [previousBD, setPreviousBD] = useState(null);
   const [accountsInfo, setAccountsInfo] = useState(null);
+  const [securities, setSecurities] = useState(null);
 
   async function loadDate() {
     console.log("Loading Date");
@@ -33,11 +35,21 @@ function App() {
     setAccountsInfo(response);
     return () => abortController.abort();
   }
+
+  async function loadSecurities() {
+    console.log("Loaded Securities!");
+    const abortController = new AbortController();
+
+    const response = await getSecurities(abortController.signal);
+    setSecurities(response);
+    return () => abortController.abort();
+  }
   useEffect(() => {loadDate()}, []);
   useEffect(() => {loadAccounts()}, []);
+  useEffect(() => {loadSecurities()}, []);
 
 
-  if (!previousBD || !accountsInfo) {
+  if (!previousBD || !accountsInfo || !securities) {
     return <h1>Loading...</h1>
   } else {
     return (
@@ -51,7 +63,7 @@ function App() {
             <Route exact path='/risk/:aoDate/:positionView/:accounts/:aggregateRows/:cusip' element={<CusipRiskHoldings accountsInfo={accountsInfo} />} />
             <Route path='/risk/:aoDate/:positionView/:accounts/:aggregateRows' element={<RiskHoldings accountsInfo={accountsInfo}/>} />
             <Route path='/shareholders' element={<ShareHolders />} />
-            <Route path='/trade-history' element={<TradeHistoryLandingPage previousBD={previousBD} accountsInfo={accountsInfo}/>}/>
+            <Route path='/trade-history' element={<TradeHistoryLandingPage previousBD={previousBD} accountsInfo={accountsInfo} securities={securities}/> } />
           </Routes>
         </main>
 

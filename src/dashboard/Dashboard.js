@@ -3,16 +3,14 @@ import "./Dashboard.css";
 import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import CustomLoader from "../components/CustomLoader";
-import { accountNameSorter, numberFormatter2, numberFormatter4, perfDataConstructor, removeUnwanteds, removeUnwantedsAndFilterOut, today } from "../utils/helperFunctions";
+import { accountNameSorter, numberFormatter4, perfDataConstructor, today } from "../utils/helperFunctions";
 import { getAccountTDPerf } from "../utils/api";
 
 //Responsible for displaying a form which should list out all potential risk holdings accounts,
 //and general user input regarding ao_Date, position view, aggregate rows, etc.
 export default function Dashboard({ previousBD, accountsInfo }) {
 
-    const [accounts, setAccounts] = useState(null);
     const [perfData, setPerfData] = useState(null);
-    const [tableData, setTableData] = useState(null);
     const [pending, setPending] = useState(true);
     const initialFormState = {
         aoDate: previousBD,
@@ -22,16 +20,6 @@ export default function Dashboard({ previousBD, accountsInfo }) {
     const [formState, setFormState] = useState({...initialFormState});
 
     async function loadDashboard() {
-        console.log("Loading Dashboard!");
-        const abortController = new AbortController();
-
-        setAccounts([...removeUnwanteds(accountsInfo).sort(accountNameSorter)]);
-        console.log(removeUnwantedsAndFilterOut(accountsInfo, formState.aoDate))
-        //setPerfData([...getAccountTDPerf({aoDate: formState.aoDate}, abortController.signal)])
-        //setPending(false);
-        return () => abortController.abort();
-    }
-    async function loadPerfData() {
         console.log("Loading Perf Data!");
         const abortController = new AbortController();
         const res = await getAccountTDPerf({aoDate: formState.aoDate}, abortController.signal);
@@ -42,9 +30,7 @@ export default function Dashboard({ previousBD, accountsInfo }) {
     }
     useEffect(() => {
         loadDashboard() 
-        loadPerfData()
-
-    }, []);
+    }, [accountsInfo, formState.aoDate]);
 
     const handleDateChange = async({target}) => {
         console.log("Date: ", target.value);

@@ -344,6 +344,8 @@ export function removeUnwantedsAndFilterOut(data, aoDate) {
     const result = array.filter((object) => {
         if (object.open_date <= aoDate && object.close_date > aoDate) {
             return object;
+        } else {
+            return;
         }
     });
     
@@ -489,6 +491,14 @@ export const accountNameSorter = (rowA, rowB) => {
 export const shareholderNameSorter = (rowA, rowB) => {
     const a = (rowA.account_ticker);
     const b = (rowB.account_ticker);
+    //console.log(`Comparing ${a} to ${b}`);
+
+    return ('' + a).localeCompare(b);
+}
+//For Trade History Landing Page: sorts by ticker after formatting data.
+export const accountLabelNameSorter = (rowA, rowB) => {
+    const a = formatAccountTicker(rowA.label);//label points to accounts ticker
+    const b = formatAccountTicker(rowB.label);
     //console.log(`Comparing ${a} to ${b}`);
 
     return ('' + a).localeCompare(b);

@@ -1,7 +1,7 @@
 /* This file represents the API we would be using to fetch our data from */
 // API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000"
-const API_BASE_URL = "http://localhost:5000";
-//const API_BASE_URL = "http://ccm-web01:5000";
+//const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "http://ccm-web01:5000";
 
 //Defines the default headers for these function to work with 'json-server'
 const headers = new Headers();
@@ -186,4 +186,9 @@ export async function getAccountTDPerf(params, signal) {
         url.searchParams.append(key, value.toString())
     })
     return await fetchJson(url, {headers, signal});
+}
+
+export async function getSecurities(signal) {
+    const url = `${API_BASE_URL}/get-securities`;
+    return await fetchJson(url, signal);
 }
