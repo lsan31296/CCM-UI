@@ -40,6 +40,7 @@ export default function TradeHistoryLandingPage({...props}) {//({ previousBD, ac
     
     const cusipColumns = [
         <Selection mode="multiple" />,
+        <HeaderFilter visible={true} />,
         <FilterRow visible={true} />,
         <Paging defaultPageSize={15} />,
         <Column dataField="cusip" caption="Cusip"/>,
@@ -90,6 +91,7 @@ export default function TradeHistoryLandingPage({...props}) {//({ previousBD, ac
     ];
     const securityTypeColumns = [
         <Selection mode="multiple" />,
+        <HeaderFilter visible={true} />,
         <FilterRow visible={true} />,
         <Paging defaultPageSize={15} />,
         <Column dataField="marketingAssetGroup" caption="MAG" />,
@@ -278,7 +280,12 @@ export default function TradeHistoryLandingPage({...props}) {//({ previousBD, ac
             ...baseStyles,
             display: "flex",
             width: "100%"
-        })
+        }),
+        menu: (baseStyles, state) => ({
+            ...baseStyles, 
+            zIndex: 9999,
+            //backgroundColor: "orange"
+        }),
     }
     let accountsMultiSelectRows = removeUnwanteds(accountsInfo).map((account) => {
         const newAccount = {
@@ -425,10 +432,10 @@ export default function TradeHistoryLandingPage({...props}) {//({ previousBD, ac
                      * CUSIP, Symbol, Original Face, Current Face, Price, Accrued, Net Money, Dealer
                      * Ensure there is an if statement checking to see that the row data for Data Grid exists.
                      */}
-                <div className="trade-history-data-grid-container">
+                <div id="trade-history-data-grid-container">
                     <h3>Trade History</h3>
                     <DataGrid dataSource={tradeHistoryData} showBorders remoteOperations={false} allowColumnReordering
-                        allowColumnResizing showColumnLines showRowLines rowAlternationEnabled
+                        allowColumnResizing showColumnLines showRowLines rowAlternationEnabled hoverStateEnabled
                     >
                         <Selection mode="multiple"/>
                         <HeaderFilter visible={true} />

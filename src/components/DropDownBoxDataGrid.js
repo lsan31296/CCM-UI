@@ -40,6 +40,7 @@ export default function DropDownBoxDataGrid({...props}) {
                         onSelectionChanged={props.onChange}
                         selectedRowKeys={props.selectedRows}
                         keyExpr="ID"
+                        allowColumnReordering allowColumnResizing showColumnLines showRowLines hoverStateEnabled
                     >
                         {/* <Column dataField="ID" caption="ID" /> */}
 

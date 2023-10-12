@@ -6,3 +6,11 @@
     display: flex;
     justify-content: space-evenly;
 }
+
+/*
+SELECTS THE HEAD ROW THAT IS A CHILD OF THE TRADE HISTORY DATA GRID CONTAINER
+*/
+#trade-history-data-grid-container .dx-header-row {
+    background-color: black !important;/* SETS THE BACKGROUND COLOR */
+    color: white !important;/* SETS FONT COLOR */
+}
