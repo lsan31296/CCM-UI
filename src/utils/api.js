@@ -192,3 +192,35 @@ export async function getSecurities(signal) {
     const url = `${API_BASE_URL}/get-securities`;
     return await fetchJson(url, signal);
 }
+/**
+ * Returns all trade history records based on the parameters passed in the following object.
+ * Primarily used to populate the DataGrid in the Trade History Landing Page.
+ * @param {*} params
+ * Params are an object in the following format:
+ *  {
+        startDate: "2023-10-11",
+        lookBack: "365",
+        cusips: 
+            [
+                "3132D6BS8",
+                "025816CW7"
+            ],
+        accounts: 
+            [
+                "MCF",
+                "UBS_10_NPT"
+            ]
+    }
+ * @param {*} signal 
+ * @returns 
+ */
+export async function getTradeHistoryLanding(params, signal) {
+    const url = new URL(`${API_BASE_URL}/get-trade-history-landing`);
+    const options = {
+        method: "POST",
+        headers,
+        body: JSON.stringify(params),
+        signal,
+    }
+    return await fetchJson(url, options);
+}

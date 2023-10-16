@@ -13,6 +13,7 @@ import { accountLabelNameSorter, removeUnwanteds } from "../utils/helperFunction
 import { Button } from 'devextreme-react/button';
 import DropDownBoxDataGrid from "../components/DropDownBoxDataGrid";
 import DataGrid, { Column, Selection, Paging, FilterRow, HeaderFilter } from 'devextreme-react/data-grid';
+import { getTradeHistoryLanding } from "../utils/api";
 //import CustomMultiSelect from "../components/CustomMultiSelect";
 
 export default function TradeHistoryLandingPage({...props}) {//({ previousBD, accountsInfo }) {
@@ -74,19 +75,19 @@ export default function TradeHistoryLandingPage({...props}) {//({ previousBD, ac
         { value: "called", label: "Called"},
     ]
     const securityTypeDataRows = [
-        { ID: 1, marketingAssetGroup: 'ABS', securityGroup: 'Securitized', securityType: 'ABS', securitySector: 'Consumer' },
-        { ID: 2, marketingAssetGroup: 'ABS', securityGroup: 'Securitized', securityType: 'ABS', securitySector: 'SBA Participation Certificates' },
-        { ID: 3, marketingAssetGroup: 'ABS', securityGroup: 'Securitized', securityType: 'ABS', securitySector: 'Small Business Investment Company' },
-        { ID: 4, marketingAssetGroup: 'ABS', securityGroup: 'Securitized', securityType: 'ABS', securitySector: 'Solar' },
-        { ID: 5, marketingAssetGroup: 'Agency MBS', securityGroup: 'Securitized', securityType: 'Agency MBS', securitySector: 'Fannie Mae' },
-        { ID: 6, marketingAssetGroup: 'Agency MBS', securityGroup: 'Securitized', securityType: 'Agency MBS', securitySector: 'Freddie Mac' },
-        { ID: 7, marketingAssetGroup: 'CMBS', securityGroup: 'Securitized', securityType: 'Agency CMBS', securitySector: 'Fannie Mae ACE' },
-        { ID: 8, marketingAssetGroup: 'CMBS', securityGroup: 'Securitized', securityType: 'Agency CMBS', securitySector: 'Fannie Mae DUS' },
-        { ID: 9, marketingAssetGroup: 'CMBS', securityGroup: 'Securitized', securityType: 'Agency CMBS', securitySector: 'Freddie CMBS' },
-        { ID: 10, marketingAssetGroup: 'CMBS', securityGroup: 'Securitized', securityType: 'Agency CMBS', securitySector: 'Freddie K' },
-        { ID: 11, marketingAssetGroup: 'CMBS', securityGroup: 'Securitized', securityType: 'Agency CMBS', securitySector: 'Freddie P' },
-        { ID: 12, marketingAssetGroup: 'CMBS', securityGroup: 'Securitized', securityType: 'Agency CMBS', securitySector: 'Freddie Q' },
-        { ID: 13, marketingAssetGroup: 'CMBS', securityGroup: 'Securitized', securityType: 'Agency CMBS', securitySector: 'Ginnie Mae REMICS' },
+        { ID: 1, securityGroup: 'Securitized', securityType: 'ABS', securitySector: 'Consumer' },
+        { ID: 2, securityGroup: 'Securitized', securityType: 'ABS', securitySector: 'SBA Participation Certificates' },
+        { ID: 3, securityGroup: 'Securitized', securityType: 'ABS', securitySector: 'Small Business Investment Company' },
+        { ID: 4, securityGroup: 'Securitized', securityType: 'ABS', securitySector: 'Solar' },
+        { ID: 5, securityGroup: 'Securitized', securityType: 'Agency MBS', securitySector: 'Fannie Mae' },
+        { ID: 6, securityGroup: 'Securitized', securityType: 'Agency MBS', securitySector: 'Freddie Mac' },
+        { ID: 7, securityGroup: 'Securitized', securityType: 'Agency CMBS', securitySector: 'Fannie Mae ACE' },
+        { ID: 8, securityGroup: 'Securitized', securityType: 'Agency CMBS', securitySector: 'Fannie Mae DUS' },
+        { ID: 9, securityGroup: 'Securitized', securityType: 'Agency CMBS', securitySector: 'Freddie CMBS' },
+        { ID: 10, securityGroup: 'Securitized', securityType: 'Agency CMBS', securitySector: 'Freddie K' },
+        { ID: 11, securityGroup: 'Securitized', securityType: 'Agency CMBS', securitySector: 'Freddie P' },
+        { ID: 12, securityGroup: 'Securitized', securityType: 'Agency CMBS', securitySector: 'Freddie Q' },
+        { ID: 13,  securityGroup: 'Securitized', securityType: 'Agency CMBS', securitySector: 'Ginnie Mae REMICS' },
         // Add more data here
     ];
     const securityTypeColumns = [
@@ -94,11 +95,12 @@ export default function TradeHistoryLandingPage({...props}) {//({ previousBD, ac
         <HeaderFilter visible={true} />,
         <FilterRow visible={true} />,
         <Paging defaultPageSize={15} />,
-        <Column dataField="marketingAssetGroup" caption="MAG" />,
+        //<Column dataField="marketingAssetGroup" caption="MAG" />,
         <Column dataField="securityGroup" caption="Group" />,
         <Column dataField="securityType" caption="Type" />,
         <Column dataField="securitySector" caption="Sector" />
     ];
+    /*
     const tradeHistoryData = [
         {
             ID: 1,
@@ -182,16 +184,18 @@ export default function TradeHistoryLandingPage({...props}) {//({ previousBD, ac
             trans_type: "BUY"
         },
     ]
+    */
     //DEFINE CONSTANTS/STATE VARIABLES
     const initialFormState = {
         startDate: previousBD, //Ex: 2023-09-26
         lookBack: 1,
-        dateType: "TD", //Can be: Trade Date or Settlement Date
         cusips: [], //synonymous with 'Security' dropdown in Carlton
         accounts: [], //synonymous with 'Funds' checkbox in Carlton
+    }
+    const secondaryFormState = {
+        dateType: "", //Can be: Trade Date or Settlement Date
         securityCombo: [
             {
-                marketingAssetGroup: "",
                 securityGroup: "",
                 securityType: "",
                 securitySector: "",
@@ -202,7 +206,7 @@ export default function TradeHistoryLandingPage({...props}) {//({ previousBD, ac
     const [formState, setFormState] = useState({...initialFormState});
     const [selectedSecurityTypeRows, setSelectedSecurityTypeRows] = useState([]);
     const [selectedCusipRows, setSelectedCusipRows] = useState([]);
-    //const [selectedData, setSelectedData] = useState([]);
+    const [tradeHistoryData, setTradeHistoryData] = useState([]);
     const dateTypeSelectStyles = {
         /**
          * Possibly responsible for the actual individual options in the drop down once dropdown indicator has been clicked.
@@ -308,7 +312,7 @@ export default function TradeHistoryLandingPage({...props}) {//({ previousBD, ac
             alert("Look Back Days must be at least 1.");
             return;
         }
-        setFormState({ ...formState, lookBack: Number(target.value) });
+        setFormState({ ...formState, lookBack: target.value });
     }
     const handleSingleSelectChange = async(values, actionMeta) => {
         console.log("dateType selected: ", values);
@@ -339,7 +343,7 @@ export default function TradeHistoryLandingPage({...props}) {//({ previousBD, ac
         setSelectedSecurityTypeRows(event.selectedRowKeys);
         const selectedData = event.selectedRowsData.map((rowData) => ({
             //ID: rowData.ID,
-            marketingAssetGroup: rowData.marketingAssetGroup,
+            //marketingAssetGroup: rowData.marketingAssetGroup,
             securityGroup: rowData.securityGroup,
             securityType: rowData.securityType,
             securitySector: rowData.securitySector
@@ -365,6 +369,8 @@ export default function TradeHistoryLandingPage({...props}) {//({ previousBD, ac
     const handleSubmitClick = async(event) => {
         event.preventDefault();
         console.log("Hit Generate button!", formState)
+        const response = await getTradeHistoryLanding({...formState});
+        setTradeHistoryData([...response]);
     }
     const clickSubmitButton = (event) => {
         document.getElementById('submit-trade-history-button').click();
@@ -400,30 +406,30 @@ export default function TradeHistoryLandingPage({...props}) {//({ previousBD, ac
                             required rowsForSelect={accountsMultiSelectRows} handleSelectMenuClose={handleSelectMenuClose} handleMultiSelectChange={handleAccountMultiSelectChange}
                             selectStyles={accountMultiSelectStyles}
                         />
+                        <div className="input-group-text col">
+                            <DropDownBoxDataGrid name="cusipDropDownDataGridMulti" /*classNames='input-group-text col'*/ placeHolderString='Select Security...'
+                        onChange={handleCusipDropDownDataGridMultiChange} selectedRows={selectedCusipRows} data={cusipDataRows}
+                        columns={cusipColumns} resizableMaxWidth={"30vw"}
+                            />
+                        </div>
+                    </div>
+                    <div className="input-group row" style={{ margin: "0% 0%" }}>
                         <MultiSelectMenu name="tradeTypeMultiSelect" classNames={"basic-multi-select input-group-text col-2"} placeHolderString={"Select Trade Type..."}
                             required rowsForSelect={tradeTypeMultiSelectRows} handleSelectMenuClose={handleSelectMenuClose} handleMultiSelectChange={handleTradeTypeMultiSelectChange}
                             selectStyles={accountMultiSelectStyles}
                         />
-                        <div id="trade-history-button-group" className="input-group-text col-2">
-                            <Button id="generate-trade-history-button" width={75} text="Generate" type="default" stylingMode="contained" onClick={clickSubmitButton}/>
-                            <Button id="export-button" width={75} text="Export" type="success" stylingMode="contained" />
-                            <button id="submit-trade-history-button" style={{ visibility: "hidden"}} type="submit"></button>
-                        </div>
-                    </div>
-                    <div className="input-group row" style={{ margin: "0% 0%"}}>
-                        <div className="input-group-text col">
-                            <DropDownBoxDataGrid name="cusipDropDownDataGridMulti" /*classNames='input-group-text col'*/ placeHolderString='Select Security...'
-                        onChange={handleCusipDropDownDataGridMultiChange} selectedRows={selectedCusipRows} data={cusipDataRows}
-                        columns={cusipColumns}
-                            />
-                        </div>
                         <div className="input-group-text col">
                             <DropDownBoxDataGrid name="securityDropDownDataGridMulti" /*classNames='input-group-text col'*/ placeHolderString='Select Security Type...'
-                        onChange={handleSecurityTypeDropDownDataGridMultiChange} selectedRows={selectedSecurityTypeRows} data={securityTypeDataRows}
-                        columns={securityTypeColumns}
-                        />
+                                onChange={handleSecurityTypeDropDownDataGridMultiChange} selectedRows={selectedSecurityTypeRows} data={securityTypeDataRows}
+                                columns={securityTypeColumns} resizableMaxWidth={"60vw"}
+                            />
                         </div>
-                    
+                        <div id="trade-history-button-group" className="input-group-text col-2">
+                            <Button id="generate-trade-history-button" width={75} text="Generate" type="default" stylingMode="contained" onClick={clickSubmitButton} />
+                            <Button id="export-button" width={75} text="Export" type="success" stylingMode="contained" />
+                            <button id="submit-trade-history-button" style={{ visibility: "hidden" }} type="submit"></button>
+                        </div>
+
                     </div>
                 </form>
                     {/**
@@ -441,6 +447,9 @@ export default function TradeHistoryLandingPage({...props}) {//({ previousBD, ac
                         <HeaderFilter visible={true} />
                         <FilterRow visible={true} />
                         <Paging defaultPageSize={100} />
+                        <Column dataField="securityGroup" caption="Group"/>
+                        <Column dataField="securityType" caption="Type"/>
+                        <Column dataField="securitySector" caption="Sector"/>
                         <Column dataField="trade_date" caption="Trade Date" dataType="date" />
                         <Column dataField="settle_date" caption="Settle Date" dataType="date" />
                         <Column dataField="trans_type" caption="Trans Type" />

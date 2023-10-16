@@ -18,7 +18,7 @@ export default function DropDownBoxDataGrid({...props}) {
         
         <div id='drop-down-data-grid-container' className={props.classNames}>
             <Resizable width={dropDownWidth} height={dropDownHeight} onResize={handleResize} minWidth={200} minHeight={37}
-                style={{ position: "relative", maxWidth: "47vw", maxHeight: "615px", overflow: "auto" }}
+                style={{ position: "relative", maxWidth: props.resizableMaxWidth, maxHeight: "37px", overflow: "auto" }}
             >
                 <DropDownBox
                     value={dropDownVisible}
