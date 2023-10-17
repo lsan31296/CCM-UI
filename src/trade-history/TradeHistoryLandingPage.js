@@ -24,8 +24,9 @@ export default function TradeHistoryLandingPage({...props}) {
         }
         return updatedRow;
     }) //Data that goes into 'Select Security...' DropDown DataGrid component
+    cusipDataRows.unshift({ID: 0, cusip: "~all_securities~", pool_number: "~all_securities~"});
     const cusipColumns = [
-        <Selection mode="multiple" />,
+        <Selection mode="multiple" allowSelectAll={false} />,
         <HeaderFilter visible={true} />,
         <FilterRow visible={true} />,
         <Paging defaultPageSize={15} />,
@@ -36,7 +37,7 @@ export default function TradeHistoryLandingPage({...props}) {
     //DEFINE CONSTANTS/STATE VARIABLES
     const initialFormState = {
         startDate: previousBD, //Ex: 2023-09-26
-        lookBack: 1,
+        lookBack: "1",
         cusips: [], //synonymous with 'Security' dropdown in Carlton
         accounts: [], //synonymous with 'Funds' checkbox in Carlton
     };
@@ -86,6 +87,10 @@ export default function TradeHistoryLandingPage({...props}) {
     }
     const handleCusipDropDownDataGridMultiChange = async(event) => {
         console.log("Cusip Drop Down Data Grid!", event.selectedRowKeys);
+        if (event.selectedRowKeys.length > 10) {
+            alert("You may not manually select more than 10 securities at a time.")
+            return;
+        }
         setSelectedCusipRows(event.selectedRowKeys);
         const selectedDate = event.selectedRowsData.map((rowData) => {
             return rowData.cusip;
@@ -159,12 +164,11 @@ export default function TradeHistoryLandingPage({...props}) {
                         <Column dataField="securityGroup" caption="Group"/>
                         <Column dataField="securityType" caption="Type"/>
                         <Column dataField="securitySector" caption="Sector"/>
+                        <Column dataField="cusip" caption="Cusip" />
                         <Column dataField="trade_date" caption="Trade Date" dataType="date" />
                         <Column dataField="settle_date" caption="Settle Date" dataType="date" />
                         <Column dataField="trans_type" caption="Trans Type" />
                         <Column dataField="account" caption="Account" />
-                        <Column dataField="advPortfolioId" caption="Advent Port ID" />
-                        <Column dataField="advSecurityId" caption="Advent Security ID" />
                         <Column dataField="sec_name" caption="Security Name" />
                         <Column dataField="pool_name" caption="Pool Name" />
                         <Column dataField="orig_face" caption="Original Face" dataType="number" format="currency" />
