@@ -60,7 +60,7 @@ export default function TradeHistoryLandingPage({...props}) {
     let accountsMultiSelectRows = removeUnwanteds(accountsInfo).map((account) => {
         const newAccount = {
             value: {...account},
-            label: account.ticker
+            label: account.name
         }
         return newAccount;
     });
