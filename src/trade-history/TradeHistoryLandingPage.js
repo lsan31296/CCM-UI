@@ -10,8 +10,9 @@ import MultiSelectMenu from "../components/MultiSelectMenu";
 import { accountLabelNameSorter, removeUnwanteds } from "../utils/helperFunctions";
 import { Button } from 'devextreme-react/button';
 import DropDownBoxDataGrid from "../components/DropDownBoxDataGrid";
-import DataGrid, { Column, Selection, Paging, FilterRow, HeaderFilter } from 'devextreme-react/data-grid';
+import DataGrid, { Column, Selection, Paging, FilterRow, HeaderFilter, Pager } from 'devextreme-react/data-grid';
 import { getTradeHistoryLanding } from "../utils/api";
+import ExportCSV from "../components/ExportCSV";
 
 export default function TradeHistoryLandingPage({...props}) {
     //console.log("Props: ", props);
@@ -113,12 +114,15 @@ export default function TradeHistoryLandingPage({...props}) {
     const clickSubmitButton = (event) => {
         document.getElementById('submit-trade-history-button').click();
     }
+    const handleExportClick = (event) => {
+        document.getElementById('trade-history-landing-export').click();
+    }
 
     if (!previousBD || !accountsInfo || !securities) {
         return <h1>Loading...</h1>
     } else {
         return (
-            <div id="trade-history-landing-page-container" style={{ padding: "0% 1%"}}>
+            <div id="trade-history-landing-page-container" style={{ padding: "0% 1% 2% 1%" }}>
                 <h1>Trade History Landing Page</h1>
                 <form id="trade-history-form" onSubmit={handleSubmitClick}>
                     <div id="trade-history-input-group-container-1" className="input-group row" style={{ margin: "0% 0%"}}>
@@ -140,10 +144,11 @@ export default function TradeHistoryLandingPage({...props}) {
                         columns={cusipColumns} resizableMaxWidth={"30vw"}
                             />
                         </div>
-                        <div id="trade-history-button-group" className="input-group-text col">
+                        <div id="trade-history-button-group" className="input-group-text col" style={{ display:"flex", justifyContent: "space-evenly"}}>
                             <Button id="generate-trade-history-button" width={75} text="Generate" type="default" stylingMode="contained" onClick={clickSubmitButton} />
-                            <Button id="export-button" width={75} text="Export" type="success" stylingMode="contained" />
-                            <button id="submit-trade-history-button" style={{ visibility: "hidden" }} type="submit"></button>
+                            <Button id="export-button" width={75} text="Export" type="success" stylingMode="contained" onClick={handleExportClick}/>
+                            <ExportCSV id={"trade-history-landing-export"} styleObj={{display: "none", visibility: "hidden"}} csvData={tradeHistoryData} fileName={`TradeHistory_${formState.cusips.toString()}_${formState.accounts.toString()}_${formState.startDate}_${formState.lookBack}`} />
+                            <button id="submit-trade-history-button" style={{ display: "none", visibility: "hidden" }} type="submit"></button>
                         </div>
                     </div>
                 </form>
@@ -156,11 +161,14 @@ export default function TradeHistoryLandingPage({...props}) {
                 <div id="trade-history-data-grid-container">
                     <DataGrid dataSource={tradeHistoryData} showBorders remoteOperations={false} allowColumnReordering
                         allowColumnResizing showColumnLines showRowLines rowAlternationEnabled hoverStateEnabled
+                        height="78vh"
                     >
                         <Selection mode="multiple"/>
                         <HeaderFilter visible={true} />
                         <FilterRow visible={true} />
-                        <Paging defaultPageSize={100} />
+                        {/* <Scrolling mode="virtual"/>*/}
+                        <Paging defaultPageSize={50} />
+                        <Pager showPageSizeSelector showNavigationButtons allowedPageSizes={[10, 50, 100, 500, 1000]} showInfo/>
                         <Column dataField="securityGroup" caption="Group"/>
                         <Column dataField="securityType" caption="Type"/>
                         <Column dataField="securitySector" caption="Sector"/>
