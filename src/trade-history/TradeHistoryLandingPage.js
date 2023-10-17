@@ -85,6 +85,9 @@ export default function TradeHistoryLandingPage({...props}) {
 
     };
     const handlePopUpCancel = () => {
+        if (popUpFormState.length <= 0) {
+            setPopUpFormState(`${JSON.stringify(initialFormState, undefined, 4)}`);
+        }
         setpopUpVisible(false);
     }
     const handlePopUpTextAreaChange = ({target}) => {
@@ -170,7 +173,7 @@ export default function TradeHistoryLandingPage({...props}) {
                             <Button id="export-button" width={75} text="Export" type="success" stylingMode="contained" onClick={handleExportClick}/>
                             <ExportCSV id={"trade-history-landing-export"} styleObj={{display: "none", visibility: "hidden"}} csvData={tradeHistoryData} fileName={`TradeHistory_${formState.cusips.toString()}_${formState.accounts.toString()}_${formState.startDate}_${formState.lookBack}`} />
                             <button id="submit-trade-history-button" style={{ display: "none", visibility: "hidden" }} type="submit"></button>
-                            <Button id="pop-up-body-button" width={75} text="Body" type="default" stylingMode="outlined" onClick={() => setpopUpVisible(true)}/>
+                            <Button id="pop-up-body-button" width={93} text="Request Detail" type="default" stylingMode="outlined" onClick={() => setpopUpVisible(true)}/>
                         </div>
                     </div>
                 </form>
