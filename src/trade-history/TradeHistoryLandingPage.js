@@ -13,6 +13,7 @@ import DropDownBoxDataGrid from "../components/DropDownBoxDataGrid";
 import DataGrid, { Column, Selection, Paging, FilterRow, HeaderFilter, Pager } from 'devextreme-react/data-grid';
 import { getTradeHistoryLanding } from "../utils/api";
 import ExportCSV from "../components/ExportCSV";
+import { Popup } from "devextreme-react";
 
 export default function TradeHistoryLandingPage({...props}) {
     //console.log("Props: ", props);
@@ -43,6 +44,8 @@ export default function TradeHistoryLandingPage({...props}) {
         accounts: [], //synonymous with 'Funds' checkbox in Carlton
     };
     const [formState, setFormState] = useState({...initialFormState});
+    const [popUpFormState, setPopUpFormState] = useState(`${JSON.stringify(initialFormState, undefined, 4)}`);
+    const [popUpVisible, setpopUpVisible] = useState(false);
     //const [selectedSecurityTypeRows, setSelectedSecurityTypeRows] = useState([]);
     const [selectedCusipRows, setSelectedCusipRows] = useState([]);
     const [tradeHistoryData, setTradeHistoryData] = useState([]);
@@ -70,6 +73,24 @@ export default function TradeHistoryLandingPage({...props}) {
     //console.log("Rows: ", accountsMultiSelectRows);
 
     //DEFINE EVENT HANDLERS
+    const handlePopUpSubmit = async(event) => {
+        event.preventDefault();
+        console.log("Pop Up Data: ", popUpFormState);
+        const response = await getTradeHistoryLanding({...JSON.parse(popUpFormState)});
+        if (response.length > 0) {
+            setFormState({...JSON.parse(popUpFormState)});
+            setTradeHistoryData([...response]);
+            setpopUpVisible(false);
+        }
+
+    };
+    const handlePopUpCancel = () => {
+        setpopUpVisible(false);
+    }
+    const handlePopUpTextAreaChange = ({target}) => {
+        console.log("Pop Up: ", target.value);
+        setPopUpFormState(target.value);
+    };
     const handleStartDateChange = ({target}) => {
         console.log("Date: ", target.value);
         setFormState({ ...formState, startDate: target.value });
@@ -149,6 +170,7 @@ export default function TradeHistoryLandingPage({...props}) {
                             <Button id="export-button" width={75} text="Export" type="success" stylingMode="contained" onClick={handleExportClick}/>
                             <ExportCSV id={"trade-history-landing-export"} styleObj={{display: "none", visibility: "hidden"}} csvData={tradeHistoryData} fileName={`TradeHistory_${formState.cusips.toString()}_${formState.accounts.toString()}_${formState.startDate}_${formState.lookBack}`} />
                             <button id="submit-trade-history-button" style={{ display: "none", visibility: "hidden" }} type="submit"></button>
+                            <Button id="pop-up-body-button" width={75} text="Body" type="default" stylingMode="outlined" onClick={() => setpopUpVisible(true)}/>
                         </div>
                     </div>
                 </form>
@@ -159,9 +181,21 @@ export default function TradeHistoryLandingPage({...props}) {
                      * Ensure there is an if statement checking to see that the row data for Data Grid exists.
                      */}
                 <div id="trade-history-data-grid-container">
+                    <Popup  visible={popUpVisible} onHiding={() => setpopUpVisible(false)} dragEnabled hideOnOutsideClick width={600}
+                        height={600} title="Data Body"
+                    >
+                        <form id="pop-up-body-form" onSubmit={handlePopUpSubmit}>
+                            <div>
+                                <label htmlFor="popUpForm" className="form-label">Request</label>
+                                <textarea className="form-control" id="pop-up-body-text-area" rows="6" value={popUpFormState} onChange={handlePopUpTextAreaChange}></textarea>
+                            </div>
+                            <button className="btn btn-primary btn-sm" type="submit">Submit</button>
+                            <button className="btn btn-danger btn-sm" onClick={handlePopUpCancel}>Cancel</button>
+                        </form>
+                    </Popup>
                     <DataGrid dataSource={tradeHistoryData} showBorders remoteOperations={false} allowColumnReordering
                         allowColumnResizing showColumnLines showRowLines rowAlternationEnabled hoverStateEnabled
-                        height="78vh"
+                        height="75vh"
                     >
                         <Selection mode="multiple"/>
                         <HeaderFilter visible={true} />
