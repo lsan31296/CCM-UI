@@ -10,7 +10,7 @@ import MultiSelectMenu from "../components/MultiSelectMenu";
 import { accountLabelNameSorter, removeUnwanteds } from "../utils/helperFunctions";
 import { Button } from 'devextreme-react/button';
 import DropDownBoxDataGrid from "../components/DropDownBoxDataGrid";
-import DataGrid, { Column, Selection, Paging, FilterRow, HeaderFilter, Pager } from 'devextreme-react/data-grid';
+import DataGrid, { Column, Selection, Paging, FilterRow, HeaderFilter, Pager, ColumnChooserSelection } from 'devextreme-react/data-grid';
 import { getTradeHistoryLanding } from "../utils/api";
 import ExportCSV from "../components/ExportCSV";
 import { Popup } from "devextreme-react";
@@ -46,7 +46,7 @@ export default function TradeHistoryLandingPage({...props}) {
     const [formState, setFormState] = useState({...initialFormState});
     const [popUpFormState, setPopUpFormState] = useState(`${JSON.stringify(initialFormState, undefined, 4)}`);
     const [popUpVisible, setpopUpVisible] = useState(false);
-    //const [selectedSecurityTypeRows, setSelectedSecurityTypeRows] = useState([]);
+    const [selectedTradeHistoryRows, setSelectedTradeHistoryRows] = useState([]);
     const [selectedCusipRows, setSelectedCusipRows] = useState([]);
     const [tradeHistoryData, setTradeHistoryData] = useState([]);
 
@@ -142,6 +142,10 @@ export default function TradeHistoryLandingPage({...props}) {
     const handleExportClick = (event) => {
         document.getElementById('trade-history-landing-export').click();
     }
+    const handleSelectedTradeHistoryRowChange = async(event) => {
+        console.log("Trade History Selected Row Data: ", event.selectedRowsData);
+        setSelectedTradeHistoryRows(event.selectedRowsData);
+    }
 
     if (!previousBD || !accountsInfo || !securities) {
         return <h1>Loading...</h1>
@@ -172,7 +176,7 @@ export default function TradeHistoryLandingPage({...props}) {
                         <div id="trade-history-button-group" className="input-group-text col" style={{ display:"flex", justifyContent: "space-evenly"}}>
                             <Button id="generate-trade-history-button" width={75} text="Generate" type="default" stylingMode="contained" onClick={clickSubmitButton} />
                             <Button id="export-button" width={75} text="Export" type="success" stylingMode="contained" onClick={handleExportClick}/>
-                            <ExportCSV id={"trade-history-landing-export"} styleObj={{display: "none", visibility: "hidden"}} csvData={tradeHistoryData} fileName={`TradeHistory_${formState.cusips.toString()}_${formState.accounts.toString()}_${formState.startDate}_${formState.lookBack}`} />
+                            <ExportCSV id={"trade-history-landing-export"} styleObj={{display: "none", visibility: "hidden"}} csvData={selectedTradeHistoryRows.length > 0 ? selectedTradeHistoryRows : tradeHistoryData } fileName={`TradeHistory_${formState.cusips.toString()}_${formState.accounts.toString()}_${formState.startDate}_${formState.lookBack}`} />
                             <button id="submit-trade-history-button" style={{ display: "none", visibility: "hidden" }} type="submit"></button>
                             <Button id="pop-up-body-button" width={93} text="Request Detail" type="default" stylingMode="outlined" onClick={() => setpopUpVisible(true)}/>
                         </div>
@@ -199,7 +203,7 @@ export default function TradeHistoryLandingPage({...props}) {
                     </Popup>
                     <DataGrid dataSource={tradeHistoryData} showBorders remoteOperations={false} allowColumnReordering
                         allowColumnResizing showColumnLines showRowLines rowAlternationEnabled hoverStateEnabled
-                        height="75vh"
+                        height="75vh" selectedRowKeys={selectedTradeHistoryRows} onSelectionChanged={handleSelectedTradeHistoryRowChange}
                     >
                         <Selection mode="multiple"/>
                         <HeaderFilter visible={true} />
