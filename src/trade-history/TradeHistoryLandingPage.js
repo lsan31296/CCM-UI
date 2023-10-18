@@ -134,6 +134,7 @@ export default function TradeHistoryLandingPage({...props}) {
         console.log("Hit Generate button!", formState)
         const response = await getTradeHistoryLanding({...formState});
         setTradeHistoryData([...response]);
+        setPopUpFormState(`${JSON.stringify(formState, undefined, 4)}`);
     }
     const clickSubmitButton = (event) => {
         document.getElementById('submit-trade-history-button').click();
@@ -190,7 +191,7 @@ export default function TradeHistoryLandingPage({...props}) {
                         <form id="pop-up-body-form" onSubmit={handlePopUpSubmit}>
                             <div>
                                 <label htmlFor="popUpForm" className="form-label">Request</label>
-                                <textarea className="form-control" id="pop-up-body-text-area" rows="6" value={popUpFormState} onChange={handlePopUpTextAreaChange}></textarea>
+                                <textarea className="form-control" id="pop-up-body-text-area" rows="8" value={popUpFormState} onChange={handlePopUpTextAreaChange}></textarea>
                             </div>
                             <button className="btn btn-primary btn-sm" type="submit">Submit</button>
                             <button className="btn btn-danger btn-sm" onClick={handlePopUpCancel}>Cancel</button>
