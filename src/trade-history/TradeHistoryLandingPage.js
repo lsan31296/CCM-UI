@@ -250,7 +250,7 @@ export default function TradeHistoryLandingPage({...props}) {
                     </Popup>
                     <DataGrid dataSource={tradeHistoryData} showBorders remoteOperations={false} allowColumnReordering
                         allowColumnResizing showColumnLines showRowLines rowAlternationEnabled hoverStateEnabled
-                        height="75vh" selectedRowKeys={selectedTradeHistoryRows} onSelectionChanged={handleSelectedTradeHistoryRowChange}
+                        height="73vh" selectedRowKeys={selectedTradeHistoryRows} onSelectionChanged={handleSelectedTradeHistoryRowChange}
                     >
                         <Selection mode="multiple"/>
                         <HeaderFilter visible={true} />
