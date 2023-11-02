@@ -7,7 +7,7 @@
 import "./TradeHistoryLandingPage.css"
 import { useState } from "react";
 import MultiSelectMenu from "../components/MultiSelectMenu";
-import { accountLabelNameSorter, removeUnwanteds } from "../utils/helperFunctions";
+import { accountLabelNameSorter, removeUnwanteds, smartURLSearch } from "../utils/helperFunctions";
 import { Button } from 'devextreme-react/button';
 import DropDownBoxDataGrid from "../components/DropDownBoxDataGrid";
 import DataGrid, { Column, Selection, Paging, FilterRow, HeaderFilter, Pager, ColumnChooserSelection } from 'devextreme-react/data-grid';
@@ -45,7 +45,7 @@ export default function TradeHistoryLandingPage({...props}) {
     };
     const [formState, setFormState] = useState({...initialFormState});
     const [popUpFormState, setPopUpFormState] = useState(`${JSON.stringify(initialFormState, undefined, 4)}`);
-    const [popUpVisible, setpopUpVisible] = useState(false);
+    const [requestDetailPopUpVisible, setRequestDetailPopUpVisible] = useState(false);
     const [selectedTradeHistoryRows, setSelectedTradeHistoryRows] = useState([]);
     const [selectedCusipRows, setSelectedCusipRows] = useState([]);
     const [tradeHistoryData, setTradeHistoryData] = useState([]);
@@ -80,7 +80,7 @@ export default function TradeHistoryLandingPage({...props}) {
         if (response.length > 0) {
             setFormState({...JSON.parse(popUpFormState)});
             setTradeHistoryData([...response]);
-            setpopUpVisible(false);
+            setRequestDetailPopUpVisible(false);
         }
 
     };
@@ -88,7 +88,7 @@ export default function TradeHistoryLandingPage({...props}) {
         if (popUpFormState.length <= 0) {
             setPopUpFormState(`${JSON.stringify(initialFormState, undefined, 4)}`);
         }
-        setpopUpVisible(false);
+        setRequestDetailPopUpVisible(false);
     }
     const handlePopUpTextAreaChange = ({target}) => {
         console.log("Pop Up: ", target.value);
@@ -132,9 +132,34 @@ export default function TradeHistoryLandingPage({...props}) {
     const handleSubmitClick = async(event) => {
         event.preventDefault();
         console.log("Hit Generate button!", formState)
-        const response = await getTradeHistoryLanding({...formState});
+        let newFormState = {...formState};
+
+        if(typeof(formState.accounts) === "string") {
+            //remove spaces, split into array by commas
+            console.log("Accounts was a string!");
+            const accountsFormatted = formState.accounts.replace(/ /g,'').split(",");
+            console.log("AccoountsFormatted: ", accountsFormatted);
+            const newAccounts = [];
+            //loop through and do a smart search on each, push found into a local result variable
+            accountsFormatted.forEach((account, index) => {
+                const match = smartURLSearch(accountsInfo, account);
+                if (match) {
+                    newAccounts.push(match.apx_portfolio_code);
+                }
+            });
+            console.log("newAccounts matched: ", newAccounts);
+            newFormState.accounts = [...newAccounts];
+        }
+
+        if (typeof(formState.cusips) === "string") {
+            const cusipsFormatted = formState.cusips.replace(/ /g,'').split(",");
+            newFormState.cusips = [...cusipsFormatted];
+        }
+        //Else use the original formState
+        const response = await getTradeHistoryLanding({...newFormState});
         setTradeHistoryData([...response]);
-        setPopUpFormState(`${JSON.stringify(formState, undefined, 4)}`);
+        setFormState({...newFormState});
+        setPopUpFormState(`${JSON.stringify(newFormState, undefined, 4)}`);
     }
     const clickSubmitButton = (event) => {
         document.getElementById('submit-trade-history-button').click();
@@ -146,6 +171,15 @@ export default function TradeHistoryLandingPage({...props}) {
         console.log("Trade History Selected Row Data: ", event.selectedRowsData);
         setSelectedTradeHistoryRows(event.selectedRowsData);
     }
+    const handleCommaSeparatedList = (event) => {
+        console.log("Comma Separated List: ", event.target.value);
+        console.log("Account List Data Type: ", typeof(event.target.value));
+        setFormState({ ...formState, accounts: event.target.value });
+    };
+    const handleCommaSeparatedCusipList = (event) => {
+        console.log("Cusip List: ", event.target.value);
+        setFormState({ ...formState, cusips: event.target.value });
+    }
 
     if (!previousBD || !accountsInfo || !securities) {
         return <h1>Loading...</h1>
@@ -154,6 +188,19 @@ export default function TradeHistoryLandingPage({...props}) {
             <div id="trade-history-landing-page-container" style={{ padding: "0% 1% 2% 1%" }}>
                 <h1>Trade History Landing Page</h1>
                 <form id="trade-history-form" onSubmit={handleSubmitClick}>
+                    
+                    <div id="trade-history-input-group-container-2" className="input-group row" style={{ margin: "0% 0%" }} >
+                        <div id="empty-space-1" style={{ visibility: "hidden"}} className="input-group-text col-4"></div>
+                        <div className="input-group-text col-2">
+                            <label htmlFor="accountList"></label>
+                            <input className="form-control" id="accountList" name="accountList" value={formState.accounts} placeholder="Comma separated list of accounts" onChange={handleCommaSeparatedList}/>
+                        </div>
+                        <div className="input-group-text col-4">
+                        <label htmlFor="cusipList"></label>
+                            <input className="form-control" id="cusipList" name="cusipList" value={formState.cusips} placeholder="Comma separated list of accounts" onChange={handleCommaSeparatedCusipList}/>
+                        </div>
+                    </div>
+
                     <div id="trade-history-input-group-container-1" className="input-group row" style={{ margin: "0% 0%"}}>
                         <div className="input-group-text col-2">
                             <label htmlFor="startDate"></label>
@@ -173,12 +220,12 @@ export default function TradeHistoryLandingPage({...props}) {
                         columns={cusipColumns} resizableMaxWidth={"30vw"}
                             />
                         </div>
-                        <div id="trade-history-button-group" className="input-group-text col" style={{ display:"flex", justifyContent: "space-evenly"}}>
+                        <div id="trade-history-button-group" className="input-group-text col-2" style={{ display:"flex", justifyContent: "space-evenly"}}>
                             <Button id="generate-trade-history-button" width={75} text="Generate" type="default" stylingMode="contained" onClick={clickSubmitButton} />
                             <Button id="export-button" width={75} text="Export" type="success" stylingMode="contained" onClick={handleExportClick}/>
                             <ExportCSV id={"trade-history-landing-export"} styleObj={{display: "none", visibility: "hidden"}} csvData={selectedTradeHistoryRows.length > 0 ? selectedTradeHistoryRows : tradeHistoryData } fileName={`TradeHistory_${formState.cusips.toString()}_${formState.accounts.toString()}_${formState.startDate}_${formState.lookBack}`} />
                             <button id="submit-trade-history-button" style={{ display: "none", visibility: "hidden" }} type="submit"></button>
-                            <Button id="pop-up-body-button" width={93} text="Request Detail" type="default" stylingMode="outlined" onClick={() => setpopUpVisible(true)}/>
+                            <Button id="pop-up-body-button" width={93} text="Request Detail" type="default" stylingMode="outlined" onClick={() => setRequestDetailPopUpVisible(true)}/>
                         </div>
                     </div>
                 </form>
@@ -189,7 +236,7 @@ export default function TradeHistoryLandingPage({...props}) {
                      * Ensure there is an if statement checking to see that the row data for Data Grid exists.
                      */}
                 <div id="trade-history-data-grid-container">
-                    <Popup  visible={popUpVisible} onHiding={() => setpopUpVisible(false)} dragEnabled hideOnOutsideClick width={600}
+                    <Popup  visible={requestDetailPopUpVisible} onHiding={() => setRequestDetailPopUpVisible(false)} dragEnabled hideOnOutsideClick width={600}
                         height={600} title="Data Body"
                     >
                         <form id="pop-up-body-form" onSubmit={handlePopUpSubmit}>
