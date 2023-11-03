@@ -10,7 +10,7 @@ import MultiSelectMenu from "../components/MultiSelectMenu";
 import { accountLabelNameSorter, removeUnwanteds, smartURLSearch } from "../utils/helperFunctions";
 import { Button } from 'devextreme-react/button';
 import DropDownBoxDataGrid from "../components/DropDownBoxDataGrid";
-import DataGrid, { Column, Selection, Paging, FilterRow, HeaderFilter, Pager, ColumnChooserSelection } from 'devextreme-react/data-grid';
+import DataGrid, { Column, Selection, Paging, FilterRow, HeaderFilter, Pager } from 'devextreme-react/data-grid';
 import { getTradeHistoryLanding } from "../utils/api";
 import ExportCSV from "../components/ExportCSV";
 import { Popup } from "devextreme-react";
@@ -70,6 +70,18 @@ export default function TradeHistoryLandingPage({...props}) {
         return newAccount;
     });
     accountsMultiSelectRows = accountsMultiSelectRows.sort(accountLabelNameSorter);
+    accountsMultiSelectRows.unshift(
+        { 
+            value: {
+                id: 0, 
+                name: "~all_accounts~", 
+                apx_portfolio_code: "~all_accounts~", 
+                ticker: "~all_accounts~"
+            },
+            label: "~all_accounts~" 
+        }
+    );
+
     //console.log("Rows: ", accountsMultiSelectRows);
 
     //DEFINE EVENT HANDLERS
@@ -270,9 +282,9 @@ export default function TradeHistoryLandingPage({...props}) {
                         <Column dataField="pool_name" caption="Pool Name" />
                         <Column dataField="orig_face" caption="Original Face" dataType="number" format="currency" />
                         <Column dataField="curr_face" caption="Current Face" dataType="number" format="currency" />
-                        <Column dataField="price" caption="Price" dataType="number" format="currency"/>
-                        <Column dataField="accrued" caption="Accrued" dataType="number" format="currency" />
-                        <Column dataField="net_money" caption="Net Money" dataType="number" format="currency" />
+                        <Column dataField="price" caption="Price" dataType="number" format={{ type: "currency", precision: 6 }}  /> {/*NEEDS 6 DECIMALS */}
+                        <Column dataField="accrued" caption="Accrued" dataType="number" format={{ type: "currency", precision: 2 }}/> {/*NEEDS 2 DECIMALS */}
+                        <Column dataField="net_money" caption="Net Money" dataType="number" format={{ type: "currency", precision: 2 }}/> {/*NEEDS 2 DECIMALS */}
                         <Column dataField="dealer" caption="Dealer" />
                     </DataGrid>
                 </div>
