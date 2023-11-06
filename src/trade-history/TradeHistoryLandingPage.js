@@ -10,7 +10,7 @@ import MultiSelectMenu from "../components/MultiSelectMenu";
 import { accountLabelNameSorter, removeUnwanteds, smartURLSearch } from "../utils/helperFunctions";
 import { Button } from 'devextreme-react/button';
 import DropDownBoxDataGrid from "../components/DropDownBoxDataGrid";
-import DataGrid, { Column, Selection, Paging, FilterRow, HeaderFilter, Pager } from 'devextreme-react/data-grid';
+import DataGrid, { Column, Selection, Paging, FilterRow, HeaderFilter, Pager, GroupItem, SortByGroupSummaryInfo, Summary } from 'devextreme-react/data-grid';
 import { getTradeHistoryLanding } from "../utils/api";
 import ExportCSV from "../components/ExportCSV";
 import { Popup } from "devextreme-react";
@@ -49,6 +49,7 @@ export default function TradeHistoryLandingPage({...props}) {
     const [selectedTradeHistoryRows, setSelectedTradeHistoryRows] = useState([]);
     const [selectedCusipRows, setSelectedCusipRows] = useState([]);
     const [tradeHistoryData, setTradeHistoryData] = useState([]);
+    const [aggregateByAccount, setAggregateByAccount] = useState(true);
 
     const accountMultiSelectStyles = {
         control: (baseStyles, state) => ({
@@ -94,7 +95,6 @@ export default function TradeHistoryLandingPage({...props}) {
             setTradeHistoryData([...response]);
             setRequestDetailPopUpVisible(false);
         }
-
     };
     const handlePopUpCancel = () => {
         if (popUpFormState.length <= 0) {
@@ -262,7 +262,7 @@ export default function TradeHistoryLandingPage({...props}) {
                     </Popup>
                     <DataGrid dataSource={tradeHistoryData} showBorders remoteOperations={false} allowColumnReordering
                         allowColumnResizing showColumnLines showRowLines rowAlternationEnabled hoverStateEnabled
-                        height="73vh" selectedRowKeys={selectedTradeHistoryRows} onSelectionChanged={handleSelectedTradeHistoryRowChange}
+                        height="72vh" selectedRowKeys={selectedTradeHistoryRows} onSelectionChanged={handleSelectedTradeHistoryRowChange}
                     >
                         <Selection mode="multiple"/>
                         <HeaderFilter visible={true} />
@@ -270,6 +270,7 @@ export default function TradeHistoryLandingPage({...props}) {
                         {/* <Scrolling mode="virtual"/>*/}
                         <Paging defaultPageSize={50} />
                         <Pager showPageSizeSelector showNavigationButtons allowedPageSizes={[10, 50, 100, 500, 1000]} showInfo/>
+                        <Column dataField="account" caption="Account" groupIndex={aggregateByAccount ? 0 : null}/>
                         <Column dataField="securityGroup" caption="Group"/>
                         <Column dataField="securityType" caption="Type"/>
                         <Column dataField="securitySector" caption="Sector"/>
@@ -277,7 +278,6 @@ export default function TradeHistoryLandingPage({...props}) {
                         <Column dataField="trade_date" caption="Trade Date" dataType="date" />
                         <Column dataField="settle_date" caption="Settle Date" dataType="date" />
                         <Column dataField="trans_type" caption="Trans Type" />
-                        <Column dataField="account" caption="Account" />
                         <Column dataField="sec_name" caption="Security Name" />
                         <Column dataField="pool_name" caption="Pool Name" />
                         <Column dataField="orig_face" caption="Original Face" dataType="number" format="currency" />
@@ -286,6 +286,18 @@ export default function TradeHistoryLandingPage({...props}) {
                         <Column dataField="accrued" caption="Accrued" dataType="number" format={{ type: "currency", precision: 2 }}/> {/*NEEDS 2 DECIMALS */}
                         <Column dataField="net_money" caption="Net Money" dataType="number" format={{ type: "currency", precision: 2 }}/> {/*NEEDS 2 DECIMALS */}
                         <Column dataField="dealer" caption="Dealer" />
+                        <Column dataField="duration" caption="Duration" dataType="number" />
+                        <Column dataField="duration_contribution" caption="Dur Cont" dataType="number" />
+                        {/* Make sure all summaries are collapsed */}
+
+                        <Summary>
+                            <GroupItem column="cusip" summaryType="count" displayFormat="{0} trades" />
+                            <GroupItem column="orig_face" summaryType="sum" valueFormat="currency" alignByColumn displayFormat="{0}"/>
+                            <GroupItem column="curr_face" summaryType="sum" valueFormat="currency" alignByColumn displayFormat="{0}"/>
+                            <GroupItem column="net_money" summaryType="sum" valueFormat={{ type: "currency", precision: 2 }} alignByColumn displayFormat="{0}"/>
+                            <GroupItem column="duration_contribution" summaryType="sum" valueFormat={{ type: "decimal" }} alignByColumn displayFormat="{0}"/>
+                        </Summary>
+                        <SortByGroupSummaryInfo summaryItem="count" />
                     </DataGrid>
                 </div>
 
