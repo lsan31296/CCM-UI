@@ -49,7 +49,8 @@ export default function TradeHistoryLandingPage({...props}) {
     const [selectedTradeHistoryRows, setSelectedTradeHistoryRows] = useState([]);
     const [selectedCusipRows, setSelectedCusipRows] = useState([]);
     const [tradeHistoryData, setTradeHistoryData] = useState([]);
-    const [aggregateByAccount, setAggregateByAccount] = useState(true);
+    const [aggregateByAccount, setAggregateByAccount] = useState(false);
+    const [aggregateByCusip, setAggregateByCusip] = useState(false);
 
     const accountMultiSelectStyles = {
         control: (baseStyles, state) => ({
@@ -192,6 +193,24 @@ export default function TradeHistoryLandingPage({...props}) {
         console.log("Cusip List: ", event.target.value);
         setFormState({ ...formState, cusips: event.target.value });
     }
+    const handleAggSwitchChange = async ({target}) => {
+        if (target.checked) {
+            console.log("Checked!");
+            if(target.value === "n") {
+                setAggregateByAccount(false);
+                setAggregateByCusip(false);
+            } 
+            if(target.value === "a") {
+                setAggregateByAccount(true);
+                setAggregateByCusip(false);
+            } 
+            if(target.value === "c") {
+                setAggregateByAccount(false);
+                setAggregateByCusip(true);
+            }
+            console.log("Agg Value: ", target.value);
+        }
+    }
 
     if (!previousBD || !accountsInfo || !securities) {
         return <h1>Loading...</h1>
@@ -201,19 +220,34 @@ export default function TradeHistoryLandingPage({...props}) {
                 <h1>Trade History Landing Page</h1>
                 <form id="trade-history-form" onSubmit={handleSubmitClick}>
                     
-                    <div id="trade-history-input-group-container-2" className="input-group row" style={{ margin: "0% 0%" }} >
+                    <div id="trade-history-input-group-container-1" className="input-group row" style={{ margin: "0% 0%" }} >
                         <div id="empty-space-1" style={{ visibility: "hidden"}} className="input-group-text col-4"></div>
                         <div className="input-group-text col-2">
                             <label htmlFor="accountList"></label>
                             <input className="form-control" id="accountList" name="accountList" value={formState.accounts} placeholder="Comma separated list of accounts" onChange={handleCommaSeparatedList}/>
                         </div>
                         <div className="input-group-text col-4">
-                        <label htmlFor="cusipList"></label>
+                            <label htmlFor="cusipList"></label>
                             <input className="form-control" id="cusipList" name="cusipList" value={formState.cusips} placeholder="Comma separated list of accounts" onChange={handleCommaSeparatedCusipList}/>
+                        </div>
+
+                        <div id="aggregate-switches-container" className="input-group-text col-2">
+                            <div className="form-check form-switch">
+                                <input className="form-check-input" type="radio" id="noAggSwitch" value="n" name="aggSwitches" onChange={handleAggSwitchChange} defaultChecked />
+                                <label className="form-check-label" htmlFor="noAggSwitch">No Agg</label>
+                            </div>
+                            <div className="form-check form-switch">
+                                <input className="form-check-input" type="radio" id="accountAggSwitch" value="a" name="aggSwitches" onChange={handleAggSwitchChange} />
+                                <label className="form-check-label" htmlFor="accountAggSwitch">Account</label>
+                            </div>
+                            <div className="form-check form-switch">
+                                <input className="form-check-input" type="radio" id="cusipAggSwitch" value="c" name="aggSwitches" onChange={handleAggSwitchChange} />
+                                <label className="form-check-label" htmlFor="cusipAggSwitch">Cusip</label>
+                            </div>
                         </div>
                     </div>
 
-                    <div id="trade-history-input-group-container-1" className="input-group row" style={{ margin: "0% 0%"}}>
+                    <div id="trade-history-input-group-container-2" className="input-group row" style={{ margin: "0% 0%"}}>
                         <div className="input-group-text col-2">
                             <label htmlFor="startDate"></label>
                             <input className="form-control" id="startDate" type="date" name="startDate" value={formState.startDate} pattern="\d{4}-\d{2}-\d{2}" onChange={handleStartDateChange}/>
@@ -268,13 +302,13 @@ export default function TradeHistoryLandingPage({...props}) {
                         <HeaderFilter visible={true} />
                         <FilterRow visible={true} />
                         {/* <Scrolling mode="virtual"/>*/}
-                        <Paging defaultPageSize={50} />
+                        <Paging defaultPageSize={100} />
                         <Pager showPageSizeSelector showNavigationButtons allowedPageSizes={[10, 50, 100, 500, 1000]} showInfo/>
                         <Column dataField="account" caption="Account" groupIndex={aggregateByAccount ? 0 : null}/>
                         <Column dataField="securityGroup" caption="Group"/>
                         <Column dataField="securityType" caption="Type"/>
                         <Column dataField="securitySector" caption="Sector"/>
-                        <Column dataField="cusip" caption="Cusip" />
+                        <Column dataField="cusip" caption="Cusip" groupIndex={aggregateByCusip ? 0 : null} />
                         <Column dataField="trade_date" caption="Trade Date" dataType="date" />
                         <Column dataField="settle_date" caption="Settle Date" dataType="date" />
                         <Column dataField="trans_type" caption="Trans Type" />
@@ -291,7 +325,8 @@ export default function TradeHistoryLandingPage({...props}) {
                         {/* Make sure all summaries are collapsed */}
 
                         <Summary>
-                            <GroupItem column="cusip" summaryType="count" displayFormat="{0} trades" />
+                            { aggregateByAccount && <GroupItem column="cusip" summaryType="count" displayFormat="{0} trades" /> }
+                            { aggregateByCusip && <GroupItem column="account" summaryType="count" displayFormat="{0} accounts" />}
                             <GroupItem column="orig_face" summaryType="sum" valueFormat="currency" alignByColumn displayFormat="{0}"/>
                             <GroupItem column="curr_face" summaryType="sum" valueFormat="currency" alignByColumn displayFormat="{0}"/>
                             <GroupItem column="net_money" summaryType="sum" valueFormat={{ type: "currency", precision: 2 }} alignByColumn displayFormat="{0}"/>

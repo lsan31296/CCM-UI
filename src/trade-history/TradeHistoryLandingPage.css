@@ -14,3 +14,8 @@ SELECTS THE HEAD ROW THAT IS A CHILD OF THE TRADE HISTORY DATA GRID CONTAINER
     background-color: black !important;/* SETS THE BACKGROUND COLOR */
     color: white !important;/* SETS FONT COLOR */
 }
+
+/* RESPONSIBLE FOR SPACE IN BETWEEN INPUT(radio/switch) AND LABEL */
+.form-check .form-check-input {
+    float: none !important;
+}
