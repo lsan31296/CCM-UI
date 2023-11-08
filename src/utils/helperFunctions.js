@@ -9,7 +9,7 @@ export function landingPageLinksData1(previousBD) {
                 items: [
                     {
                         name: "UI Single Account Holdings Report",
-                        description: <div id="landing-page-link-ui-single-page-account-holdings-report">
+                        description: <div>
                             <p>Sample Link: '/risk/:aoDate/:positionView/:accounts/:aggregateRows'</p>
                             <p>Each variable that has ':' before it is a variable you must insert yourself. The format follows:</p>
                             <ul>
@@ -19,11 +19,12 @@ export function landingPageLinksData1(previousBD) {
                                 <li>aggregateRows - 'n' or 'ys' for no aggregate or aggregation by security group, type and sector.</li>
                             </ul>
                         </div>,
-                        link: `/risk/${previousBD}/TD/Archdiocese_of_Boston/ys`
+                        link: `/risk/${previousBD}/TD/Archdiocese_of_Boston/ys`,
+                        id : "#landing-page-link-ui-single-page-account-holdings-report"
                     },
                     {
                         name: "UI Single Account Single Cusip Holdings Report",
-                        description: <div id="landing-page-link-ui-single-page-account-single-cusip-holdings-report">
+                        description: <div>
                             <p>Sample Link: '/risk/:aoDate/:positionView/:accounts/:aggregateRows/:cusip'</p>
                             <p>Each variable that has ':' before it is a variable you must insert yourself. The format follows:</p>
                             <ul>
@@ -34,7 +35,8 @@ export function landingPageLinksData1(previousBD) {
                                 <li>cusip - Seven digit cusip, letters in all caps. MUST ADD THIS MANUALLY.</li>
                             </ul>
                         </div>,
-                        link: `/risk/${previousBD}/TD/Archdiocese_of_Boston/ys`
+                        link: `/risk/${previousBD}/TD/Archdiocese_of_Boston/ys`,
+                        id: "#landing-page-link-ui-single-page-account-single-cusip-holdings-report"
                     },
                 ],
                 overallCount: 2
@@ -52,15 +54,14 @@ export function landingPageLinksData2(previousBD) {
                 items: [
                     {
                         name: "Trade History",
-                        description: <div id="landing-page-link-trade-history">
+                        description: <div>
                             <p>Sample Link: '/trade-history'</p>
-                            <p>Will bring up a page that will further have a form to fill out in order to set
-                                parameters of what trade history you'd like to look at. Conversely to filling out the form,
-                                there will be a copy and paste portion for which data can be injected into the form directly.
-                                Once either one of these methods has been filled, fell free to hit the 'Generate' button.
-                            </p>
+                            <p>Will bring up a page that will further have a form to fill out in order to set parameters of what trade history you'd like to look at.</p>
+                            <p>Instead of filling out the form, there will be a copy and paste portion for which data can be injected into the form directly.</p>
+                            <p>Once either one of these methods has been filled, fell free to hit the 'Generate' button.</p>
                         </div>,
-                        link: `/trade-history`
+                        link: `/trade-history`,
+                        id: "#landing-page-link-trade-history"
                     },
                 ],
                 overallCount: 1
@@ -77,21 +78,22 @@ export function landingPageLinksData3(previousBD) {
                 items: [
                     {
                         name: "Daily Performance",
-                        description: <div id="landing-page-link-performance">
+                        description: <div>
                             <p>Sample Link: '/performance'</p>
-                            <p>Will bring up a page that displays all active accounts in a table with their
-                                respective performance numbers. Each account name is a clickable link to a risk holdings
-                                data table for that particular account. Just ensure that the date and aggregation type is correct.
-                            </p>
+                            <p>Will bring up a page that displays all active accounts in a table with their respective performance numbers. </p>
+                            <p>Each account name is a clickable link to a risk holdings data table for that particular account.</p>
+                            <p>Just ensure that the date and aggregation type is correct.</p>
                         </div>,
-                        link: `/performance`
+                        link: `/performance`,
+                        id: "#landing-page-link-performance"
                     },
                     {
                         name: "Attribution",
-                        description: <div id="landing-pagep-link-attribution">
+                        description: <div>
                             <p>TBD</p>
                         </div>,
-                        link: `TBD`
+                        link: `#`,
+                        id: "#landing-page-link-attribution"
                     }
                 ],
                 overallCount: 2
@@ -108,24 +110,27 @@ export function landingPageLinksData4(previousBD) {
                 items: [
                     {
                         name: "ITVC Directory",
-                        description: <div id="landing-page-link-itvc-directory">
+                        description: <div>
                             <p>TBD</p>
                         </div>,
-                        link: `TBD`
+                        link: `#`,
+                        id: "#landing-page-link-itvc-directory"
                     },
                     {
                         name: "PM Monthly Meeting", 
-                        description: <div id="landing-page-link-pm-monthly-meeting">
+                        description: <div>
                             <p>TBD</p>
                         </div>,
-                        link: `TBD`
+                        link: `#`,
+                        id: "#landing-page-link-pm-monthly-meeting"
                     },
                     {
                         name: "MCT",
-                        description: <div id="landing-page-link-mct">
+                        description: <div>
                             <p>TBD</p>
                         </div>,
-                        link: `https://mctmco.com/login.action?sctSession=reset`
+                        link: `https://mctmco.com/login.action?sctSession=reset`,
+                        id: "#landing-page-link-mct"
                     }
                 ],
                 overallCount: 3
