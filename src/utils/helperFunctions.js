@@ -1,5 +1,85 @@
 import dayjs from "dayjs";
 
+export function landingPageLinksData1(previousBD) {
+
+    return (
+        [
+            {
+                key: "Risk and Holdings",
+                items: [
+                    {
+                        name: "UI Single Account Holdings Report",
+                        description: <div id="landing-page-link-ui-single-page-account-holdings-report">
+                            <p>Sample Link: '/risk/:aoDate/:positionView/:accounts/:aggregateRows'</p>
+                            <p>Each variable that has ':' before it is a variable you must insert yourself. The format follows:</p>
+                            <ul>
+                                <li>aoDate - 'YYYY-MM-DD'</li>
+                                <li>positionView - Either 'TD','SD','ID','LT'</li>
+                                <li>accounts - 'Ticker', 'Name', 'Portfolio Code. Smart Search feature.</li>
+                                <li>aggregateRows - 'n' or 'ys' for no aggregate or aggregation by security group, type and sector.</li>
+                            </ul>
+                        </div>,
+                        link: `/risk/${previousBD}/TD/Archdiocese_of_Boston/ys`
+                    },
+                    {
+                        name: "UI Single Account Single Cusip Holdings Report",
+                        description: <div id="landing-page-link-ui-single-page-account-single-cusip-holdings-report">
+                            <p>Sample Link: '/risk/:aoDate/:positionView/:accounts/:aggregateRows/:cusip'</p>
+                            <p>Each variable that has ':' before it is a variable you must insert yourself. The format follows:</p>
+                            <ul>
+                                <li>aoDate - 'YYYY-MM-DD'</li>
+                                <li>positionView - Either 'TD','SD','ID','LT'</li>
+                                <li>accounts - 'Ticker', 'Name', 'Portfolio Code. Smart Search feature.</li>
+                                <li>aggregateRows - 'n' or 'ys' for no aggregate or aggregation by security group, type and sector.</li>
+                                <li>cusip - Seven digit cusip, letters in all caps. MUST ADD THIS MANUALLY.</li>
+                            </ul>
+                        </div>,
+                        link: `/risk/${previousBD}/TD/Archdiocese_of_Boston/ys`
+                    },
+                ],
+                overallCount: 2
+            }
+        ]
+    );
+}
+
+export function landingPageLinksData2(previousBD) {
+
+    return (
+        [
+            {
+                key: "Tools",
+                items: [
+                    {
+                        name: "Trade History",
+                        description: <div id="landing-page-link-trade-history">
+                            <p>Sample Link: '/trade-history'</p>
+                            <p>Will bring up a page that will further have a form to fill out in order to set
+                                parameters of what trade history you'd like to look at. Conversely to filling out the form,
+                                there will be a copy and paste portion for which data can be injected into the form directly.
+                                Once either one of these methods has been filled, fell free to hit the 'Generate' button.
+                            </p>
+                        </div>,
+                        link: `/trade-history`
+                    },
+                    {
+                        name: "Performance Landing Page",
+                        description: <div id="landing-page-link-performance">
+                            <p>Sample Link: '/performance'</p>
+                            <p>Will bring up a page that displays all active accounts in a table with their
+                                respective performance numbers. Each account name is a clickable link to a risk holdings
+                                data table for that particular account. Just ensure that the date and aggregation type is correct.
+                            </p>
+                        </div>,
+                        link: `/performance`
+                    }
+                ],
+                overallCount: 2
+            }
+        ]
+    );
+}
+
 export const dataTableStyles = {
     TD: {
         title: "Trade Date",

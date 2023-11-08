@@ -6,9 +6,8 @@ export default function DesktopBar() {
         <div className='desktop-top-bar'>
             <a href='/' >Home</a>
             <a href='/trade-history' >Trade History</a>
-            <a href='#'>CRA Investors  </a>
-            <a href='#'>Impact Investors  </a>
-            <a href='#'>Contact Us  </a>
+            <a href='/performance'>Performance</a>
+            <a href='/shareholders'>Shareholders</a>
         </div>
     )
 }

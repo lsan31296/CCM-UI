@@ -1,0 +1,23 @@
+/* unvisited link */
+#landing-page-container a:link {
+    color: black;
+    text-decoration: none;
+}
+
+/* visited link */
+#landing-page-container a:visited {
+    color: darkblue;
+    text-decoration: none;
+}
+
+/* mouse over link */
+#landing-page-container a:hover {
+    color: darkgrey;
+    text-decoration: none;
+}
+
+/* selected link */
+#landing-page-container a:active {
+    color: pink;
+    text-decoration: none;
+}
