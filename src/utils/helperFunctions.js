@@ -62,8 +62,21 @@ export function landingPageLinksData2(previousBD) {
                         </div>,
                         link: `/trade-history`
                     },
+                ],
+                overallCount: 1
+            }
+        ]
+    );
+}
+
+export function landingPageLinksData3(previousBD) {
+    return (
+        [
+            {
+                key: "Performance",
+                items: [
                     {
-                        name: "Performance Landing Page",
+                        name: "Daily Performance",
                         description: <div id="landing-page-link-performance">
                             <p>Sample Link: '/performance'</p>
                             <p>Will bring up a page that displays all active accounts in a table with their
@@ -72,9 +85,50 @@ export function landingPageLinksData2(previousBD) {
                             </p>
                         </div>,
                         link: `/performance`
+                    },
+                    {
+                        name: "Attribution",
+                        description: <div id="landing-pagep-link-attribution">
+                            <p>TBD</p>
+                        </div>,
+                        link: `TBD`
                     }
                 ],
                 overallCount: 2
+            }
+        ]
+    );
+}
+
+export function landingPageLinksData4(previousBD) {
+    return (
+        [
+            {
+                key: "Monthly/Quarterly Reporting and Meetings",
+                items: [
+                    {
+                        name: "ITVC Directory",
+                        description: <div id="landing-page-link-itvc-directory">
+                            <p>TBD</p>
+                        </div>,
+                        link: `TBD`
+                    },
+                    {
+                        name: "PM Monthly Meeting", 
+                        description: <div id="landing-page-link-pm-monthly-meeting">
+                            <p>TBD</p>
+                        </div>,
+                        link: `TBD`
+                    },
+                    {
+                        name: "MCT",
+                        description: <div id="landing-page-link-mct">
+                            <p>TBD</p>
+                        </div>,
+                        link: `https://mctmco.com/login.action?sctSession=reset`
+                    }
+                ],
+                overallCount: 3
             }
         ]
     );
