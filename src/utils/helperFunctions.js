@@ -95,8 +95,18 @@ export function landingPageLinksData2(previousBD) {
                         link: `/trade-history`,
                         id: "#landing-page-link-trade-history"
                     },
+                    {
+                        name: "Shareholders",
+                        description: <div>
+                            <p>Sample: '/shareholders'</p>
+                            <p>Page displays a list of active shareholders currently holding accounts with us.</p>
+                            <p>Also displays some added information such as Number, Ticker, Open/Close Date, etc</p>
+                        </div>,
+                        link: `/shareholders`,
+                        id: "#landing-page-shareholders"
+                    }
                 ],
-                overallCount: 1
+                overallCount: 2
             }
         ]
     );
