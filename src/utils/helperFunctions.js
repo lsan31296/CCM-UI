@@ -38,8 +38,40 @@ export function landingPageLinksData1(previousBD) {
                         link: `/risk/${previousBD}/TD/Archdiocese_of_Boston/ys`,
                         id: "#landing-page-link-ui-single-page-account-single-cusip-holdings-report"
                     },
+                    {
+                        name: "Daily Risk File",
+                        description: <div>
+                            <p>TBD</p>
+                        </div>,
+                        link: `#`,
+                        id: "#landing-page-link-daily-risk-file"
+                    },
+                    {
+                        name: "KRDs Active",
+                        description: <div>
+                            <p>TBD</p>
+                        </div>,
+                        link: `#`,
+                        id: "#landing-page-krds"
+                    },
+                    {
+                        name: "KRDs By Port",
+                        description: <div>
+                            <p>TBD</p>
+                        </div>,
+                        link: `#`,
+                        id: "#landing-page-krds-by-port"
+                    },
+                    {
+                        name: "Corporate Watchlist",
+                        description: <div>
+                            <p>TBD</p>
+                        </div>,
+                        link: `#`,
+                        id: "#landing-page-corporate-watchlist"
+                    }
                 ],
-                overallCount: 2
+                overallCount: 6
             }
         ]
     );
