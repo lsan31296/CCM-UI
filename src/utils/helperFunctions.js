@@ -106,8 +106,18 @@ export function landingPageLinksData2(previousBD) {
                         link: `/shareholders`,
                         id: "#landing-page-shareholders"
                     },
+                    {
+                        name: "Portfolio Targets",
+                        description: <div>
+                            <p>Sample: '/portfolio-targets'</p>
+                            <p>Page which displays trading strategies for securities based</p>
+                            <p>on benchmark/live data.</p>
+                        </div>,
+                        link: `/portfolio-targets`,
+                        id: "#landing-page-portfolio-targets",
+                    }
                 ],
-                overallCount: 2
+                overallCount: 3
             }
         ]
     );

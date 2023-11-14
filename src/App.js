@@ -13,6 +13,7 @@ import ShareHolders from './shareholders/ShareHolders';
 import CusipRiskHoldings from './cusip/CusipRiskHoldings';
 import TradeHistoryLandingPage from './trade-history/TradeHistoryLandingPage';
 import LandingPage from './home-landing/LandingPage';
+import PortfolioTargetsPage from './portfolio-targets/PortfolioTargetsPage';
 
 function App() {
   const [previousBD, setPreviousBD] = useState(null);
@@ -66,6 +67,7 @@ function App() {
             <Route path='/risk/:aoDate/:positionView/:accounts/:aggregateRows' element={<RiskHoldings accountsInfo={accountsInfo}/>} />
             <Route path='/shareholders' element={<ShareHolders />} />
             <Route path='/trade-history' element={<TradeHistoryLandingPage previousBD={previousBD} accountsInfo={accountsInfo} securities={securities}/> } />
+            <Route path='/portfolio-targets' element={<PortfolioTargetsPage />} />
           </Routes>
         </main>
 

@@ -1,5 +1,4 @@
 import { Tooltip } from "devextreme-react";
-import { Route } from "react-router";
 
 /**
  * Responsible for the list template of how the items will be rendered in the list.
