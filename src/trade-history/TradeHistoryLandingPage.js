@@ -7,7 +7,7 @@
 import "./TradeHistoryLandingPage.css"
 import { useState } from "react";
 import MultiSelectMenu from "../components/MultiSelectMenu";
-import { accountLabelNameSorter, removeUnwanteds, smartURLSearch } from "../utils/helperFunctions";
+import { accountLabelNameSorter, calcDateByLookBack, calcLookBackDaysByDate, removeUnwanteds, smartURLSearch } from "../utils/helperFunctions";
 import { Button } from 'devextreme-react/button';
 import DropDownBoxDataGrid from "../components/DropDownBoxDataGrid";
 import DataGrid, { Column, Selection, Paging, FilterRow, HeaderFilter, Pager, GroupItem, SortByGroupSummaryInfo, Summary } from 'devextreme-react/data-grid';
@@ -43,14 +43,15 @@ export default function TradeHistoryLandingPage({...props}) {
         cusips: [], //synonymous with 'Security' dropdown in Carlton
         accounts: [], //synonymous with 'Funds' checkbox in Carlton
     };
-    const [formState, setFormState] = useState({...initialFormState});
-    const [popUpFormState, setPopUpFormState] = useState(`${JSON.stringify(initialFormState, undefined, 4)}`);
-    const [requestDetailPopUpVisible, setRequestDetailPopUpVisible] = useState(false);
-    const [selectedTradeHistoryRows, setSelectedTradeHistoryRows] = useState([]);
-    const [selectedCusipRows, setSelectedCusipRows] = useState([]);
-    const [tradeHistoryData, setTradeHistoryData] = useState([]);
-    const [aggregateByAccount, setAggregateByAccount] = useState(false);
-    const [aggregateByCusip, setAggregateByCusip] = useState(false);
+    const [formState, setFormState] = useState({...initialFormState});//Form data that will be sent as API request body
+    const [popUpFormState, setPopUpFormState] = useState(`${JSON.stringify(initialFormState, undefined, 4)}`);//Form data inside of the Request Detail for copy and pasting. Should always reflect the live form data.
+    const [requestDetailPopUpVisible, setRequestDetailPopUpVisible] = useState(false);//Toggle pop up visibility
+    const [selectedTradeHistoryRows, setSelectedTradeHistoryRows] = useState([]);//Used to determine which rows will be downloading when hitting export.
+    const [selectedCusipRows, setSelectedCusipRows] = useState([]);//Tracks row id's for cusip selection
+    const [tradeHistoryData, setTradeHistoryData] = useState([]);//Response body; records displayed in main data grid
+    const [aggregateByAccount, setAggregateByAccount] = useState(false);//Toggle aggregation
+    const [aggregateByCusip, setAggregateByCusip] = useState(false);//Toggle aggregation
+    const [daysBackDateChange, setDaysBackDateChange] = useState(calcDateByLookBack(formState.startDate, formState.lookBack));//Date calculated by end date and days back
 
     const accountMultiSelectStyles = {
         control: (baseStyles, state) => ({
@@ -110,6 +111,7 @@ export default function TradeHistoryLandingPage({...props}) {
     const handleStartDateChange = ({target}) => {
         console.log("Date: ", target.value);
         setFormState({ ...formState, startDate: target.value });
+        setDaysBackDateChange(calcDateByLookBack(target.value, formState.lookBack));
     }
     const handleLookBackChange = ({target}) => {
         //console.log("Look Back: ", target.value);
@@ -119,6 +121,7 @@ export default function TradeHistoryLandingPage({...props}) {
             return;
         }
         setFormState({ ...formState, lookBack: target.value });
+        setDaysBackDateChange(calcDateByLookBack(formState.startDate, target.value))
     }
     const handleSelectMenuClose = async(values, actionMeta) => {
         console.log("Menu Closed!", formState);
@@ -211,6 +214,11 @@ export default function TradeHistoryLandingPage({...props}) {
             console.log("Agg Value: ", target.value);
         }
     }
+    const handleDaysBackDateChange = async({target}) => {
+        console.log("Days Back Date Change: ", target.value)
+        setDaysBackDateChange(target.value);
+        setFormState({...formState, lookBack: calcLookBackDaysByDate(target.value, formState.startDate)});
+    }
 
     if (!previousBD || !accountsInfo || !securities) {
         return <h1>Loading...</h1>
@@ -221,14 +229,18 @@ export default function TradeHistoryLandingPage({...props}) {
                 <form id="trade-history-form" onSubmit={handleSubmitClick}>
                     
                     <div id="trade-history-input-group-container-1" className="input-group row" style={{ margin: "0% 0%" }} >
-                        <div id="empty-space-1" style={{ visibility: "hidden"}} className="input-group-text col-4"></div>
+                        <div id="days-back-date-change" className="input-group-text col-2">
+                            <label htmlFor="days-back-date-change"></label>
+                            <input className="form-control" id="days-back-date-change" type="date" value={daysBackDateChange} name="days-back-date-change" pattern="\d{4}-\d{2}-\d{2}" onChange={handleDaysBackDateChange}/>
+                        </div>
+                        <div id="empty-space-1" style={{ visibility: "hidden"}} className="input-group-text col-2"></div>
                         <div className="input-group-text col-2">
                             <label htmlFor="accountList"></label>
                             <input className="form-control" id="accountList" name="accountList" value={formState.accounts} placeholder="Comma separated list of accounts" onChange={handleCommaSeparatedList}/>
                         </div>
                         <div className="input-group-text col-4">
                             <label htmlFor="cusipList"></label>
-                            <input className="form-control" id="cusipList" name="cusipList" value={formState.cusips} placeholder="Comma separated list of accounts" onChange={handleCommaSeparatedCusipList}/>
+                            <input className="form-control" id="cusipList" name="cusipList" value={formState.cusips} placeholder="Comma separated list of cusips" onChange={handleCommaSeparatedCusipList}/>
                         </div>
 
                         <div id="aggregate-switches-container" className="input-group-text col-2">
@@ -330,7 +342,7 @@ export default function TradeHistoryLandingPage({...props}) {
                             <GroupItem column="orig_face" summaryType="sum" valueFormat="currency" alignByColumn displayFormat="{0}"/>
                             <GroupItem column="curr_face" summaryType="sum" valueFormat="currency" alignByColumn displayFormat="{0}"/>
                             <GroupItem column="net_money" summaryType="sum" valueFormat={{ type: "currency", precision: 2 }} alignByColumn displayFormat="{0}"/>
-                            <GroupItem column="duration_contribution" summaryType="sum" valueFormat={{ type: "decimal" }} alignByColumn displayFormat="{0}"/>
+                            <GroupItem column="duration_contribution" summaryType="sum" valueFormat={{ type: "fixedPoint", precision: 6 }} alignByColumn displayFormat="{0}"/>
                         </Summary>
                         <SortByGroupSummaryInfo summaryItem="count" />
                     </DataGrid>

@@ -49,17 +49,18 @@ export function landingPageLinksData1(previousBD) {
                     {
                         name: "KRDs Active",
                         description: <div>
-                            <p>TBD</p>
+                            <p>Active KRD's Tableau Report</p>
                         </div>,
-                        link: `#`,
+                        //link: `/activeKRDS`,
+                        link: `https://prod-useast-a.online.tableau.com/t/ccmtableau/views/KRDs/ActiveKRDs/2e2ec5f8-3d03-4b64-9d3e-26c611cf4bec/71488f7f-2837-4d03-983a-dd5fb984586c`,
                         id: "#landing-page-krds"
                     },
                     {
                         name: "KRDs By Port",
                         description: <div>
-                            <p>TBD</p>
+                            <p>Port KRD's Tableau Report</p>
                         </div>,
-                        link: `#`,
+                        link: `https://prod-useast-a.online.tableau.com/t/ccmtableau/views/KRDs/KRDs/c5dee9e9-760d-4e22-9aff-922efaad0299/8834628f-ff11-4617-a604-63b045c79faa`,
                         id: "#landing-page-krds-by-port"
                     },
                     {
@@ -104,7 +105,7 @@ export function landingPageLinksData2(previousBD) {
                         </div>,
                         link: `/shareholders`,
                         id: "#landing-page-shareholders"
-                    }
+                    },
                 ],
                 overallCount: 2
             }
@@ -582,6 +583,17 @@ export function dateFormatter(date) {
 export function sqlDateToDateString(date) {
     if(date === "") return;
     return dayjs(date).format("MM/DD/YYYY");
+}
+
+export function calcDateByLookBack(endDate, lookBack) {
+    const date = dayjs(endDate);
+    return date.subtract(lookBack, 'day').format("YYYY-MM-DD");
+}
+
+export function calcLookBackDaysByDate(startDate, endDate) {
+    const start = dayjs(startDate);
+    const end = dayjs(endDate);
+    return end.diff(start, 'day').toString();
 }
 
 export function aggRowFilter(resData, aggregateRows) {
