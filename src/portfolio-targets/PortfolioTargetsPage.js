@@ -6,7 +6,7 @@
 import { useState } from "react"
 
 export default function PortfolioTargetsPage({...props}) {
-    //DECLARE FORM VARIABLES
+    //DECLARE STATE VARIABLES
     const initialFormState = {
         activeOADTarget: "",
         activeOADMinTolerance: "",
@@ -58,11 +58,11 @@ export default function PortfolioTargetsPage({...props}) {
         activeKRDMaxTolerance30Y: "",
         activeKRDMin30Y: "",
         activeKRDMax30Y: "",
-        sectorAllocationTarget: "",
-        sectorAllocationMinTolerance: "",
-        sectorAllocationMaxTolerance: "",
-        sectorAllocationMin: "",
-        sectorAllocationMax: "",
+        //sectorAllocationTarget: "",
+        //sectorAllocationMinTolerance: "",
+        //sectorAllocationMaxTolerance: "",
+        //sectorAllocationMin: "",
+        //sectorAllocationMax: "",
         sectorAllocationTargetABS: "",
         sectorAllocationMinToleranceABS: "",
         sectorAllocationMaxToleranceABS: "",
@@ -101,14 +101,122 @@ export default function PortfolioTargetsPage({...props}) {
         sectorAllocationTotal: "",
     }
     const [formState, setFormState] = useState({...initialFormState});
+    //DECLARE DYNAMIC CALCULATION
+    const calcActiveOADTarget = (formState) => {
+        //const A = 
+        const result = ( Number(parseFloat(formState.activeKRDTarget6M).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget1Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget2Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget3Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget5Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget7Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget10Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget20Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget30Y).toFixed(4)) );
+        console.log("calcActiveOADTarget: ", result);
+        return parseFloat(result).toFixed(2);
+    } 
+    const calcActiveOADMin = (d5, d7) => {
+        let result;
+        const D5 = Number(parseFloat(d5).toFixed(4));
+        const D7 = Number(parseFloat(d7).toFixed(4));
+        // Check if D5 is greater than 0
+        if (D5 > 0) {
+            // If true, calculate the maximum of 0 and the difference between D5 and D7
+            result = Math.max(0, D5 - D7);
+        } else if (D5 < 0) {
+            // If D5 is less than 0, calculate the minimum of 0 and the difference between D5 and D7
+            result = Math.min(0, D5 - D7);
+        } else {
+            // If D5 is not greater than 0 and not less than 0, assign 0 to the variable 'result'
+            result = 0;
+        }
 
+        return parseFloat(result).toFixed(2);
+    }
+    const calcActiveOADMax = (d5, d8) => {
+        let result;
+        const D5 = Number(parseFloat(d5).toFixed(4));
+        const D8 = Number(parseFloat(d8).toFixed(4));
+        // Check if D5 is greater than 0
+        if (D5 < 0) {
+            // If true, calculate the maximum of 0 and the sum between D5 and D8
+            result = Math.max(0, D5 + D8);
+        } else if (D5 > 0) {
+            // If D5 is less than 0, calculate the minimum of 0 and the sum between D5 and D8
+            result = Math.min(0, D5 + D8);
+        } else {
+            // If D5 is not greater than 0 and not less than 0, assign 0 to the variable 'result'
+            result = 0;
+        }
+
+        return parseFloat(result).toFixed(2);
+    }
+    const calcActiveKRDMinOrMax = (h5, h7) => {
+        const H5 = Number(parseFloat(h5).toFixed(4));
+        const H7 = Number(parseFloat(h7).toFixed(4));
+        const result = H5 + H7;
+        return parseFloat(result).toFixed(2);
+    }
+    const calcSectorAllocationTotal = (formState) => {
+        const result = ( Number(parseFloat(formState.sectorAllocationTargetABS).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetCash).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetCorporate).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetGovt).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetMultiFamMBS).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetMuni).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetSingleFamMBS).toFixed(2)) );
+        console.log("calcSectorAllocationTotal: ", parseFloat(result).toFixed(2));
+        return parseFloat(result).toFixed(2);
+    }
+    const calcSectorAllocationMinOrMax = (target, minOrMaxTolerance) => {
+        const sum = ( Number(parseFloat(target).toFixed(4)) + Number(parseFloat(minOrMaxTolerance).toFixed(4)) );
+        const result = Math.max(0, sum);
+        return parseFloat(result).toFixed(2);
+    }
     //DECLARE EVENT HANDLER FUNCTIONS
     const handleSave = (event) => {
         event.preventDefault();
         console.log("Form State: ", formState)
     }
+    const handleGenerateClick = () => {
+        const activeOADTargetValue = calcActiveOADTarget(formState);
+
+        const calculatedFormState = {
+            ...formState,
+            activeOADTarget: activeOADTargetValue,
+            activeOADMin: calcActiveOADMin(activeOADTargetValue, formState.activeOADMinTolerance),
+            activeOADMax: calcActiveOADMax(activeOADTargetValue, formState.activeOADMaxTolerance),
+            activeKRDMin6M: calcActiveKRDMinOrMax(formState.activeKRDTarget6M, formState.activeKRDMinTolerance6M),
+            activeKRDMin1Y: calcActiveKRDMinOrMax(formState.activeKRDTarget1Y, formState.activeKRDMinTolerance1Y),
+            activeKRDMin2Y: calcActiveKRDMinOrMax(formState.activeKRDTarget2Y, formState.activeKRDMinTolerance2Y),
+            activeKRDMin3Y: calcActiveKRDMinOrMax(formState.activeKRDTarget3Y, formState.activeKRDMinTolerance3Y),
+            activeKRDMin5Y: calcActiveKRDMinOrMax(formState.activeKRDTarget5Y, formState.activeKRDMinTolerance5Y),
+            activeKRDMin7Y: calcActiveKRDMinOrMax(formState.activeKRDTarget7Y, formState.activeKRDMinTolerance7Y),
+            activeKRDMin10Y: calcActiveKRDMinOrMax(formState.activeKRDTarget10Y, formState.activeKRDMinTolerance10Y),
+            activeKRDMin20Y: calcActiveKRDMinOrMax(formState.activeKRDTarget20Y, formState.activeKRDMinTolerance20Y),
+            activeKRDMin30Y: calcActiveKRDMinOrMax(formState.activeKRDTarget30Y, formState.activeKRDMinTolerance30Y),
+            activeKRDMax6M: calcActiveKRDMinOrMax(formState.activeKRDTarget6M, formState.activeKRDMaxTolerance6M),
+            activeKRDMax1Y: calcActiveKRDMinOrMax(formState.activeKRDTarget1Y, formState.activeKRDMaxTolerance1Y),
+            activeKRDMax2Y: calcActiveKRDMinOrMax(formState.activeKRDTarget2Y, formState.activeKRDMaxTolerance2Y),
+            activeKRDMax3Y: calcActiveKRDMinOrMax(formState.activeKRDTarget3Y, formState.activeKRDMaxTolerance3Y),
+            activeKRDMax5Y: calcActiveKRDMinOrMax(formState.activeKRDTarget5Y, formState.activeKRDMaxTolerance5Y),
+            activeKRDMax7Y: calcActiveKRDMinOrMax(formState.activeKRDTarget7Y, formState.activeKRDMaxTolerance7Y),
+            activeKRDMax10Y: calcActiveKRDMinOrMax(formState.activeKRDTarget10Y, formState.activeKRDMaxTolerance10Y),
+            activeKRDMax20Y: calcActiveKRDMinOrMax(formState.activeKRDTarget20Y, formState.activeKRDMaxTolerance20Y),
+            activeKRDMax30Y: calcActiveKRDMinOrMax(formState.activeKRDTarget30Y, formState.activeKRDMaxTolerance30Y),
+            sectorAllocationTotal: calcSectorAllocationTotal(formState),
+            sectorAllocationMinABS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetABS, formState.sectorAllocationMinToleranceABS),
+            sectorAllocationMinCash: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCash, formState.sectorAllocationMinToleranceCash),
+            sectorAllocationMinCorporate: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCorporate, formState.sectorAllocationMinToleranceCorporate),
+            sectorAllocationMinGovt: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetGovt, formState.sectorAllocationMinToleranceGovt),
+            sectorAllocationMinMultiFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMultiFamMBS, formState.sectorAllocationMinToleranceMultiFamMBS),
+            sectorAllocationMinMuni: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMuni, formState.sectorAllocationMinToleranceMuni),
+            sectorAllocationMinSingleFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetSingleFamMBS, formState.sectorAllocationMinToleranceSingleFamMBS),
+            sectorAllocationMaxABS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetABS, formState.sectorAllocationMaxToleranceABS),
+            sectorAllocationMaxCash: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCash, formState.sectorAllocationMaxToleranceCash),
+            sectorAllocationMaxCorporate: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCorporate, formState.sectorAllocationMaxToleranceCorporate),
+            sectorAllocationMaxGovt: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetGovt, formState.sectorAllocationMaxToleranceGovt),
+            sectorAllocationMaxMultiFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMultiFamMBS, formState.sectorAllocationMaxToleranceMultiFamMBS),
+            sectorAllocationMaxMuni: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMuni, formState.sectorAllocationMaxToleranceMuni),
+            sectorAllocationMaxSingleFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetSingleFamMBS, formState.sectorAllocationMaxToleranceSingleFamMBS),
+        }
+        console.log("Form State after calculation: ",calculatedFormState)
+        setFormState({...calculatedFormState})
+    }
     const handleInputChange = ({target}) => {
-        setFormState({...formState, [target.name]: target.value})
+        console.log(`${target.name} = ${target.value}`);
+        setFormState(
+            {...formState, 
+                [target.name]: target.value,
+            }
+        )
     }
 
     return (
@@ -118,7 +226,8 @@ export default function PortfolioTargetsPage({...props}) {
 
                 {/*<div className="container">*/}
         <div id="portfolio-target-button-container" style={{ float: "right"}}>
-            <button className="btn btn-primary btn-sm">Save</button>
+            <button className="btn btn-primary btn-sm" type="button" onClick={handleGenerateClick}>Generate</button>
+            <button className="btn btn-secondary btn-sm" type="submit">Save</button>
         </div>
 
                 <div className="row" id="header-row">
@@ -391,7 +500,7 @@ export default function PortfolioTargetsPage({...props}) {
                 </div>
 
                 <div className="row" id="sector-allocation-subheader-row">
-                    <div className="col-2"></div>
+                    <div className="col-1"></div>
                     <div className="col-1">
                         <h6>ABS</h6>
                     </div>
@@ -420,9 +529,11 @@ export default function PortfolioTargetsPage({...props}) {
 
                 <div className="row" id="sector-allocation-target-row">
                     <label htmlFor="sectorAllocationTarget" className="col-form-label col-1">Target</label>
+                    {/*
                     <div className="col-1">
                         <input className="form-control" id="sectorAllocationTarget" name="sectorAllocationTarget" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTarget}/>
                     </div>
+                     */}
                     <div className="col-1">
                         <input className="form-control" id="sectorAllocationTargetABS" name="sectorAllocationTargetABS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetABS}/>
                     </div>
@@ -451,9 +562,11 @@ export default function PortfolioTargetsPage({...props}) {
 
                 <div className="row" id="sector-allocation-min-tolerance-row">
                     <label htmlFor="sectorAllocationMinTolerance" className="col-form-label col-1">Min Tolerance</label>
+                    {/*
                     <div className="col-1">
                         <input className="form-control" id="sectorAllocationMinTolerance" name="sectorAllocationMinTolerance" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinTolerance}/>
                     </div>
+                    */}
                     <div className="col-1">
                         <input className="form-control" id="sectorAllocationMinToleranceABS" name="sectorAllocationMinToleranceABS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceABS}/>
                     </div>
@@ -479,9 +592,11 @@ export default function PortfolioTargetsPage({...props}) {
 
                 <div className="row" id="sector-allocation-max-tolerance-row">
                     <label htmlFor="sectorAllocationMaxTolerance" className="col-form-label col-1">Max Tolerance</label>
+                    {/*
                     <div className="col-1">
                         <input className="form-control" id="sectorAllocationMaxTolerance" name="sectorAllocationMaxTolerance" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxTolerance}/>
                     </div>
+                    */}
                     <div className="col-1">
                         <input className="form-control" id="sectorAllocationMaxToleranceABS" name="sectorAllocationMaxToleranceABS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceABS}/>
                     </div>
@@ -507,9 +622,11 @@ export default function PortfolioTargetsPage({...props}) {
 
                 <div className="row" id="sector-allocation-min-row">
                     <label htmlFor="sectorAllocationMin" className="col-form-label col-1">Min</label>
+                    {/*
                     <div className="col-1">
                         <input className="form-control" id="sectorAllocationMin" name="sectorAllocationMin" placeholder="Ex 5%" disabled value={formState.sectorAllocationMin}/>
                     </div>
+                    */}
                     <div className="col-1">
                         <input className="form-control" id="sectorAllocationMinABS" name="sectorAllocationMinABS" placeholder="Ex 5%" disabled value={formState.sectorAllocationMinABS}/>
                     </div>
@@ -535,9 +652,11 @@ export default function PortfolioTargetsPage({...props}) {
 
                 <div className="row" id="sector-allocation-max-row">
                     <label htmlFor="sectorAllocationMax" className="col-form-label col-1">Max</label>
+                    {/*
                     <div className="col-1">
                         <input className="form-control" id="sectorAllocationMax" name="sectorAllocationMax" placeholder="Ex 5%" disabled value={formState.sectorAllocationMax}/>
                     </div>
+                    */}
                     <div className="col-1">
                         <input className="form-control" id="sectorAllocationMaxABS" name="sectorAllocationMaxABS" placeholder="Ex 5%" disabled value={formState.sectorAllocationMaxABS}/>
                     </div>
