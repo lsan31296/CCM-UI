@@ -3,7 +3,8 @@
  * calculated and displayed in conjunction. These input cells will also be saved after hitting a 'Run' button.
  */
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { getPreviousPortfolioTargets } from "../utils/api";
 
 export default function PortfolioTargetsPage({...props}) {
     //DECLARE STATE VARIABLES
@@ -152,13 +153,13 @@ export default function PortfolioTargetsPage({...props}) {
     }
     const calcSectorAllocationTotal = (formState) => {
         const result = ( Number(parseFloat(formState.sectorAllocationTargetABS).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetCash).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetCorporate).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetGovt).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetMultiFamMBS).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetMuni).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetSingleFamMBS).toFixed(2)) );
-        console.log("calcSectorAllocationTotal: ", parseFloat(result).toFixed(2));
-        return parseFloat(result).toFixed(2);
+        console.log("calcSectorAllocationTotal: ", parseFloat(result).toFixed(4));
+        return parseFloat(result).toFixed(4);
     }
     const calcSectorAllocationMinOrMax = (target, minOrMaxTolerance) => {
         const sum = ( Number(parseFloat(target).toFixed(4)) + Number(parseFloat(minOrMaxTolerance).toFixed(4)) );
         const result = Math.max(0, sum);
-        return parseFloat(result).toFixed(2);
+        return parseFloat(result).toFixed(4);
     }
     //DECLARE EVENT HANDLER FUNCTIONS
     const handleSave = (event) => {
@@ -218,6 +219,19 @@ export default function PortfolioTargetsPage({...props}) {
             }
         )
     }
+
+    async function loadPreviousPortfolioTargets() {
+        console.log("Loading Previous Portfolio Targets!");
+        const abortController = new AbortController();
+
+        const response = await getPreviousPortfolioTargets(abortController.signal);
+        setFormState({...formState, ...response[0] });
+        console.log("Previous Portfolio Targets: ", response[0]);
+
+        return () => abortController.abort();
+    }
+
+    useEffect(() => {loadPreviousPortfolioTargets()}, []);
 
     return (
         <div id="portfolio-targets-page-container">

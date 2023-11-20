@@ -224,3 +224,8 @@ export async function getTradeHistoryLanding(params, signal) {
     }
     return await fetchJson(url, options);
 }
+
+export async function getPreviousPortfolioTargets(signal) {
+    const url = `${API_BASE_URL}/get-sonic-target-inputs`;
+    return await fetchJson(url, signal);
+}
