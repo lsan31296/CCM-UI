@@ -229,3 +229,15 @@ export async function getPreviousPortfolioTargets(signal) {
     const url = `${API_BASE_URL}/get-sonic-target-inputs`;
     return await fetchJson(url, signal);
 }
+
+//NEED TO CREATE THE POST REQUEST TO UPDATE PORTFOLIO TARGETS
+export async function savePortfolioTargets(params, signal) {
+    const url = new URL(`${API_BASE_URL}/update-sonic-target-inputs`);
+    const options = {
+        method: "POST",
+        headers,
+        body: JSON.stringify(params),
+        signal,
+    }
+    return await fetchJson(url, options);
+}

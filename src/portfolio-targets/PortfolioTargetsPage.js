@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState } from "react"
-import { getPreviousPortfolioTargets } from "../utils/api";
+import { getPreviousPortfolioTargets, savePortfolioTargets } from "../utils/api";
 
 export default function PortfolioTargetsPage({...props}) {
     //DECLARE STATE VARIABLES
@@ -106,7 +106,7 @@ export default function PortfolioTargetsPage({...props}) {
     const calcActiveOADTarget = (formState) => {
         //const A = 
         const result = ( Number(parseFloat(formState.activeKRDTarget6M).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget1Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget2Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget3Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget5Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget7Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget10Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget20Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget30Y).toFixed(4)) );
-        console.log("calcActiveOADTarget: ", result);
+        console.log("calcActiveOADTarget: ", parseFloat(result).toFixed(2));
         return parseFloat(result).toFixed(2);
     } 
     const calcActiveOADMin = (d5, d7) => {
@@ -162,9 +162,20 @@ export default function PortfolioTargetsPage({...props}) {
         return parseFloat(result).toFixed(4);
     }
     //DECLARE EVENT HANDLER FUNCTIONS
-    const handleSave = (event) => {
+    const handleSave = async (event) => {
         event.preventDefault();
         console.log("Form State: ", formState)
+        //Turn data into decimal numbers
+        const formattedInputs = {...formState};
+        for (const property in formState) {
+            if(typeof(formState[property]) === "string") {
+                formattedInputs[property] = Number(formattedInputs[property])
+            }
+        }
+        console.log("Formatted formState: ", formattedInputs)
+        //NEED TO CREATE A POST REQUEST THAT SENDS OVER ALL THE USER INPUTS UPON HITTING THE SAVE BUTTON. EVENTUALLY IT SHOULD RETURN TRADES USER SHOULD EXECUTE IN ORDER TO INCREASE PORTFOLIO NUMBERS
+        await savePortfolioTargets(formattedInputs);
+        console.log("Saved Portfolio Inputs to database.");
     }
     const handleGenerateClick = () => {
         const activeOADTargetValue = calcActiveOADTarget(formState);
@@ -225,6 +236,7 @@ export default function PortfolioTargetsPage({...props}) {
         const abortController = new AbortController();
 
         const response = await getPreviousPortfolioTargets(abortController.signal);
+        
         setFormState({...formState, ...response[0] });
         console.log("Previous Portfolio Targets: ", response[0]);
 
@@ -378,7 +390,7 @@ export default function PortfolioTargetsPage({...props}) {
                 <div className="row" id="max-tolerance-row">
                     <label htmlFor="activeOADMaxTolerance" className="col-form-label col-1">Max Tolerance</label>
                     <div className="col-1">
-                        <input className="form-control" id="activeAodMaxTolerance" name="activeOADMaxTolerance" placeholder="Ex 0.03" onChange={handleInputChange} value={formState.activeKRDMaxTolerance}/>
+                        <input className="form-control" id="activeAodMaxTolerance" name="activeOADMaxTolerance" placeholder="Ex 0.03" onChange={handleInputChange} value={formState.activeOADMaxTolerance}/>
                     </div>
 
                     <div className="col-1">
