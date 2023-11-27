@@ -102,6 +102,7 @@ export default function PortfolioTargetsPage({...props}) {
         sectorAllocationTotal: "",
     }
     const [formState, setFormState] = useState({...initialFormState});
+    const [firstRenderFormState, setFirstRenderFormState] = useState(null);
     //DECLARE DYNAMIC CALCULATION
     const calcActiveOADTarget = (formState) => {
         //const A = 
@@ -176,6 +177,7 @@ export default function PortfolioTargetsPage({...props}) {
         //NEED TO CREATE A POST REQUEST THAT SENDS OVER ALL THE USER INPUTS UPON HITTING THE SAVE BUTTON. EVENTUALLY IT SHOULD RETURN TRADES USER SHOULD EXECUTE IN ORDER TO INCREASE PORTFOLIO NUMBERS
         await savePortfolioTargets(formattedInputs);
         console.log("Saved Portfolio Inputs to database.");
+        generateOnLoad();
     }
     const handleGenerateClick = () => {
         const activeOADTargetValue = calcActiveOADTarget(formState);
@@ -230,20 +232,27 @@ export default function PortfolioTargetsPage({...props}) {
             }
         )
     }
-
+    //DECLARE HOOKS
     async function loadPreviousPortfolioTargets() {
         console.log("Loading Previous Portfolio Targets!");
         const abortController = new AbortController();
 
         const response = await getPreviousPortfolioTargets(abortController.signal);
         
-        setFormState({...formState, ...response[0] });
+        setFormState({ ...formState, ...response[0] });
+        setFirstRenderFormState({ ...formState, ...response[0] });
         console.log("Previous Portfolio Targets: ", response[0]);
 
         return () => abortController.abort();
     }
 
+    async function generateOnLoad() {
+        console.log("Generating on function call not click!");
+        document.getElementById('generate-button').click();
+    }
+
     useEffect(() => {loadPreviousPortfolioTargets()}, []);
+    useEffect(() => {generateOnLoad()}, [firstRenderFormState]);
 
     return (
         <div id="portfolio-targets-page-container">
@@ -252,8 +261,8 @@ export default function PortfolioTargetsPage({...props}) {
 
                 {/*<div className="container">*/}
         <div id="portfolio-target-button-container" style={{ float: "right"}}>
-            <button className="btn btn-primary btn-sm" type="button" onClick={handleGenerateClick}>Generate</button>
-            <button className="btn btn-secondary btn-sm" type="submit">Save</button>
+            <button id="generate-button" className="btn btn-primary btn-sm" type="button" onClick={handleGenerateClick}>Generate</button>
+            <button id="save-button" className="btn btn-secondary btn-sm" type="submit">Save</button>
         </div>
 
                 <div className="row" id="header-row">
