@@ -128,7 +128,7 @@ export default function PortfolioTargetsPage({...props}) {
 
         return parseFloat(result).toFixed(2);
     }
-    /*
+    /*//For some reason this wasn't working the same as the excel sheet. Excel sheet showed 0.03 for max while web ui showed 0.00
     const calcActiveOADMax = (d5, d8) => {
         let result;
         const D5 = Number(parseFloat(d5).toFixed(4));
@@ -177,12 +177,12 @@ export default function PortfolioTargetsPage({...props}) {
     const calcSectorAllocationTotal = (formState) => {
         const result = ( Number(parseFloat(formState.sectorAllocationTargetABS).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetCash).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetCorporate).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetGovt).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetMultiFamMBS).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetMuni).toFixed(2)) + Number(parseFloat(formState.sectorAllocationTargetSingleFamMBS).toFixed(2)) );
         console.log("calcSectorAllocationTotal: ", parseFloat(result).toFixed(4));
-        return parseFloat(result).toFixed(4);
+        return parseFloat(result).toFixed(2);
     }
     const calcSectorAllocationMinOrMax = (target, minOrMaxTolerance) => {
         const sum = ( Number(parseFloat(target).toFixed(4)) + Number(parseFloat(minOrMaxTolerance).toFixed(4)) );
         const result = Math.max(0, sum);
-        return parseFloat(result).toFixed(4);
+        return parseFloat(result).toFixed(2);
     }
     //DECLARE EVENT HANDLER FUNCTIONS
     const handleSave = async (event) => {
@@ -193,6 +193,9 @@ export default function PortfolioTargetsPage({...props}) {
         for (const property in formState) {
             if(typeof(formState[property]) === "string") {
                 formattedInputs[property] = Number(formattedInputs[property])
+            }
+            if(property.includes("sector")) {
+                formattedInputs[property] = formattedInputs[property] / 100;
             }
         }
         console.log("Formatted formState: ", formattedInputs)
@@ -260,10 +263,16 @@ export default function PortfolioTargetsPage({...props}) {
         const abortController = new AbortController();
 
         const response = await getPreviousPortfolioTargets(abortController.signal);
+        const formattedFormState = {...formState, ...response[0]};
+        for (const property in formState) {
+            if(property.includes("sector")) {
+                formattedFormState[property] = parseFloat(formattedFormState[property] * 100).toFixed(2);
+            }
+        }
+        console.log("Formatted formState Loaded: ", formattedFormState)
         
-        setFormState({ ...formState, ...response[0] });
-        setFirstRenderFormState({ ...formState, ...response[0] });
-        console.log("Previous Portfolio Targets: ", response[0]);
+        setFormState({ ...formattedFormState });
+        setFirstRenderFormState({ ...formattedFormState });
 
         return () => abortController.abort();
     }
@@ -592,28 +601,52 @@ export default function PortfolioTargetsPage({...props}) {
                     </div>
                      */}
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationTargetABS" name="sectorAllocationTargetABS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetABS}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationTargetABS" name="sectorAllocationTargetABS" placeholder="Ex 5%" onChange={handleInputChange} value={formState.sectorAllocationTargetABS} />
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationTargetCash" name="sectorAllocationTargetCash" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetCash}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationTargetCash" name="sectorAllocationTargetCash" placeholder="Ex 5%" onChange={handleInputChange} value={formState.sectorAllocationTargetCash} />
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationTargetCorporate" name="sectorAllocationTargetCorporate" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetCorporate}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationTargetCorporate" name="sectorAllocationTargetCorporate" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetCorporate}/>
+                            <div className="input-group-text">%</div>
+                        </div> 
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationTargetGovt" name="sectorAllocationTargetGovt" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetGovt}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationTargetGovt" name="sectorAllocationTargetGovt" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetGovt}/>
+                            <div className="input-group-text">%</div>
+                        </div> 
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationTargetMultiFamMBS" name="sectorAllocationTargetMultiFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetMultiFamMBS}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationTargetMultiFamMBS" name="sectorAllocationTargetMultiFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetMultiFamMBS}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationTargetMuni" name="sectorAllocationTargetMuni" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetMuni}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationTargetMuni" name="sectorAllocationTargetMuni" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetMuni}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationTargetSingleFamMBS" name="sectorAllocationTargetSingleFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetSingleFamMBS}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationTargetSingleFamMBS" name="sectorAllocationTargetSingleFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetSingleFamMBS}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationTotal" name="sectorAllocationTotal" placeholder="Ex 5%" disabled value={formState.sectorAllocationTotal}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationTotal" name="sectorAllocationTotal" placeholder="Ex 5%" disabled value={formState.sectorAllocationTotal}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                 </div>
 
@@ -625,25 +658,46 @@ export default function PortfolioTargetsPage({...props}) {
                     </div>
                     */}
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMinToleranceABS" name="sectorAllocationMinToleranceABS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceABS}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMinToleranceABS" name="sectorAllocationMinToleranceABS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceABS}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMinToleranceCash" name="sectorAllocationMinToleranceCash" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceCash}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMinToleranceCash" name="sectorAllocationMinToleranceCash" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceCash}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMinToleranceCorporate" name="sectorAllocationMinToleranceCorporate" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceCorporate}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMinToleranceCorporate" name="sectorAllocationMinToleranceCorporate" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceCorporate}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMinToleranceGovt" name="sectorAllocationMinToleranceGovt" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceGovt}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMinToleranceGovt" name="sectorAllocationMinToleranceGovt" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceGovt}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMinToleranceMultiFamMBS" name="sectorAllocationMinToleranceMultiFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceMultiFamMBS}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMinToleranceMultiFamMBS" name="sectorAllocationMinToleranceMultiFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceMultiFamMBS}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMinToleranceMuni" name="sectorAllocationMinToleranceMuni" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceMuni}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMinToleranceMuni" name="sectorAllocationMinToleranceMuni" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceMuni}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMinToleranceSingleFamMBS" name="sectorAllocationMinToleranceSingleFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceSingleFamMBS}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMinToleranceSingleFamMBS" name="sectorAllocationMinToleranceSingleFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceSingleFamMBS}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                 </div>
 
@@ -655,25 +709,46 @@ export default function PortfolioTargetsPage({...props}) {
                     </div>
                     */}
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMaxToleranceABS" name="sectorAllocationMaxToleranceABS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceABS}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMaxToleranceABS" name="sectorAllocationMaxToleranceABS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceABS}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMaxToleranceCash" name="sectorAllocationMaxToleranceCash" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceCash}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMaxToleranceCash" name="sectorAllocationMaxToleranceCash" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceCash}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMaxToleranceCorporate" name="sectorAllocationMaxToleranceCorporate" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceCorporate}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMaxToleranceCorporate" name="sectorAllocationMaxToleranceCorporate" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceCorporate}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMaxToleranceGovt" name="sectorAllocationMaxToleranceGovt" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceGovt}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMaxToleranceGovt" name="sectorAllocationMaxToleranceGovt" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceGovt}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMaxToleranceMultiFamMBS" name="sectorAllocationMaxToleranceMultiFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceMultiFamMBS}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMaxToleranceMultiFamMBS" name="sectorAllocationMaxToleranceMultiFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceMultiFamMBS}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMaxToleranceMuni" name="sectorAllocationMaxToleranceMuni" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceMuni}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMaxToleranceMuni" name="sectorAllocationMaxToleranceMuni" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceMuni}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMaxToleranceSingleFamMBS" name="sectorAllocationMaxToleranceSingleFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceSingleFamMBS}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMaxToleranceSingleFamMBS" name="sectorAllocationMaxToleranceSingleFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceSingleFamMBS}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                 </div>
 
@@ -685,25 +760,46 @@ export default function PortfolioTargetsPage({...props}) {
                     </div>
                     */}
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMinABS" name="sectorAllocationMinABS" placeholder="Ex 5%" disabled value={formState.sectorAllocationMinABS}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMinABS" name="sectorAllocationMinABS" placeholder="Ex 5%" disabled value={formState.sectorAllocationMinABS}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMinCash" name="sectorAllocationMinCash" placeholder="Ex 5%" disabled value={formState.sectorAllocationMinCash}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMinCash" name="sectorAllocationMinCash" placeholder="Ex 5%" disabled value={formState.sectorAllocationMinCash}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMinCorporate" name="sectorAllocationMinCorporate" placeholder="Ex 5%" disabled value={formState.sectorAllocationMinCorporate}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMinCorporate" name="sectorAllocationMinCorporate" placeholder="Ex 5%" disabled value={formState.sectorAllocationMinCorporate}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMinGovt" name="sectorAllocationMinGovt" placeholder="Ex 5%" disabled value={formState.sectorAllocationMinGovt}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMinGovt" name="sectorAllocationMinGovt" placeholder="Ex 5%" disabled value={formState.sectorAllocationMinGovt}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMinMultiFamMBS" name="sectorAllocationMinMultiFamMBS" placeholder="Ex 5%" disabled value={formState.sectorAllocationMinMultiFamMBS}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMinMultiFamMBS" name="sectorAllocationMinMultiFamMBS" placeholder="Ex 5%" disabled value={formState.sectorAllocationMinMultiFamMBS}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMinMuni" name="sectorAllocationMinMuni" placeholder="Ex 5%" disabled value={formState.sectorAllocationMinMuni}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMinMuni" name="sectorAllocationMinMuni" placeholder="Ex 5%" disabled value={formState.sectorAllocationMinMuni}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMinSingleFamMBS" name="sectorAllocationMinSingleFamMBS" placeholder="Ex 5%" disabled value={formState.sectorAllocationMinSingleFamMBS}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMinSingleFamMBS" name="sectorAllocationMinSingleFamMBS" placeholder="Ex 5%" disabled value={formState.sectorAllocationMinSingleFamMBS}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                 </div>
 
@@ -715,25 +811,46 @@ export default function PortfolioTargetsPage({...props}) {
                     </div>
                     */}
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMaxABS" name="sectorAllocationMaxABS" placeholder="Ex 5%" disabled value={formState.sectorAllocationMaxABS}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMaxABS" name="sectorAllocationMaxABS" placeholder="Ex 5%" disabled value={formState.sectorAllocationMaxABS}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMaxCash" name="sectorAllocationMaxCash" placeholder="Ex 5%" disabled value={formState.sectorAllocationMaxCash}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMaxCash" name="sectorAllocationMaxCash" placeholder="Ex 5%" disabled value={formState.sectorAllocationMaxCash}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMaxCorporate" name="sectorAllocationMaxCorporate" placeholder="Ex 5%" disabled value={formState.sectorAllocationMaxCorporate}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMaxCorporate" name="sectorAllocationMaxCorporate" placeholder="Ex 5%" disabled value={formState.sectorAllocationMaxCorporate}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMaxGovt" name="sectorAllocationMaxGovt" placeholder="Ex 5%" disabled value={formState.sectorAllocationMaxGovt}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMaxGovt" name="sectorAllocationMaxGovt" placeholder="Ex 5%" disabled value={formState.sectorAllocationMaxGovt}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMaxMultiFamMBS" name="sectorAllocationMaxMultiFamMBS" placeholder="Ex 5%" disabled value={formState.sectorAllocationMaxMultiFamMBS}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMaxMultiFamMBS" name="sectorAllocationMaxMultiFamMBS" placeholder="Ex 5%" disabled value={formState.sectorAllocationMaxMultiFamMBS}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMaxMuni" name="sectorAllocationMaxMuni" placeholder="Ex 5%" disabled value={formState.sectorAllocationMaxMuni}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMaxMuni" name="sectorAllocationMaxMuni" placeholder="Ex 5%" disabled value={formState.sectorAllocationMaxMuni}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                     <div className="col-1">
-                        <input className="form-control" id="sectorAllocationMaxSingleFamMBS" name="sectorAllocationMaxSingleFamMBS" placeholder="Ex 5%" disabled value={formState.sectorAllocationMaxSingleFamMBS}/>
+                        <div className="input-group">
+                            <input className="form-control" id="sectorAllocationMaxSingleFamMBS" name="sectorAllocationMaxSingleFamMBS" placeholder="Ex 5%" disabled value={formState.sectorAllocationMaxSingleFamMBS}/>
+                            <div className="input-group-text">%</div>
+                        </div>
                     </div>
                 </div>
                 {/*</div>*/}
