@@ -128,6 +128,7 @@ export default function PortfolioTargetsPage({...props}) {
 
         return parseFloat(result).toFixed(2);
     }
+    /*
     const calcActiveOADMax = (d5, d8) => {
         let result;
         const D5 = Number(parseFloat(d5).toFixed(4));
@@ -135,13 +136,34 @@ export default function PortfolioTargetsPage({...props}) {
         // Check if D5 is greater than 0
         if (D5 < 0) {
             // If true, calculate the maximum of 0 and the sum between D5 and D8
+            console.log("D5 < 0");
             result = Math.max(0, D5 + D8);
         } else if (D5 > 0) {
             // If D5 is less than 0, calculate the minimum of 0 and the sum between D5 and D8
+            console.log("D5 > 0");
             result = Math.min(0, D5 + D8);
         } else {
             // If D5 is not greater than 0 and not less than 0, assign 0 to the variable 'result'
+            console.log("D5 = 0");
             result = 0;
+        }
+
+        return parseFloat(result).toFixed(2);
+    }
+    */
+    const calcActiveOADMax = (d5, d8) => {
+        let result;
+        const D5 = Number(parseFloat(d5).toFixed(4));
+        const D8 = Number(parseFloat(d8).toFixed(4));
+        // Check if D5 is greater than 0
+        if (D5 > 0) {
+            // If D5 is less than 0, calculate the minimum of 0 and the sum between D5 and D8
+            console.log("D5 > 0");
+            result = Math.min(0, D5 + D8);
+        } else {
+            // If true, calculate the maximum of 0 and the sum between D5 and D8
+            console.log("D5 < 0");
+            result = Math.max(0, D5 + D8);
         }
 
         return parseFloat(result).toFixed(2);
