@@ -14,6 +14,7 @@ import CusipRiskHoldings from './cusip/CusipRiskHoldings';
 import TradeHistoryLandingPage from './trade-history/TradeHistoryLandingPage';
 import LandingPage from './home-landing/LandingPage';
 import PortfolioTargetsPage from './portfolio-targets/PortfolioTargetsPage';
+import VConnConfirmationPage from './vconn/VConnConfirmationPage';
 
 function App() {
   const [previousBD, setPreviousBD] = useState(null);
@@ -68,6 +69,7 @@ function App() {
             <Route path='/shareholders' element={<ShareHolders />} />
             <Route path='/trade-history' element={<TradeHistoryLandingPage previousBD={previousBD} accountsInfo={accountsInfo} securities={securities}/> } />
             <Route path='/portfolio-targets' element={<PortfolioTargetsPage />} />
+            <Route path='/vconn-confirmation' element={<VConnConfirmationPage previousBD={previousBD} accountsInfo={accountsInfo} securities={securities}/>}  />
           </Routes>
         </main>
 

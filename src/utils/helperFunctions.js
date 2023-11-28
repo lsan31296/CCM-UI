@@ -115,9 +115,20 @@ export function landingPageLinksData2(previousBD) {
                         </div>,
                         link: `/portfolio-targets`,
                         id: "#landing-page-portfolio-targets",
+                    },
+                    {
+                        name: "VConn Confirmation Page",
+                        description: <div>
+                            <p>Sample: '/vconn-confirmation'</p>
+                            <p>Page which displays whether BBG and Carlton trades</p>
+                            <p>are a confirmed match. Trades are editable if such a case</p>
+                            <p>occurs.</p>
+                        </div>,
+                        link: `/vconn-confirmation`,
+                        id: "#landing-page-vconn-confirmation",
                     }
                 ],
-                overallCount: 3
+                overallCount: 4
             }
         ]
     );
