@@ -109,7 +109,8 @@ export default function PortfolioTargetsPage({...props}) {
         const result = ( Number(parseFloat(formState.activeKRDTarget6M).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget1Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget2Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget3Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget5Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget7Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget10Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget20Y).toFixed(4)) + Number(parseFloat(formState.activeKRDTarget30Y).toFixed(4)) );
         console.log("calcActiveOADTarget: ", parseFloat(result).toFixed(2));
         return parseFloat(result).toFixed(2);
-    } 
+    }
+    /*//Apparently equation was wrong at the source
     const calcActiveOADMin = (d5, d7) => {
         let result;
         const D5 = Number(parseFloat(d5).toFixed(4));
@@ -125,6 +126,16 @@ export default function PortfolioTargetsPage({...props}) {
             // If D5 is not greater than 0 and not less than 0, assign 0 to the variable 'result'
             result = 0;
         }
+
+        return parseFloat(result).toFixed(2);
+    }
+    */
+    const calcActiveOADMin = (d5, d7) => {
+        let result;
+        const D5 = Number(parseFloat(d5).toFixed(4));
+        const D7 = Number(parseFloat(d7).toFixed(4));
+        
+        result = Math.max(0, D5 + D7);
 
         return parseFloat(result).toFixed(2);
     }
@@ -155,16 +166,8 @@ export default function PortfolioTargetsPage({...props}) {
         let result;
         const D5 = Number(parseFloat(d5).toFixed(4));
         const D8 = Number(parseFloat(d8).toFixed(4));
-        // Check if D5 is greater than 0
-        if (D5 > 0) {
-            // If D5 is less than 0, calculate the minimum of 0 and the sum between D5 and D8
-            console.log("D5 > 0");
-            result = Math.min(0, D5 + D8);
-        } else {
-            // If true, calculate the maximum of 0 and the sum between D5 and D8
-            console.log("D5 < 0");
-            result = Math.max(0, D5 + D8);
-        }
+
+        result = Math.max(0, D5 + D8);
 
         return parseFloat(result).toFixed(2);
     }
@@ -286,17 +289,17 @@ export default function PortfolioTargetsPage({...props}) {
     useEffect(() => {generateOnLoad()}, [firstRenderFormState]);
 
     return (
-        <div id="portfolio-targets-page-container">
+        <div id="portfolio-targets-page-container" style={{ padding: "0% 1% 0% 1%" }}>
             <h1>Portfolio Targets</h1>
             <form id="portfolio-targets-form" onSubmit={handleSave}>
 
                 {/*<div className="container">*/}
-        <div id="portfolio-target-button-container" style={{ float: "right"}}>
-            <button id="generate-button" className="btn btn-primary btn-sm" type="button" onClick={handleGenerateClick}>Generate</button>
-            <button id="save-button" className="btn btn-secondary btn-sm" type="submit">Save</button>
-        </div>
+                <div id="portfolio-target-button-container" style={{ float: "right" }}>
+                    <button id="generate-button" className="btn btn-primary btn-sm" type="button" onClick={handleGenerateClick}>Generate</button>
+                    <button id="save-button" className="btn btn-secondary btn-sm" type="submit">Save</button>
+                </div>
 
-                <div className="row" id="header-row">
+                <div className="row" id="header-row" style={{ width: "100%"}}>
                     <div className="col-1"></div>
                     <div className="col-1">
                         <h5>Active OAD(bps)</h5>
@@ -340,7 +343,7 @@ export default function PortfolioTargetsPage({...props}) {
                 </div>
 
                 <div className="row" id="target-row">
-                    <label htmlFor="activeOADTarget" className="col-form-label col-1">Target</label>
+                    <label htmlFor="activeOADTarget" className="col-form-label col-1 ps-3">Target</label>
                     <div className="col-1">
                         <input className="form-control" id="activeAodTarget" name="activeOADTarget" placeholder="Ex 0.00" disabled value={formState.activeOADTarget}/>
                     </div>
@@ -384,7 +387,7 @@ export default function PortfolioTargetsPage({...props}) {
                 </div>
 
                 <div className="row" id="min-tolerance-row">
-                    <label htmlFor="activeOADMinTolerance" className="col-form-label col-1">Min Tolerance</label>
+                    <label htmlFor="activeOADMinTolerance" className="col-form-label col-1 ps-3">Min Tolerance</label>
                     <div className="col-1">
                         <input className="form-control" id="activeAodMinTolerance" name="activeOADMinTolerance" placeholder="Ex -0.03" onChange={handleInputChange} value={formState.activeOADMinTolerance}/>
                     </div>
@@ -428,7 +431,7 @@ export default function PortfolioTargetsPage({...props}) {
                 </div>
 
                 <div className="row" id="max-tolerance-row">
-                    <label htmlFor="activeOADMaxTolerance" className="col-form-label col-1">Max Tolerance</label>
+                    <label htmlFor="activeOADMaxTolerance" className="col-form-label col-1 ps-3">Max Tolerance</label>
                     <div className="col-1">
                         <input className="form-control" id="activeAodMaxTolerance" name="activeOADMaxTolerance" placeholder="Ex 0.03" onChange={handleInputChange} value={formState.activeOADMaxTolerance}/>
                     </div>
@@ -472,7 +475,7 @@ export default function PortfolioTargetsPage({...props}) {
                 </div>
 
                 <div className="row" id="min-row">
-                    <label htmlFor="activeOADMin" className="col-form-label col-1">Min</label>
+                    <label htmlFor="activeOADMin" className="col-form-label col-1 ps-3">Min</label>
                     <div className="col-1">
                         <input className="form-control" id="activeOADMin" name="activeOADMin" placeholder="Ex -0.03" disabled value={formState.activeOADMin}/>
                     </div>
@@ -516,7 +519,7 @@ export default function PortfolioTargetsPage({...props}) {
                 </div>
 
                 <div className="row mb-3" id="max-row">
-                    <label htmlFor="activeOADMax" className="col-form-label col-1">Max</label>
+                    <label htmlFor="activeOADMax" className="col-form-label col-1 ps-3">Max</label>
                     <div className="col-1">
                         <input className="form-control" id="activeOADMax" name="activeOADMax" placeholder="Ex 0.03" disabled value={formState.activeOADMax}/>
                     </div>
@@ -594,7 +597,7 @@ export default function PortfolioTargetsPage({...props}) {
                 </div>
 
                 <div className="row" id="sector-allocation-target-row">
-                    <label htmlFor="sectorAllocationTarget" className="col-form-label col-1">Target</label>
+                    <label htmlFor="sectorAllocationTarget" className="col-form-label col-1 ps-3">Target</label>
                     {/*
                     <div className="col-1">
                         <input className="form-control" id="sectorAllocationTarget" name="sectorAllocationTarget" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTarget}/>
@@ -651,7 +654,7 @@ export default function PortfolioTargetsPage({...props}) {
                 </div>
 
                 <div className="row" id="sector-allocation-min-tolerance-row">
-                    <label htmlFor="sectorAllocationMinTolerance" className="col-form-label col-1">Min Tolerance</label>
+                    <label htmlFor="sectorAllocationMinTolerance" className="col-form-label col-1 ps-3">Min Tolerance</label>
                     {/*
                     <div className="col-1">
                         <input className="form-control" id="sectorAllocationMinTolerance" name="sectorAllocationMinTolerance" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinTolerance}/>
@@ -702,7 +705,7 @@ export default function PortfolioTargetsPage({...props}) {
                 </div>
 
                 <div className="row" id="sector-allocation-max-tolerance-row">
-                    <label htmlFor="sectorAllocationMaxTolerance" className="col-form-label col-1">Max Tolerance</label>
+                    <label htmlFor="sectorAllocationMaxTolerance" className="col-form-label col-1 ps-3">Max Tolerance</label>
                     {/*
                     <div className="col-1">
                         <input className="form-control" id="sectorAllocationMaxTolerance" name="sectorAllocationMaxTolerance" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxTolerance}/>
@@ -753,7 +756,7 @@ export default function PortfolioTargetsPage({...props}) {
                 </div>
 
                 <div className="row" id="sector-allocation-min-row">
-                    <label htmlFor="sectorAllocationMin" className="col-form-label col-1">Min</label>
+                    <label htmlFor="sectorAllocationMin" className="col-form-label col-1 ps-3">Min</label>
                     {/*
                     <div className="col-1">
                         <input className="form-control" id="sectorAllocationMin" name="sectorAllocationMin" placeholder="Ex 5%" disabled value={formState.sectorAllocationMin}/>
@@ -804,7 +807,7 @@ export default function PortfolioTargetsPage({...props}) {
                 </div>
 
                 <div className="row" id="sector-allocation-max-row">
-                    <label htmlFor="sectorAllocationMax" className="col-form-label col-1">Max</label>
+                    <label htmlFor="sectorAllocationMax" className="col-form-label col-1 ps-3">Max</label>
                     {/*
                     <div className="col-1">
                         <input className="form-control" id="sectorAllocationMax" name="sectorAllocationMax" placeholder="Ex 5%" disabled value={formState.sectorAllocationMax}/>
