@@ -69,7 +69,7 @@ function App() {
             <Route path='/shareholders' element={<ShareHolders />} />
             <Route path='/trade-history' element={<TradeHistoryLandingPage previousBD={previousBD} accountsInfo={accountsInfo} securities={securities}/> } />
             <Route path='/portfolio-targets' element={<PortfolioTargetsPage />} />
-            <Route path='/vconn-confirmation' element={<VConnConfirmationPage previousBD={previousBD} accountsInfo={accountsInfo} securities={securities}/>}  />
+            <Route path='/bloomberg-confirmation' element={<VConnConfirmationPage previousBD={previousBD} accountsInfo={accountsInfo} securities={securities}/>}  />
           </Routes>
         </main>
 

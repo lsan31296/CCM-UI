@@ -241,3 +241,11 @@ export async function savePortfolioTargets(params, signal) {
     }
     return await fetchJson(url, options);
 }
+
+export async function getVConnTradeConfirmation(params, signal) {
+    const url = new URL(`${API_BASE_URL}/get-vconn-trade-confirmation`);
+    Object.entries(params).forEach(([key, value]) => {
+        url.searchParams.append(key, value.toString())
+    });
+    return await fetchJson(url, {headers}, []);
+}

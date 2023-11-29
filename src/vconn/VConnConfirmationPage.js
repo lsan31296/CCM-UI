@@ -6,10 +6,15 @@
  * whereas Carlton is the data we can change through the editable fields of the DataGrid.
  */
 import { Button } from 'devextreme-react/button';
-import DataGrid, { Column, Editing, Paging, Lookup } from 'devextreme-react/data-grid';
+import DataGrid, { Column, Editing, Paging, Lookup, HeaderFilter, FilterRow, Pager, ColumnFixing } from 'devextreme-react/data-grid';
 import { Col } from 'devextreme-react/responsive-box';
+import { useEffect, useState } from 'react';
+import { getVConnTradeConfirmation } from '../utils/api';
+import { dateFormatter, sqlDateToDateString } from '../utils/helperFunctions';
 
 export default function VConnConfirmationPage({...props}) {
+    const [vConnConfirmationData, setVConnConfirmationData] = useState(null);
+    const date = "2023-11-13";
     const data = [
         {
             Id: 1,
@@ -90,35 +95,70 @@ export default function VConnConfirmationPage({...props}) {
 
     ]
 
+    const handleCarltonEditing = (e) => {
+        console.log("Event: ", e);
+        const isEditable = e.dataField.startsWith('c');
+        console.log(`Column ${e.column} is editable.`);
+        e.allowEditing = isEditable;
+        e.cancel = !isEditable;
+    };
+    async function loadVConnConfirmation() {
+        console.log("Loading VConn Confirmation trades!");
+        const abortController = new AbortController();
+
+        const response = await getVConnTradeConfirmation({ currDate: date });
+        setVConnConfirmationData([...response]);
+
+        return () => abortController.abort();
+    }
+
+    useEffect(() => {loadVConnConfirmation()}, [date]);
 
     return (
         <div id='vconn-confirmation-page-container' style={{ padding: "0% 1% 0% 1%"}} >
-            <h1>VConn Confirmation Page</h1>
+            <h1>Bloomberg Trade Confirmation Page</h1>
             <div id='vconn-data-grid-container'>
-                <DataGrid dataSource={data} showBorders showRowLines showColumnLines hoverStateEnabled 
-                    keyExpr="Id" allowColumnReordering allowColumnResizing 
+                <DataGrid dataSource={vConnConfirmationData} showBorders showRowLines showColumnLines hoverStateEnabled
+                    keyExpr="c_TradeOrderId" allowColumnReordering allowColumnResizing columnAutoWidth height="83vh"
                 >
-
-                <Editing 
-                    mode='row' allowUpdating allowAdding allowDeleting
-                />
-                <Column dataField='Id' caption='ID'/>
-                <Column dataField='Autofill' caption='AutoFill'/>
-                <Column dataField='Match'/>
-                <Column dataField='OrderId'/>
-                <Column dataField='Cusip'/>
-                <Column dataField='b_Side'/>
-                <Column dataField='c_Side'/>
-                <Column dataField='b_Face'/>
-                <Column dataField='c_Face'/>
-                <Column dataField='b_Price'/>
-                <Column dataField='c_Price'/>
-                <Column dataField='b_TradeDate' dataType='date'/>
-                <Column dataField='c_TradeDate' dataType='date'/>
-                <Column dataField='b_SettleDate' dataType='date'/>
-                <Column dataField='c_SettleDate' dataType='date'/>
-                <Column dataField='b_Factor'/>
-                <Column dataField='c_Factor'/>
+                    <ColumnFixing enabled={true} />
+                    <HeaderFilter visible={true} />
+                    <FilterRow visible={true} />
+                    <Paging defaultPageSize={50} />
+                    <Pager showPageSizeSelector showNavigationButtons allowedPageSizes={[10, 50, 100, 500, 1000]} showInfo />
+                    <Editing
+                        mode='cell' allowUpdating allowAdding allowDeleting confirmDelete onEditingStart={handleCarltonEditing}
+                    />
+                    <Column dataField='' caption='AutoFill' fixed />
+                    <Column dataField='vConnMatch' caption='Match' calculateDisplayValue={(data) => data.vConnMatch ? true : <p>x</p>} />
+                    <Column dataField='c_TradeOrderId' caption='Order ID' />
+                    <Column dataField='cusip' caption='Cusip' />
+                    <Column dataField='b_TxnType' caption='b_Side' />
+                    <Column dataField='c_TxnType' caption='c_Side' />
+                    <Column dataField='b_TradeDate' caption='b_TradeDate' calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.b_TradeDate))} />
+                    <Column dataField='b_SettleDate' caption='b_SettleDate' calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.b_SettleDate))} />
+                    <Column dataField='c_TradeDate' caption='c_TradeDate' calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.c_TradeDate))} />
+                    <Column dataField='c_SettleDate' caption='c_SettleDate' calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.c_SettleDate))} />
+                    <Column dataField='b_AccruedInterest' caption='b_Accrued' />
+                    <Column dataField='c_AccruedInterest' caption='c_Accrued' />
+                    <Column dataField='b_Price' caption='b_Price' />
+                    <Column dataField='c_Price' caption='c_Price' />
+                    <Column dataField='b_Factor' caption='b_Factor' />
+                    <Column dataField='c_Factor' caption='c_Factor' />
+                    <Column dataField='b_Quantity' caption='b_Quantity' />
+                    <Column dataField='c_Quantity' caption='c_Quantity' />
+                    <Column dataField='b_CurrentFace' caption='b_CurrentFace' />
+                    <Column dataField='c_Face' caption='c_Face' />
+                    <Column dataField='b_Principal' caption='b_Principal' />
+                    <Column dataField='c_Principal' caption='c_Principal' />
+                    <Column dataField='b_dealerTicker' caption='b_DealerTicker' />
+                    <Column dataField='c_dealerTicker' caption='c_DealerTicker' />
+                    <Column dataField='b_Broker' caption='b_Broker' />
+                    <Column dataField='b_BrokerName' caption='b_BrokerName' />
+                    <Column dataField='b_DirAlias' caption='b_DirAlias' />
+                    <Column dataField='platform' caption='Platform' />
+                    <Column dataField='app' caption='App' />
+                    <Column dataField='fileName' caption='Filename' />
                 </DataGrid>
             </div>
         </div>
