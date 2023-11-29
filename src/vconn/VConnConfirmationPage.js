@@ -15,94 +15,73 @@ import { dateFormatter, sqlDateToDateString } from '../utils/helperFunctions';
 export default function VConnConfirmationPage({...props}) {
     const [vConnConfirmationData, setVConnConfirmationData] = useState(null);
     const date = "2023-11-13";
-    const data = [
-        {
-            Id: 1,
-            Autofill: "Yes/No",
-            Match: "False",
-            OrderId: 1111,
-            Cusip: "91282CJJ1",
-            b_Side: "Buy",
-            c_Side: "Buy",
-            b_Face: 349000,
-            c_Face: 20000,
-            b_Price: 100.46,
-            c_Price: 100.4453,
-            b_TradeDate: "11/17/2023",
-            c_TradeDate: "11/17/2023",
-            b_SettleDate: "11/20/2023",
-            c_SettleDate: "11/20/2023",
-            b_Factor: 1.00,
-            c_Factor: 0.98
-        },
-        {
-            Id: 2,
-            Autofill: "Yes/No",
-            Match: "False",
-            OrderId: 2222,
-            Cusip: "912810TU2",
-            b_Side: "Buy",
-            c_Side: "Buy",
-            b_Face: 190000,
-            c_Face: 190000,
-            b_Price: 94.5391,
-            c_Price: 94.5391,
-            b_TradeDate: "11/17/2023",
-            c_TradeDate: "11/17/2023",
-            b_SettleDate: "11/20/2023",
-            c_SettleDate: "11/20/2023",
-            b_Factor: 1.00,
-            c_Factor: 1.00
-        },
-        {
-            Id: 3,
-            Autofill: "Yes/No",
-            Match: "False",
-            OrderId: 3333,
-            Cusip: "912810TV0",
-            b_Side: "Buy",
-            c_Side: "Buy",
-            b_Face: 703000,
-            c_Face: 703000,
-            b_Price: 102.3906,
-            c_Price: 102.3906,
-            b_TradeDate: "11/17/2023",
-            c_TradeDate: "11/17/2023",
-            b_SettleDate: "11/20/2023",
-            c_SettleDate: "11/20/2023",
-            b_Factor: 1.00,
-            c_Factor: 1.00
-        },
-        {
-            Id: 4,
-            Autofill: "Yes/No",
-            Match: "False",
-            OrderId: 12345,
-            Cusip: "91282CJJ1",
-            b_Side: "Buy",
-            c_Side: "Buy",
-            b_Face: 20000,
-            c_Face: 20000,
-            b_Price: 100.4453,
-            c_Price: 100.4453,
-            b_TradeDate: "11/17/2023",
-            c_TradeDate: "11/17/2023",
-            b_SettleDate: "11/20/2023",
-            c_SettleDate: "11/20/2023",
-            b_Factor: 1.00,
-            c_Factor: 1.00
+
+    const handleCellUnMatchingStyles = (e) => {
+        //console.log("Event: ", e);
+        if (e.rowType === "data") {
+            switch (e.column.dataField) {
+                case 'c_TxnType':
+                case 'b_TxnType':
+                    if (e.data.c_TxnType !== e.data.b_TxnType) {
+                        e.cellElement.style.cssText = "color: white; background-color: salmon"
+                    }
+                    break;
+                case 'c_TradeDate':
+                case 'b_TradeDate':
+                    if (e.data.c_TradeDate !== e.data.b_TradeDate) {
+                        e.cellElement.style.cssText = "color: white; background-color: salmon"
+                    }
+                    break;
+                case 'c_SettleDate':
+                case 'b_SettleDate':
+                    if (e.data.c_SettleDate !== e.data.b_SettleDate) {
+                        e.cellElement.style.cssText = "color: white; background-color: salmon"
+                    }
+                    break;
+                case 'c_AccruedInterest':
+                case 'b_AccruedInterest':
+                    if (e.data.c_AccruedInterest.toFixed(2) !== e.data.b_AccruedInterest.toFixed(2)) {
+                        e.cellElement.style.cssText = "color: white; background-color: salmon"
+                    }
+                    break;
+                case 'c_Price':
+                case 'b_Price':
+                    if (e.data.c_Price.toFixed(2) !== e.data.b_Price.toFixed(2)) {
+                        e.cellElement.style.cssText = "color: white; background-color: salmon"
+                    }
+                    break;
+                case 'c_Factor':
+                case 'b_Factor':
+                    if (e.data.c_Factor.toFixed(2) !== e.data.b_Factor.toFixed(2)) {
+                        e.cellElement.style.cssText = "color: white; background-color: salmon"
+                    }
+                    break;
+                case 'c_Quantity':
+                case 'b_Quantity':
+                    if (e.data.c_Quantity.toFixed(2) !== e.data.b_Quantity.toFixed(2)) {
+                        e.cellElement.style.cssText = "color: white; background-color: salmon"
+                    }
+                    break;
+                case 'c_CurrentFace':
+                case 'b_Face':
+                    if (e.data.c_CurrentFace.toFixed(2) !== e.data.b_Face.toFixed(2)) {
+                        e.cellElement.style.cssText = "color: white; background-color: salmon"
+                    }
+                    break;
+                case 'c_Principal':
+                case 'b_Principal':
+                    if (e.data.c_Principal.toFixed(2) !== e.data.b_Principal.toFixed(2)) {
+                        e.cellElement.style.cssText = "color: white; background-color: salmon"
+                    }
+                    break;
+                case 'c_dealerTicker':
+                case 'b_dealerTicker':
+                    if (e.data.c_dealerTicker !== e.data.b_dealerTicker) {
+                        e.cellElement.style.cssText = "color: white; background-color: salmon"
+                    }
+                    break;
+            }
         }
-
-    ]
-
-    const handleCarltonEditing = (e) => {
-        console.log("Event: ", e);
-        //For cell mode
-        const isEditable = e.column.dataField && (e.column.dataField.startsWith('c') || e.column.dataField.startsWith('v'));
-        if (isEditable) console.log(`Column ${e.column.dataField} is editable.`);
-        e.column.showEditorAlways = false;
-        //e.column.cancel = !isEditable;
-        e.column.allowEditing = isEditable;
     };
     async function loadVConnConfirmation() {
         console.log("Loading VConn Confirmation trades!");
@@ -114,15 +93,41 @@ export default function VConnConfirmationPage({...props}) {
         return () => abortController.abort();
     }
 
+    const handleSaved = (e) => {
+        console.log("onSaved!: ", e);
+        const savedChanges = e.changes[0].data;
+        
+        const updatedRow = vConnConfirmationData.find((element, i) => {
+            if(element.c_TradeOrderId === e.changes[0].key || element.cusip === e.changes[0].data.cusip) {
+                const updatedVConnData = [...vConnConfirmationData];
+                updatedVConnData[i] = savedChanges;
+                console.log("Updated vConnConfirmationDat State: ", updatedVConnData);
+
+                setVConnConfirmationData([
+                    ...updatedVConnData                
+                ]);
+            }
+        });
+        
+        
+    }
+
+    const handleSubmitSave = () => {
+        console.log("Current VConnConfirmationData State: ", vConnConfirmationData);
+    }
+
     useEffect(() => {loadVConnConfirmation()}, [date]);
 
     return (
         <div id='vconn-confirmation-page-container' style={{ padding: "0% 1% 0% 1%"}} >
             <h1>Bloomberg Trade Confirmation Page</h1>
             <div id='vconn-data-grid-container'>
+                <div style={{ float: "right"}}>
+                    <button id='submit-bloomber-confirmation-edits-button' className='btn btn-sm btn-primary' type='button' onClick={handleSubmitSave}>Save</button>
+                </div>
                 <DataGrid dataSource={vConnConfirmationData} showBorders showRowLines showColumnLines hoverStateEnabled
-                    keyExpr="c_TradeOrderId" allowColumnReordering allowColumnResizing columnAutoWidth height="83vh"
-                    //onEditingStart={handleCarltonEditing}
+                    keyExpr="c_TradeOrderId" allowColumnResizing columnAutoWidth height="83vh"
+                    onCellPrepared={handleCellUnMatchingStyles} onSaved={handleSaved}
                 >
                     <ColumnFixing enabled={true} />
                     <HeaderFilter visible={true} />
@@ -136,12 +141,12 @@ export default function VConnConfirmationPage({...props}) {
                     <Column dataField='vConnMatch' caption='Match' />
                     <Column dataField='c_TradeOrderId' caption='Order ID' allowEditing={false}/>
                     <Column dataField='cusip' caption='Cusip' allowEditing={false}/>
-                    <Column dataField='b_TxnType' caption='b_Side' allowEditing={false}/>
-                    <Column dataField='c_TxnType' caption='c_Side' />
+                    <Column dataField='b_TxnType' caption='b_Side' allowEditing={false} />
+                    <Column dataField='c_TxnType' caption='c_Side' allowEditing={false}/>
                     <Column dataField='b_TradeDate' caption='b_TradeDate' allowEditing={false} calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.b_TradeDate))} />
                     <Column dataField='b_SettleDate' caption='b_SettleDate' allowEditing={false} calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.b_SettleDate))} />
-                    <Column dataField='c_TradeDate' caption='c_TradeDate' calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.c_TradeDate))} />
-                    <Column dataField='c_SettleDate' caption='c_SettleDate' calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.c_SettleDate))} />
+                    <Column dataField='c_TradeDate' caption='c_TradeDate' allowEditing={false} calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.c_TradeDate))} />
+                    <Column dataField='c_SettleDate' caption='c_SettleDate' allowEditing={false} calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.c_SettleDate))} />
                     <Column dataField='b_AccruedInterest' caption='b_Accrued' allowEditing={false}/>
                     <Column dataField='c_AccruedInterest' caption='c_Accrued' />
                     <Column dataField='b_Price' caption='b_Price' allowEditing={false}/>
@@ -151,15 +156,15 @@ export default function VConnConfirmationPage({...props}) {
                     <Column dataField='b_Quantity' caption='b_Quantity' allowEditing={false}/>
                     <Column dataField='c_Quantity' caption='c_Quantity' />
                     <Column dataField='b_CurrentFace' caption='b_CurrentFace' allowEditing={false}/>
-                    <Column dataField='c_Face' caption='c_Face' />
+                    <Column dataField='c_Face' caption='c_Face' allowEditing={false}/>
                     <Column dataField='b_Principal' caption='b_Principal' allowEditing={false}/>
-                    <Column dataField='c_Principal' caption='c_Principal' />
+                    <Column dataField='c_Principal' caption='c_Principal' allowEditing={false}/>
                     <Column dataField='b_dealerTicker' caption='b_DealerTicker' allowEditing={false}/>
-                    <Column dataField='c_dealerTicker' caption='c_DealerTicker' />
+                    <Column dataField='c_dealerTicker' caption='c_DealerTicker' allowEditing={false}/>
                     <Column dataField='b_Broker' caption='b_Broker' allowEditing={false}/>
                     <Column dataField='b_BrokerName' caption='b_BrokerName' allowEditing={false}/>
                     <Column dataField='b_DirAlias' caption='b_DirAlias' allowEditing={false}/>
-                    <Column dataField='platform' caption='Platform' />
+                    <Column dataField='platform' caption='Platform' allowEditing={false}/>
                     <Column dataField='app' caption='App' allowEditing={false}/>
                     <Column dataField='fileName' caption='Filename' allowEditing={false}/>
                 </DataGrid>
