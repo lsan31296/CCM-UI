@@ -97,10 +97,12 @@ export default function VConnConfirmationPage({...props}) {
 
     const handleCarltonEditing = (e) => {
         console.log("Event: ", e);
-        const isEditable = e.dataField.startsWith('c');
-        console.log(`Column ${e.column} is editable.`);
-        e.allowEditing = isEditable;
-        e.cancel = !isEditable;
+        //For cell mode
+        const isEditable = e.column.dataField && (e.column.dataField.startsWith('c') || e.column.dataField.startsWith('v'));
+        if (isEditable) console.log(`Column ${e.column.dataField} is editable.`);
+        e.column.showEditorAlways = false;
+        //e.column.cancel = !isEditable;
+        e.column.allowEditing = isEditable;
     };
     async function loadVConnConfirmation() {
         console.log("Loading VConn Confirmation trades!");
@@ -120,6 +122,7 @@ export default function VConnConfirmationPage({...props}) {
             <div id='vconn-data-grid-container'>
                 <DataGrid dataSource={vConnConfirmationData} showBorders showRowLines showColumnLines hoverStateEnabled
                     keyExpr="c_TradeOrderId" allowColumnReordering allowColumnResizing columnAutoWidth height="83vh"
+                    //onEditingStart={handleCarltonEditing}
                 >
                     <ColumnFixing enabled={true} />
                     <HeaderFilter visible={true} />
@@ -127,38 +130,38 @@ export default function VConnConfirmationPage({...props}) {
                     <Paging defaultPageSize={50} />
                     <Pager showPageSizeSelector showNavigationButtons allowedPageSizes={[10, 50, 100, 500, 1000]} showInfo />
                     <Editing
-                        mode='cell' allowUpdating allowAdding allowDeleting confirmDelete onEditingStart={handleCarltonEditing}
+                        mode='cell' allowUpdating allowAdding allowDeleting confirmDelete
                     />
-                    <Column dataField='' caption='AutoFill' fixed />
-                    <Column dataField='vConnMatch' caption='Match' calculateDisplayValue={(data) => data.vConnMatch ? true : <p>x</p>} />
-                    <Column dataField='c_TradeOrderId' caption='Order ID' />
-                    <Column dataField='cusip' caption='Cusip' />
-                    <Column dataField='b_TxnType' caption='b_Side' />
+                    <Column dataField='' caption='AutoFill' fixed allowEditing={false}/>
+                    <Column dataField='vConnMatch' caption='Match' />
+                    <Column dataField='c_TradeOrderId' caption='Order ID' allowEditing={false}/>
+                    <Column dataField='cusip' caption='Cusip' allowEditing={false}/>
+                    <Column dataField='b_TxnType' caption='b_Side' allowEditing={false}/>
                     <Column dataField='c_TxnType' caption='c_Side' />
-                    <Column dataField='b_TradeDate' caption='b_TradeDate' calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.b_TradeDate))} />
-                    <Column dataField='b_SettleDate' caption='b_SettleDate' calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.b_SettleDate))} />
+                    <Column dataField='b_TradeDate' caption='b_TradeDate' allowEditing={false} calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.b_TradeDate))} />
+                    <Column dataField='b_SettleDate' caption='b_SettleDate' allowEditing={false} calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.b_SettleDate))} />
                     <Column dataField='c_TradeDate' caption='c_TradeDate' calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.c_TradeDate))} />
                     <Column dataField='c_SettleDate' caption='c_SettleDate' calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.c_SettleDate))} />
-                    <Column dataField='b_AccruedInterest' caption='b_Accrued' />
+                    <Column dataField='b_AccruedInterest' caption='b_Accrued' allowEditing={false}/>
                     <Column dataField='c_AccruedInterest' caption='c_Accrued' />
-                    <Column dataField='b_Price' caption='b_Price' />
+                    <Column dataField='b_Price' caption='b_Price' allowEditing={false}/>
                     <Column dataField='c_Price' caption='c_Price' />
-                    <Column dataField='b_Factor' caption='b_Factor' />
+                    <Column dataField='b_Factor' caption='b_Factor' allowEditing={false}/>
                     <Column dataField='c_Factor' caption='c_Factor' />
-                    <Column dataField='b_Quantity' caption='b_Quantity' />
+                    <Column dataField='b_Quantity' caption='b_Quantity' allowEditing={false}/>
                     <Column dataField='c_Quantity' caption='c_Quantity' />
-                    <Column dataField='b_CurrentFace' caption='b_CurrentFace' />
+                    <Column dataField='b_CurrentFace' caption='b_CurrentFace' allowEditing={false}/>
                     <Column dataField='c_Face' caption='c_Face' />
-                    <Column dataField='b_Principal' caption='b_Principal' />
+                    <Column dataField='b_Principal' caption='b_Principal' allowEditing={false}/>
                     <Column dataField='c_Principal' caption='c_Principal' />
-                    <Column dataField='b_dealerTicker' caption='b_DealerTicker' />
+                    <Column dataField='b_dealerTicker' caption='b_DealerTicker' allowEditing={false}/>
                     <Column dataField='c_dealerTicker' caption='c_DealerTicker' />
-                    <Column dataField='b_Broker' caption='b_Broker' />
-                    <Column dataField='b_BrokerName' caption='b_BrokerName' />
-                    <Column dataField='b_DirAlias' caption='b_DirAlias' />
+                    <Column dataField='b_Broker' caption='b_Broker' allowEditing={false}/>
+                    <Column dataField='b_BrokerName' caption='b_BrokerName' allowEditing={false}/>
+                    <Column dataField='b_DirAlias' caption='b_DirAlias' allowEditing={false}/>
                     <Column dataField='platform' caption='Platform' />
-                    <Column dataField='app' caption='App' />
-                    <Column dataField='fileName' caption='Filename' />
+                    <Column dataField='app' caption='App' allowEditing={false}/>
+                    <Column dataField='fileName' caption='Filename' allowEditing={false}/>
                 </DataGrid>
             </div>
         </div>
