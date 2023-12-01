@@ -11,12 +11,18 @@ import { Col } from 'devextreme-react/responsive-box';
 import { useEffect, useState } from 'react';
 import { getVConnTradeConfirmation, saveVConnTrades } from '../utils/api';
 import { dateFormatter, sqlDateToDateString } from '../utils/helperFunctions';
+import { Popup } from 'devextreme-react';
 
 export default function VConnConfirmationPage({...props}) {
     const [vConnConfirmationData, setVConnConfirmationData] = useState(null);
     const [changedRows, setChangedRows] = useState(null);
     let changesTempArr = [];
     const date = "2023-11-13";
+    const [password, setPassword] = useState(null);
+    const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
+    const [popUpVisible, setPopUpVisible] = useState(false);
+    const initialFormState = {username: "", password: ""};
+    const [popUpForm, setPopUpForm] = useState({...initialFormState});
 
     const handleCellUnMatchingStyles = (e) => {
         //console.log("Event: ", e);
@@ -96,48 +102,111 @@ export default function VConnConfirmationPage({...props}) {
     }
 
     const handleSaved = (e) => {
-        console.log("onSaved!: ", e);
-        const savedChanges = e.changes[0].data;
-        changesTempArr.push(e.changes[0].data);
-        
-        const updatedRow = vConnConfirmationData.find((element, i) => {
-            if(element.fillID === e.changes[0].data.key) {
-                const updatedVConnData = [...vConnConfirmationData];
-                updatedVConnData[i] = savedChanges;
-                console.log("Updated vConnConfirmationDat State: ", updatedVConnData);
+        if (isPasswordCorrect) {
+            console.log("onSaved!: ", e);
+            const savedChanges = e.changes[0].data;
+            changesTempArr.push(e.changes[0].data);
+            console.log("Changes: ", e.changes[0].data);
 
-                setVConnConfirmationData([
-                    ...updatedVConnData                
-                ]);
-            }
-        });
+            const updatedRow = vConnConfirmationData.find((element, i) => {
+                if (element.fillID === e.changes[0].data.key) {
+                    const updatedVConnData = [...vConnConfirmationData];
+                    updatedVConnData[i] = savedChanges;
+                    console.log("Updated vConnConfirmationDat State: ", updatedVConnData);
+
+                    setVConnConfirmationData([
+                        ...updatedVConnData
+                    ]);
+                }
+            });
+        } 
+    }
+
+    const handleEnteringSave = (e) => {
+        console.log("Entering Save: ", e)
+        if (!isPasswordCorrect) {
+            e.cancel = true;
+            e.changes = [];
+            alert(`Please revert your changes and login.`);
+            return;
+        }
     }
 
     const handleSubmitSave = async () => {
         console.log("Current VConnConfirmationData State: ", vConnConfirmationData);
-        //Now create an endpoint that updates the db and create a dependency for a new state variable updatedVConnConfirmationTradeData
-        setChangedRows([...changesTempArr]);
-        console.log("changedRows State: ", changesTempArr);
-        const rowsAffected = await saveVConnTrades(changesTempArr);
-        if(rowsAffected >= 0) {
-            alert(`${rowsAffected} rows updated!`);
+        console.log("Logged In: ", isPasswordCorrect);
+        if (isPasswordCorrect) {
+            setChangedRows([...changesTempArr]);
+            console.log("changedRows State: ", changesTempArr);
+            const rowsAffected = await saveVConnTrades(changesTempArr);
+            if (rowsAffected > 0) {
+                alert(`${rowsAffected} row(s) updated!`);
+                return;
+            } else if (rowsAffected === 0) {
+                alert(`No rows were affected. Either because you didn't change anything or you entered the password incorrectly.`)
+                return;
+            }
+            changesTempArr = [];
+        } else if (!isPasswordCorrect) {
+            
+            alert(`Please login before making any changes.`);
             return;
         }
-        changesTempArr = [];
+        //Now create an endpoint that updates the db and create a dependency for a new state variable updatedVConnConfirmationTradeData
+    }
+
+    const handleLogin = (e) => {
+        e.preventDefault();
+        if (popUpForm.password === 'ccmisthebest') {
+            console.log("Successful Login.");
+            setIsPasswordCorrect(true);
+            setPopUpVisible(false);
+        } else {
+            console.log("Unsuccessful Login.");
+            setIsPasswordCorrect(false);
+            alert(`No rows were affected. Username/Password is incorrect.`)
+            return;
+        }
+    }
+    const handleLoginCancel = () => {
+        setPopUpVisible(false);
+    }
+    const handlePopUpInputChange = ({target}) => {
+        console.log("Pop Up value: ", target.value);
+        setPopUpForm({...popUpForm, [target.name]: target.value})
     }
 
     useEffect(() => {loadVConnConfirmation()}, [date]);
 
     return (
         <div id='vconn-confirmation-page-container' style={{ padding: "0% 1% 0% 1%"}} >
-            <h1>Bloomberg Trade Confirmation Page</h1>
-            <div id='vconn-data-grid-container'>
-                <div style={{ float: "right"}}>
-                    <button id='submit-bloomber-confirmation-edits-button' className='btn btn-sm btn-primary' type='button' onClick={handleSubmitSave}>Save</button>
+            <div className='row' id='page-title'>
+                <h1 className='col'>Bloomberg Trade Confirmation Page</h1>
+                <div className='col-1'>
+                    <button style={{ float: "right" }} id='submit-bloomber-confirmation-edits-button' className='btn btn-sm btn-primary' type='button' onClick={handleSubmitSave}>Save</button>
+                    <button style={{ float: "right" }} id='login-bloomber-confirmation-edits-button' className='btn btn-sm btn-success' type='button' onClick={() => isPasswordCorrect ? alert(`You're already logged in.`) : setPopUpVisible(true)}>Login</button>
                 </div>
+            </div>
+            <div id='vconn-data-grid-container'>
+                <Popup visible={popUpVisible} onHiding={() => setPopUpVisible(false)} dragEnabled width={600}
+                    height={600} title='Login Credentials'
+                >
+                    <form id="pop-up-body-form" onSubmit={handleLogin}>
+                        <div id='username-input-container'>
+                            <label htmlFor="username" className="form-label">Username</label>
+                            <input className="form-control" name='username' id="username" value={popUpForm.username} onChange={handlePopUpInputChange} />
+                        </div>
+                        <div>
+                            <label htmlFor="password" className="form-label">Password</label>
+                            <input className="form-control" id="password" name='password' value={popUpForm.password} onChange={handlePopUpInputChange} />
+                        </div>
+                        <button className="btn btn-primary btn-sm" type="submit">Submit</button>
+                        <button className="btn btn-danger btn-sm" onClick={handleLoginCancel}>Cancel</button>
+                    </form>
+                </Popup>
                 <DataGrid dataSource={vConnConfirmationData} showBorders showRowLines showColumnLines hoverStateEnabled
                     keyExpr="fillID" allowColumnResizing columnAutoWidth height="83vh"
-                    onCellPrepared={handleCellUnMatchingStyles} onSaved={handleSaved}
+                    onCellPrepared={handleCellUnMatchingStyles} onSaved={handleSaved} onSaving={handleEnteringSave}
                 >
                     <ColumnFixing enabled={true} />
                     <HeaderFilter visible={true} />
