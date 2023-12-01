@@ -249,3 +249,14 @@ export async function getVConnTradeConfirmation(params, signal) {
     });
     return await fetchJson(url, {headers}, []);
 }
+
+export async function saveVConnTrades(params, signal) {
+    const url = new URL(`${API_BASE_URL}/update-vconn-trade-confirmation`);
+    const options = {
+        method: "POST",
+        headers,
+        body: JSON.stringify(params),
+        signal,
+    }
+    return await fetchJson(url, options);
+}

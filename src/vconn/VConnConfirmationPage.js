@@ -9,11 +9,13 @@ import { Button } from 'devextreme-react/button';
 import DataGrid, { Column, Editing, Paging, Lookup, HeaderFilter, FilterRow, Pager, ColumnFixing } from 'devextreme-react/data-grid';
 import { Col } from 'devextreme-react/responsive-box';
 import { useEffect, useState } from 'react';
-import { getVConnTradeConfirmation } from '../utils/api';
+import { getVConnTradeConfirmation, saveVConnTrades } from '../utils/api';
 import { dateFormatter, sqlDateToDateString } from '../utils/helperFunctions';
 
 export default function VConnConfirmationPage({...props}) {
     const [vConnConfirmationData, setVConnConfirmationData] = useState(null);
+    const [changedRows, setChangedRows] = useState(null);
+    let changesTempArr = [];
     const date = "2023-11-13";
 
     const handleCellUnMatchingStyles = (e) => {
@@ -96,9 +98,10 @@ export default function VConnConfirmationPage({...props}) {
     const handleSaved = (e) => {
         console.log("onSaved!: ", e);
         const savedChanges = e.changes[0].data;
+        changesTempArr.push(e.changes[0].data);
         
         const updatedRow = vConnConfirmationData.find((element, i) => {
-            if(element.c_TradeOrderId === e.changes[0].key || element.cusip === e.changes[0].data.cusip) {
+            if(element.fillID === e.changes[0].data.key) {
                 const updatedVConnData = [...vConnConfirmationData];
                 updatedVConnData[i] = savedChanges;
                 console.log("Updated vConnConfirmationDat State: ", updatedVConnData);
@@ -108,12 +111,19 @@ export default function VConnConfirmationPage({...props}) {
                 ]);
             }
         });
-        
-        
     }
 
-    const handleSubmitSave = () => {
+    const handleSubmitSave = async () => {
         console.log("Current VConnConfirmationData State: ", vConnConfirmationData);
+        //Now create an endpoint that updates the db and create a dependency for a new state variable updatedVConnConfirmationTradeData
+        setChangedRows([...changesTempArr]);
+        console.log("changedRows State: ", changesTempArr);
+        const rowsAffected = await saveVConnTrades(changesTempArr);
+        if(rowsAffected >= 0) {
+            alert(`${rowsAffected} rows updated!`);
+            return;
+        }
+        changesTempArr = [];
     }
 
     useEffect(() => {loadVConnConfirmation()}, [date]);
@@ -126,7 +136,7 @@ export default function VConnConfirmationPage({...props}) {
                     <button id='submit-bloomber-confirmation-edits-button' className='btn btn-sm btn-primary' type='button' onClick={handleSubmitSave}>Save</button>
                 </div>
                 <DataGrid dataSource={vConnConfirmationData} showBorders showRowLines showColumnLines hoverStateEnabled
-                    keyExpr="c_TradeOrderId" allowColumnResizing columnAutoWidth height="83vh"
+                    keyExpr="fillID" allowColumnResizing columnAutoWidth height="83vh"
                     onCellPrepared={handleCellUnMatchingStyles} onSaved={handleSaved}
                 >
                     <ColumnFixing enabled={true} />
@@ -137,8 +147,9 @@ export default function VConnConfirmationPage({...props}) {
                     <Editing
                         mode='cell' allowUpdating allowAdding allowDeleting confirmDelete
                     />
+                    <Column dataField='fillID' caption='Fill ID' allowEditing={false}/>
                     <Column dataField='' caption='AutoFill' fixed allowEditing={false}/>
-                    <Column dataField='vConnMatch' caption='Match' />
+                    <Column dataField='vConnMatch' caption='Match' allowEditing={false}/>
                     <Column dataField='c_TradeOrderId' caption='Order ID' allowEditing={false}/>
                     <Column dataField='cusip' caption='Cusip' allowEditing={false}/>
                     <Column dataField='b_TxnType' caption='b_Side' allowEditing={false} />
