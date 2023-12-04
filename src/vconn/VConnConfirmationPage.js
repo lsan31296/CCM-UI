@@ -5,24 +5,25 @@
  * styling will be used to determine quickly if an account is a match to the BBG data. Note that BBG is read only
  * whereas Carlton is the data we can change through the editable fields of the DataGrid.
  */
-import { Button } from 'devextreme-react/button';
-import DataGrid, { Column, Editing, Paging, Lookup, HeaderFilter, FilterRow, Pager, ColumnFixing } from 'devextreme-react/data-grid';
-import { Col } from 'devextreme-react/responsive-box';
+import DataGrid, { Column, Editing, Paging, HeaderFilter, FilterRow, Pager, ColumnFixing } from 'devextreme-react/data-grid';
 import { useEffect, useState } from 'react';
 import { getVConnTradeConfirmation, saveVConnTrades } from '../utils/api';
 import { dateFormatter, sqlDateToDateString } from '../utils/helperFunctions';
 import { Popup } from 'devextreme-react';
+import "./VConnConfirmationPage.css"
 
 export default function VConnConfirmationPage({...props}) {
     const [vConnConfirmationData, setVConnConfirmationData] = useState(null);
     const [changedRows, setChangedRows] = useState(null);
     let changesTempArr = [];
     const date = "2023-11-13";
-    const [password, setPassword] = useState(null);
+    //const [password, setPassword] = useState(null);
+    let password;
+    let username;
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
     const [popUpVisible, setPopUpVisible] = useState(false);
-    const initialFormState = {username: "", password: ""};
-    const [popUpForm, setPopUpForm] = useState({...initialFormState});
+    //const initialFormState = {username: "", password: ""};
+    //const [popUpForm, setPopUpForm] = useState({...initialFormState});
 
     const handleCellUnMatchingStyles = (e) => {
         //console.log("Event: ", e);
@@ -156,8 +157,10 @@ export default function VConnConfirmationPage({...props}) {
     }
 
     const handleLogin = (e) => {
+        console.log("Logging In!")
         e.preventDefault();
-        if (popUpForm.password === 'ccmisthebest') {
+        //if (popUpForm.password === 'ccmisthebest') {
+        if(password === 'ccmisthebest') {
             console.log("Successful Login.");
             setIsPasswordCorrect(true);
             setPopUpVisible(false);
@@ -172,8 +175,9 @@ export default function VConnConfirmationPage({...props}) {
         setPopUpVisible(false);
     }
     const handlePopUpInputChange = ({target}) => {
-        console.log("Pop Up value: ", target.value);
-        setPopUpForm({...popUpForm, [target.name]: target.value})
+        //console.log("Pop Up value: ", target.value);
+        //setPopUpForm({...popUpForm, [target.name]: target.value})
+        target.name === 'password' ? password = target.value : username = target.value;
     }
 
     useEffect(() => {loadVConnConfirmation()}, [date]);
@@ -194,14 +198,14 @@ export default function VConnConfirmationPage({...props}) {
                     <form id="pop-up-body-form" onSubmit={handleLogin}>
                         <div id='username-input-container'>
                             <label htmlFor="username" className="form-label">Username</label>
-                            <input className="form-control" name='username' id="username" value={popUpForm.username} onChange={handlePopUpInputChange} />
+                            <input className="form-control" name='username' id="username" /*value={username}*/ onChange={handlePopUpInputChange} />
                         </div>
                         <div>
                             <label htmlFor="password" className="form-label">Password</label>
-                            <input className="form-control" id="password" name='password' value={popUpForm.password} onChange={handlePopUpInputChange} />
+                            <input className="form-control" id="password" name='password' type='password' /*value={password}*/ onChange={handlePopUpInputChange} />
                         </div>
                         <button className="btn btn-primary btn-sm" type="submit">Submit</button>
-                        <button className="btn btn-danger btn-sm" onClick={handleLoginCancel}>Cancel</button>
+                        <button className="btn btn-danger btn-sm" type="button" onClick={handleLoginCancel}>Cancel</button>
                     </form>
                 </Popup>
                 <DataGrid dataSource={vConnConfirmationData} showBorders showRowLines showColumnLines hoverStateEnabled
@@ -214,7 +218,7 @@ export default function VConnConfirmationPage({...props}) {
                     <Paging defaultPageSize={50} />
                     <Pager showPageSizeSelector showNavigationButtons allowedPageSizes={[10, 50, 100, 500, 1000]} showInfo />
                     <Editing
-                        mode='cell' allowUpdating allowAdding allowDeleting confirmDelete
+                        mode='cell' allowUpdating confirmDelete
                     />
                     <Column dataField='fillID' caption='Fill ID' allowEditing={false}/>
                     <Column dataField='' caption='AutoFill' fixed allowEditing={false}/>
@@ -228,7 +232,7 @@ export default function VConnConfirmationPage({...props}) {
                     <Column dataField='c_TradeDate' caption='c_TradeDate' allowEditing={false} calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.c_TradeDate))} />
                     <Column dataField='c_SettleDate' caption='c_SettleDate' allowEditing={false} calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.c_SettleDate))} />
                     <Column dataField='b_AccruedInterest' caption='b_Accrued' allowEditing={false}/>
-                    <Column dataField='c_AccruedInterest' caption='c_Accrued' />
+                    <Column dataField='c_AccruedInterest' caption='c_Accrued'/>
                     <Column dataField='b_Price' caption='b_Price' allowEditing={false}/>
                     <Column dataField='c_Price' caption='c_Price' />
                     <Column dataField='b_Factor' caption='b_Factor' allowEditing={false}/>
