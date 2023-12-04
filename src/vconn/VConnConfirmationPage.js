@@ -8,15 +8,17 @@
 import DataGrid, { Column, Editing, Paging, HeaderFilter, FilterRow, Pager, ColumnFixing } from 'devextreme-react/data-grid';
 import { useEffect, useState } from 'react';
 import { getVConnTradeConfirmation, saveVConnTrades } from '../utils/api';
-import { dateFormatter, sqlDateToDateString } from '../utils/helperFunctions';
+import { dateFormatter, sqlDateToDateString, today, yesterday } from '../utils/helperFunctions';
 import { Popup } from 'devextreme-react';
-import "./VConnConfirmationPage.css"
+import "./VConnConfirmationPage.css";
+
 
 export default function VConnConfirmationPage({...props}) {
     const [vConnConfirmationData, setVConnConfirmationData] = useState(null);
     const [changedRows, setChangedRows] = useState(null);
     let changesTempArr = [];
-    const date = "2023-11-13";
+    const { previousBD } = props;
+    const date = sqlDateToDateString(previousBD);
     //const [password, setPassword] = useState(null);
     let password;
     let username;
@@ -215,7 +217,7 @@ export default function VConnConfirmationPage({...props}) {
                     <ColumnFixing enabled={true} />
                     <HeaderFilter visible={true} />
                     <FilterRow visible={true} />
-                    <Paging defaultPageSize={50} />
+                    <Paging defaultPageSize={100} />
                     <Pager showPageSizeSelector showNavigationButtons allowedPageSizes={[10, 50, 100, 500, 1000]} showInfo />
                     <Editing
                         mode='cell' allowUpdating confirmDelete

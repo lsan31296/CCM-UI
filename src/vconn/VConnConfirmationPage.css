@@ -1,3 +1,6 @@
 .dx-data-row td {  
     text-align: left!important;  
 } 
+.dx-data-row .dx-editor-cell {
+    text-align: center!important;
+}
