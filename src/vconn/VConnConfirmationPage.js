@@ -5,7 +5,7 @@
  * styling will be used to determine quickly if an account is a match to the BBG data. Note that BBG is read only
  * whereas Carlton is the data we can change through the editable fields of the DataGrid.
  */
-import DataGrid, { Column, Editing, Paging, HeaderFilter, FilterRow, Pager, ColumnFixing } from 'devextreme-react/data-grid';
+import DataGrid, { Column, Editing, Paging, HeaderFilter, FilterRow, Pager, ColumnFixing, Button } from 'devextreme-react/data-grid';
 import { useEffect, useState } from 'react';
 import { getVConnTradeConfirmation, saveVConnTrades } from '../utils/api';
 import { dateFormatter, sqlDateToDateString, today, yesterday } from '../utils/helperFunctions';
@@ -17,16 +17,14 @@ export default function VConnConfirmationPage({...props}) {
     const [vConnConfirmationData, setVConnConfirmationData] = useState(null);
     const [changedRows, setChangedRows] = useState(null);
     let changesTempArr = [];
-    const { previousBD } = props;
-    const date = sqlDateToDateString(previousBD);
-    //const [password, setPassword] = useState(null);
+    //const date = sqlDateToDateString(today());
+    const date = sqlDateToDateString(yesterday(today()));
     let password;
     let username;
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
     const [popUpVisible, setPopUpVisible] = useState(false);
-    //const initialFormState = {username: "", password: ""};
-    //const [popUpForm, setPopUpForm] = useState({...initialFormState});
 
+    //HANDLES CONDITIONAL RENDERING
     const handleCellUnMatchingStyles = (e) => {
         //console.log("Event: ", e);
         if (e.rowType === "data") {
@@ -103,7 +101,7 @@ export default function VConnConfirmationPage({...props}) {
 
         return () => abortController.abort();
     }
-
+    //HANDLES WHAT IS TO BE DONE WITH THE SAVED CHANGE
     const handleSaved = (e) => {
         if (isPasswordCorrect) {
             console.log("onSaved!: ", e);
@@ -124,7 +122,7 @@ export default function VConnConfirmationPage({...props}) {
             });
         } 
     }
-
+    //HANDLES CHANGE REJECTION IF USER IS NOT LOGGED IN
     const handleEnteringSave = (e) => {
         console.log("Entering Save: ", e)
         if (!isPasswordCorrect) {
@@ -134,7 +132,7 @@ export default function VConnConfirmationPage({...props}) {
             return;
         }
     }
-
+    //HANDLES AND KEEPS TRACK OF ALL CHANGES MADE IN ONE SESSION
     const handleSubmitSave = async () => {
         console.log("Current VConnConfirmationData State: ", vConnConfirmationData);
         console.log("Logged In: ", isPasswordCorrect);
@@ -157,9 +155,10 @@ export default function VConnConfirmationPage({...props}) {
         }
         //Now create an endpoint that updates the db and create a dependency for a new state variable updatedVConnConfirmationTradeData
     }
-
+    //HANDLES POP UP LOGIN FORM
     const handleLogin = (e) => {
         console.log("Logging In!")
+        console.log("Today's date: ", sqlDateToDateString(today()));
         e.preventDefault();
         //if (popUpForm.password === 'ccmisthebest') {
         if(password === 'ccmisthebest') {
@@ -181,7 +180,25 @@ export default function VConnConfirmationPage({...props}) {
         //setPopUpForm({...popUpForm, [target.name]: target.value})
         target.name === 'password' ? password = target.value : username = target.value;
     }
-
+    //HANDLES RENDERING OF THE 'YES' AND 'NO' BUTTONS IN AUTOFILL CELL
+    const handleAutoFillYesRendering = () => {
+        return (
+            <button id='autofill-yes-button' type='button' className='btn btn-sm btn-success'>YES</button>
+        )
+    }
+    const handleAutoFillNoRendering = () => {
+        return (
+            <button id='autofill-no-button' type='button' className='btn btn-sm btn-danger'>NO</button>
+        );
+    }
+    //HANDLES THE 'YES' OR 'NO' CLICK IN AUTOFILL COLUMN. ACCESS ROW/COLUMN DATA.
+    const handleYesClick = (e) => {
+        console.log("Clicked YES!", e.row);
+    }
+    const handleNoClick = (e) => {
+        console.log("Clicked NO!", e.row);
+    }
+    //LOADS VCONN CONFIRMATION TRADE DATA FOR TODAY'S DATE
     useEffect(() => {loadVConnConfirmation()}, [date]);
 
     return (
@@ -223,7 +240,10 @@ export default function VConnConfirmationPage({...props}) {
                         mode='cell' allowUpdating confirmDelete
                     />
                     <Column dataField='fillID' caption='Fill ID' allowEditing={false}/>
-                    <Column dataField='' caption='AutoFill' fixed allowEditing={false}/>
+                    <Column caption='AutoFill' fixed type='buttons' allowEditing={false} >
+                        <Button type='success' text='YES' stylingMode='contained' onClick={handleYesClick} render={handleAutoFillYesRendering}/>
+                        <Button type='danger' text='NO' stylingMode='contained' onClick={handleNoClick} render={handleAutoFillNoRendering}/>
+                    </Column>
                     <Column dataField='vConnMatch' caption='Match' allowEditing={false}/>
                     <Column dataField='c_TradeOrderId' caption='Order ID' allowEditing={false}/>
                     <Column dataField='cusip' caption='Cusip' allowEditing={false}/>
