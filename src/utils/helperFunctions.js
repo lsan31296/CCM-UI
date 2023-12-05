@@ -68,7 +68,7 @@ export function landingPageLinksData1(previousBD) {
                         description: <div>
                             <p>TBD</p>
                         </div>,
-                        link: `#`,
+                        link: `/corporate-watchlist`,
                         id: "#landing-page-corporate-watchlist"
                     }
                 ],
