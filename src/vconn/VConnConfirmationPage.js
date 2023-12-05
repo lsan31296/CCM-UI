@@ -17,8 +17,8 @@ export default function VConnConfirmationPage({...props}) {
     const [vConnConfirmationData, setVConnConfirmationData] = useState(null);
     const [changedRows, setChangedRows] = useState(null);
     let changesTempArr = [];
-    //const date = sqlDateToDateString(today());
-    const date = sqlDateToDateString(yesterday(today()));
+    const date = sqlDateToDateString(today());
+    //const date = sqlDateToDateString(yesterday(today()));
     let password;
     let username;
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
