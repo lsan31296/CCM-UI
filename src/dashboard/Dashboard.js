@@ -174,7 +174,7 @@ export default function Dashboard({ previousBD, accountsInfo }) {
                 </form>
                 <div id="dashboard-data-table-container">
                     <DataTable
-                        title={<h1>Dashboard</h1>}
+                        title={<h1>Performance Dashboard</h1>}
                         columns={columnHeaders}
                         data={perfData}
                         customStyles={customStyles}

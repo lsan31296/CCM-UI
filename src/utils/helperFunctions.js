@@ -191,7 +191,7 @@ export function landingPageLinksData4(previousBD) {
                     {
                         name: "MCT",
                         description: <div>
-                            <p>TBD</p>
+                            <p>https://mctmco.com/login.action?sctSession=reset</p>
                         </div>,
                         link: `https://mctmco.com/login.action?sctSession=reset`,
                         id: "#landing-page-link-mct"

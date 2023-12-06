@@ -7,21 +7,24 @@
 
 import { DataGrid } from "devextreme-react";
 import { Column, Editing, FilterRow, HeaderFilter } from "devextreme-react/data-grid";
-import { useState } from "react"
+import { useRef, useState } from "react"
 
-export default function CorporateWatchlistPage({...props}) {
+export default function CorporateWatchlistPage() {
     const [corpWatchlistData, setCorpWatchlistData] = useState([{
-        issuer: "",
-        cusip: "",
-        reason: "",
-        action: "",
-        todo: ""
-    }]);
+        issuer: "Sample Issuer",
+        cusip: "Sample CUSIP",
+        reason: "Sample ReAsOn",
+        action: "AcTiOn",
+        todo: "Things to do"
+    }]);//Definitely needs to be stored in a database somewhere as it will not hold data after every refresh
+    const dataGrid = useRef(null);
+
 
 
     return (
         <div id="corporate-watchlist-page-container">
             <h1>Corporate Watchlist Page</h1>
+
             <DataGrid dataSource={corpWatchlistData} showBorders allowColumnReordering allowColumnResizing showColumnLines 
                 rowAlternationEnabled hoverStateEnabled height="80vh" 
             >

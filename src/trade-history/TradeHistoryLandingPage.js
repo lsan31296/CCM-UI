@@ -5,7 +5,7 @@
  *  Trade Date, Look Back, CUSIP(s), Account(s)
  */
 import "./TradeHistoryLandingPage.css"
-import { useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import MultiSelectMenu from "../components/MultiSelectMenu";
 import { accountLabelNameSorter, calcDateByLookBack, calcLookBackDaysByDate, removeUnwanteds, smartURLSearch } from "../utils/helperFunctions";
 import { Button } from 'devextreme-react/button';
@@ -15,8 +15,127 @@ import { getTradeHistoryLanding } from "../utils/api";
 import ExportCSV from "../components/ExportCSV";
 import { Popup } from "devextreme-react";
 
+//DRAG SELECT CODE
+let selectedRows = [],
+        shiftSelectRange = {},
+        isSelectionStopped,
+        rowsInfo = [];//END
+
 export default function TradeHistoryLandingPage({...props}) {
     //console.log("Props: ", props);
+    const dataGrid = useRef(null);//DRAG SELECT CODE
+    const [data, setData] = useState([]);
+    useEffect(() => {
+        const dataGridElement = dataGrid.current.instance.element();
+        dataGridElement.addEventListener('touchmove', (args) => {
+            const event = args.touches[0],
+                element = document.elementFromPoint(event.clientX, event.clientY),
+                rowInfo = rowsInfo.filter((x) => x.rowElement === element)[0];
+            if(rowInfo) {
+                selectedRows.push(rowInfo.rowIndex);
+                showSelection(dataGrid.current.instance, selectedRows);
+            }
+        });
+    }, []); //DRAG SELECT CODE
+    
+    const foreachRange = useCallback((selectedRows, func) => {
+        if (selectedRows.length > 0) {
+            selectedRows.forEach(func);
+        }
+    }, []);
+
+    const showSelection = useCallback(
+        (component, selectedRows) => {
+            const selectedCells = component
+                .element()
+                .querySelectorAll('.row-selected');
+
+            // Remove previously selected rows
+            if (selectedCells) {
+                for (let i = 0; i < selectedCells.length; i++) {
+                    selectedCells[i].classList.remove('row-selected');
+                }
+            }
+
+            // Add the 'row-selected' class to the selected rows
+            foreachRange(selectedRows, function (rowIndex) {
+                console.log(component.getRowElement(rowIndex)[0]);
+                component.getRowElement(rowIndex)[0].classList.add('row-selected');
+            });
+        },
+        [foreachRange]
+    );
+
+    const onRowHoverChanged = useCallback(
+        (e) => {
+            const event = e.event;
+            if (event.buttons === 1) {
+                if (isSelectionStopped) {
+                    isSelectionStopped = false;
+                    selectedRows = [];
+                }
+
+                if (!selectedRows.includes(e.rowIndex)) {
+                    selectedRows.push(e.rowIndex);
+                }
+                showSelection(e.component, selectedRows);
+            } else {
+                isSelectionStopped = true;
+            }
+        },
+        [showSelection]
+    );
+
+    const onRowClick = useCallback(
+        (e) => {
+            if (e.event && e.event.ctrlKey === true && e.event.shiftKey === false) {
+                // Toggle selection for a single row when Ctrl + Left Click
+                if (selectedRows.includes(e.rowIndex)) {
+                    setData((prevData) => {
+                        return prevData.filter((item) => item !== e.rowIndex);
+                    });
+                } else {
+                    setData((prevData) => [...prevData, e.rowIndex]);
+                }
+            } else if (
+                e.event &&
+                e.event.ctrlKey === false &&
+                e.event.shiftKey === true
+            ) {
+                // Selection via Shift + Left Click
+                shiftSelectRange.endRowIndex = e.rowIndex;
+                showSelection(e.component, Array.from(new Array(e.rowIndex + 1).keys()));
+            } else {
+                shiftSelectRange.startRowIndex = e.rowIndex;
+                shiftSelectRange.endRowIndex = e.rowIndex;
+                isSelectionStopped = false;
+                showSelection(e.component, [e.rowIndex]);
+            }
+        },
+        [showSelection]
+    );
+
+    const onRowPrepared = useCallback(
+        (e) => {
+            if (e.rowType === 'data')
+                rowsInfo.push({
+                    rowElement: e.rowElement,
+                    rowIndex: e.rowIndex,
+                });
+
+            e.rowElement.addEventListener('touchstart', () => {
+                selectedRows = [e.rowIndex];
+                showSelection(e.component, selectedRows);
+            });
+        },
+        [showSelection]
+    );
+
+    const onContentReady = useCallback((e) => {
+        setData([]);
+    }, []);
+
+
     const { previousBD, accountsInfo, securities } = props;
     const cusipDataRows = securities.map((security) => {
         const updatedRow = { 
@@ -306,16 +425,21 @@ export default function TradeHistoryLandingPage({...props}) {
                             <button className="btn btn-danger btn-sm" onClick={handlePopUpCancel}>Cancel</button>
                         </form>
                     </Popup>
-                    <DataGrid dataSource={tradeHistoryData} showBorders remoteOperations={false} allowColumnReordering
-                        allowColumnResizing showColumnLines showRowLines rowAlternationEnabled hoverStateEnabled
-                        height="72vh" selectedRowKeys={selectedTradeHistoryRows} onSelectionChanged={handleSelectedTradeHistoryRowChange}
+                    <DataGrid ref={dataGrid} id="gridContainer" keyExpr='carlAllocationId' dataSource={tradeHistoryData} showBorders remoteOperations={false} allowColumnReordering
+                        allowColumnResizing showColumnLines showRowLines rowAlternationEnabled //hoverStateEnabled
+                        height="65vh" 
+                        //selectedRowKeys={selectedTradeHistoryRows} onSelectionChanged={handleSelectedTradeHistoryRowChange}
+                        onRowHoverChanged={onRowHoverChanged} onRowClick={onRowClick} onRowPrepared={onRowPrepared} onContentReady={onContentReady}
                     >
-                        <Selection mode="multiple"/>
+                        
                         <HeaderFilter visible={true} />
                         <FilterRow visible={true} />
-                        {/* <Scrolling mode="virtual"/>*/}
+                        {/* 
+                        <Selection mode="multiple"/>
+                        <Scrolling mode="virtual"/>
                         <Paging defaultPageSize={100} />
                         <Pager showPageSizeSelector showNavigationButtons allowedPageSizes={[10, 50, 100, 500, 1000]} showInfo/>
+                        */}
                         <Column dataField="account" caption="Account" groupIndex={aggregateByAccount ? 0 : null}/>
                         <Column dataField="securityGroup" caption="Group"/>
                         <Column dataField="securityType" caption="Type"/>
@@ -347,7 +471,21 @@ export default function TradeHistoryLandingPage({...props}) {
                         <SortByGroupSummaryInfo summaryItem="count" />
                     </DataGrid>
                 </div>
-
+                <div style={{ padding: "1% 0% 1% 0%", border: "pink solid 1px"}}>
+                    <h3 className='caption'>Selected Rows:</h3>
+                    <div className='selected-data'>
+                        <ul>
+                            {data.map((rowIndex, i) => {
+                                return (
+                                    <li key={i}>
+                                        {dataGrid.current.instance.cellValue(rowIndex, 'cusip')}
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </div>
+                </div>
+                
             </div>
         );
     }
