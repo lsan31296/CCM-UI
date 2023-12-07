@@ -1,7 +1,7 @@
 /* This file represents the API we would be using to fetch our data from */
 // API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000"
-//const API_BASE_URL = "http://localhost:5000";
-const API_BASE_URL = "http://ccm-web01:5000";
+const API_BASE_URL = "http://localhost:5000";
+//const API_BASE_URL = "http://ccm-web01:5000";
 
 //Defines the default headers for these function to work with 'json-server'
 const headers = new Headers();
@@ -252,6 +252,22 @@ export async function getVConnTradeConfirmation(params, signal) {
 
 export async function saveVConnTrades(params, signal) {
     const url = new URL(`${API_BASE_URL}/update-vconn-trade-confirmation`);
+    const options = {
+        method: "POST",
+        headers,
+        body: JSON.stringify(params),
+        signal,
+    }
+    return await fetchJson(url, options);
+}
+
+export async function getWatchlistRecords(signal) {
+    const url = new URL(`${API_BASE_URL}/get-watchlist`);
+    return await fetchJson(url, signal);
+}
+
+export async function updateWatchListRecords(params, signal) {
+    const url = new URL(`${API_BASE_URL}/update-watchlist`);
     const options = {
         method: "POST",
         headers,
