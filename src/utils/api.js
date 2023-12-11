@@ -287,3 +287,15 @@ export async function createWatchListRecord(params, signal) {
     }
     return await fetchJson(url, options);
 }
+
+export async function deleteWatchListRecord(params, signal) {
+    const url = new URL(`${API_BASE_URL}/delete-watchlist`);
+    Object.entries(params).forEach(([key, value]) => {
+        url.searchParams.append(key, value.toString())
+    });
+    const options = {
+        method: "POST",
+        headers
+    };
+    return await fetchJson(url, options, []);
+}

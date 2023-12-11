@@ -8,13 +8,13 @@
 import { DataGrid } from "devextreme-react";
 import { Column, Editing, FilterRow, HeaderFilter } from "devextreme-react/data-grid";
 import { useEffect, useState } from "react"
-import { createWatchListRecord, getWatchlistRecords, updateWatchListRecords } from "../utils/api";
+import { createWatchListRecord, deleteWatchListRecord, getWatchlistRecords, updateWatchListRecords } from "../utils/api";
 
 export default function CorporateWatchlistPage({...props}) {
     const [corpWatchlistData, setCorpWatchlistData] = useState(null);
     const [updatedRows, setUpdatedRows] = useState([]);
     const [addedRows, setAddedRows] = useState([]);
-    
+    const [deletedRows, setDeletedRows] = useState([]);
 
     async function loadCorporateWatchlist() {
         console.log("Loading Corporate Watchlist records!");
@@ -53,27 +53,28 @@ export default function CorporateWatchlistPage({...props}) {
         console.log("Inserted the following rows: ", addedRows);
 
         //Must insert first the submit
-        /*const recordsUpdated = await updateWatchListRecords([...updatedRows]);
+        const recordsUpdated = await updateWatchListRecords([...updatedRows]);
         if (recordsUpdated > 0) {
             alert(`${recordsUpdated} records were updated!`);
             return;
-        }*/
+        }
     }
 
     const handleAddedRow = async(e) => {
         console.log("Inserted Rows!", e);
-        const newRow = {
-            issuer: e.data.issuer,
-            cusip: e.data.cusip,
-            reason: e.data.reason,
-            action: e.data.action,
-            toDo: e.data.toDo,
-            watchType: e.data.watchType
-        }
         const success = await createWatchListRecord({...e.data});
         if (success > 0) {
             console.log("Successfully inserted row in db!");
             setAddedRows([...addedRows, {...e.data}]);
+        }
+    }
+
+    const handleRowDelete = async(e) => {
+        console.log("Deleting row!", e);
+        const successfullyDeleted = await deleteWatchListRecord({ Cusip: e.data.cusip});
+        if (successfullyDeleted > 0) {
+            console.log("Successfully deleted row in db!");
+            setDeletedRows([...deletedRows, {...e.data}]);
         }
     }
 
@@ -87,7 +88,7 @@ export default function CorporateWatchlistPage({...props}) {
             </div>
             <DataGrid dataSource={corpWatchlistData} showBorders allowColumnReordering allowColumnResizing showColumnLines 
                 rowAlternationEnabled hoverStateEnabled height="80vh" onSaved={handleAfterSave} keyExpr="cusip"
-                onRowInserting={handleAddedRow}
+                onRowInserting={handleAddedRow} onRowRemoving={handleRowDelete}
             >
                 <HeaderFilter visible />
                 <FilterRow visible />
