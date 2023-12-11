@@ -276,3 +276,14 @@ export async function updateWatchListRecords(params, signal) {
     }
     return await fetchJson(url, options);
 }
+
+export async function createWatchListRecord(params, signal) {
+    const url = new URL(`${API_BASE_URL}/create-watchlist`);
+    const options = {
+        method: "POST",
+        headers,
+        body: JSON.stringify(params),
+        signal,
+    }
+    return await fetchJson(url, options);
+}

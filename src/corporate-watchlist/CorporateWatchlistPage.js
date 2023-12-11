@@ -8,11 +8,12 @@
 import { DataGrid } from "devextreme-react";
 import { Column, Editing, FilterRow, HeaderFilter } from "devextreme-react/data-grid";
 import { useEffect, useState } from "react"
-import { getWatchlistRecords, updateWatchListRecords } from "../utils/api";
+import { createWatchListRecord, getWatchlistRecords, updateWatchListRecords } from "../utils/api";
 
 export default function CorporateWatchlistPage({...props}) {
     const [corpWatchlistData, setCorpWatchlistData] = useState(null);
     const [updatedRows, setUpdatedRows] = useState([]);
+    const [addedRows, setAddedRows] = useState([]);
     
 
     async function loadCorporateWatchlist() {
@@ -49,10 +50,30 @@ export default function CorporateWatchlistPage({...props}) {
 
     const handleSubmitUpdateClick = async () => {
         console.log("Submitted following changes: ", updatedRows);
-        const recordsUpdated = await updateWatchListRecords([...updatedRows]);
+        console.log("Inserted the following rows: ", addedRows);
+
+        //Must insert first the submit
+        /*const recordsUpdated = await updateWatchListRecords([...updatedRows]);
         if (recordsUpdated > 0) {
             alert(`${recordsUpdated} records were updated!`);
             return;
+        }*/
+    }
+
+    const handleAddedRow = async(e) => {
+        console.log("Inserted Rows!", e);
+        const newRow = {
+            issuer: e.data.issuer,
+            cusip: e.data.cusip,
+            reason: e.data.reason,
+            action: e.data.action,
+            toDo: e.data.toDo,
+            watchType: e.data.watchType
+        }
+        const success = await createWatchListRecord({...e.data});
+        if (success > 0) {
+            console.log("Successfully inserted row in db!");
+            setAddedRows([...addedRows, {...e.data}]);
         }
     }
 
@@ -66,15 +87,17 @@ export default function CorporateWatchlistPage({...props}) {
             </div>
             <DataGrid dataSource={corpWatchlistData} showBorders allowColumnReordering allowColumnResizing showColumnLines 
                 rowAlternationEnabled hoverStateEnabled height="80vh" onSaved={handleAfterSave} keyExpr="cusip"
+                onRowInserting={handleAddedRow}
             >
                 <HeaderFilter visible />
                 <FilterRow visible />
-                <Editing mode="cell" allowAdding allowDeleting allowUpdating confirmDelete/>
+                <Editing mode="row" allowAdding allowDeleting allowUpdating confirmDelete/>
                 <Column dataField="issuer" caption="Issuer"/>
-                <Column dataField="cusip" caption="Cusip" allowEditing={false}/>
+                <Column dataField="cusip" caption="Cusip"/>
                 <Column dataField="reason" caption="Reason"/>
                 <Column dataField="action" caption="Action"/>
                 <Column dataField="toDo" caption="To-Do"/>
+                <Column dataField="watchType" caption="Watch Type"/>
             </DataGrid>
         </div>
     )
