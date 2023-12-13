@@ -4,3 +4,9 @@
 .dx-data-row .dx-editor-cell {
     text-align: center!important;
 }
+#approve-column-header button {
+    /*border: red solid 1px;*/
+    padding: 0px 0% 0px 0px;
+    margin: 0px 0px 0px 2px;
+    height: 21px;
+}

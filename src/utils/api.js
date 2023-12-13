@@ -261,6 +261,17 @@ export async function saveVConnTrades(params, signal) {
     return await fetchJson(url, options);
 }
 
+export async function unApproveVConnTrades(params, signal) {
+    const url = new URL(`${API_BASE_URL}/unapprove-vconn-trade-confirmation`);
+    const options = {
+        method: "POST",
+        headers,
+        body: JSON.stringify(params),
+        signal,
+    }
+    return await fetchJson(url, options);
+}
+
 export async function getWatchlistRecords(signal) {
     const url = new URL(`${API_BASE_URL}/get-watchlist`);
     return await fetchJson(url, signal);

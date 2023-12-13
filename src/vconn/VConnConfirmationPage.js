@@ -23,6 +23,8 @@ export default function VConnConfirmationPage({...props}) {
     let username;
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
     const [popUpVisible, setPopUpVisible] = useState(false);
+    const [approveAll, setApproveAll] = useState(false);
+    const [approvedAllRows, setApprovedAllRows] = useState([]);
 
     //HANDLES CONDITIONAL RENDERING
     const handleCellUnMatchingStyles = (e) => {
@@ -71,24 +73,26 @@ export default function VConnConfirmationPage({...props}) {
                         e.cellElement.style.cssText = "color: white; background-color: salmon"
                     }
                     break;
-                case 'c_CurrentFace':
-                case 'b_Face':
-                    if (e.data.c_CurrentFace.toFixed(2) !== e.data.b_Face.toFixed(2)) {
+                case 'c_Face':
+                case 'b_CurrentFace':
+                    if (e.data.c_Face.toFixed(2) !== e.data.b_CurrentFace.toFixed(2)) {
                         e.cellElement.style.cssText = "color: white; background-color: salmon"
                     }
                     break;
                 case 'c_Principal':
                 case 'b_Principal':
                     if (e.data.c_Principal.toFixed(2) !== e.data.b_Principal.toFixed(2)) {
+                        //console.log("Principal columns do not match: ", e.data.c_Principal.toFixed(2), e.data.b_Principal.toFixed(2));
                         e.cellElement.style.cssText = "color: white; background-color: salmon"
                     }
                     break;
-                case 'c_dealerTicker':
+                /* case 'c_dealerTicker':
                 case 'b_dealerTicker':
                     if (e.data.c_dealerTicker !== e.data.b_dealerTicker) {
                         e.cellElement.style.cssText = "color: white; background-color: salmon"
                     }
                     break;
+                */
             }
         }
     };
@@ -137,17 +141,30 @@ export default function VConnConfirmationPage({...props}) {
         console.log("Current VConnConfirmationData State: ", vConnConfirmationData);
         console.log("Logged In: ", isPasswordCorrect);
         if (isPasswordCorrect) {
-            setChangedRows([...changesTempArr]);
-            console.log("changedRows State: ", changesTempArr);
-            const rowsAffected = await saveVConnTrades(changesTempArr);
-            if (rowsAffected > 0) {
-                alert(`${rowsAffected} row(s) updated!`);
-                return;
-            } else if (rowsAffected === 0) {
-                alert(`No rows were affected. Either because you didn't change anything or you entered the password incorrectly.`)
-                return;
+            if (approvedAllRows.length > 0) {
+                console.log("Saving Approved all rows!", approvedAllRows);
+                const approvedRowsAffected = await saveVConnTrades(approvedAllRows);
+                if (approvedRowsAffected > 0) {
+                    alert(`${approvedRowsAffected} ${approveAll ? "Approved" : "Unapproved"} row(s) updated!`);
+                    return;
+                } else if (approvedRowsAffected === 0) {
+                    alert(`No rows were ${approveAll ? "approved" : "unapproved"}. Either because you didn't change anything or you entered the password incorrectly.`)
+                    return;
+                }
+                setApprovedAllRows([]);
+            } else {
+                setChangedRows([...changesTempArr]);
+                console.log("changedRows State: ", changesTempArr);
+                const rowsAffected = await saveVConnTrades(changesTempArr);
+                if (rowsAffected > 0) {
+                    alert(`${rowsAffected} row(s) updated!`);
+                    return;
+                } else if (rowsAffected === 0) {
+                    alert(`No rows were affected. Either because you didn't change anything or you entered the password incorrectly.`)
+                    return;
+                }
+                changesTempArr = [];
             }
-            changesTempArr = [];
         } else if (!isPasswordCorrect) {
             
             alert(`Please login before making any changes.`);
@@ -198,6 +215,79 @@ export default function VConnConfirmationPage({...props}) {
     const handleNoClick = (e) => {
         console.log("Clicked NO!", e.row);
     }
+    const renderMatchCellValue = (rowData) => {
+        //console.log("renderMatchCellValue", rowData);
+        switch (true) {
+            case (rowData.c_TxnType !== rowData.b_TxnType):
+                return false;
+            case (rowData.c_TradeDate !== rowData.b_TradeDate):
+                return false;
+            case (rowData.c_SettleDate !== rowData.b_SettleDate):
+                return false;
+            case (rowData.c_AccruedInterest.toFixed(2) !== rowData.b_AccruedInterest.toFixed(2)):
+                return false;
+            case (rowData.c_Price.toFixed(2) !== rowData.b_Price.toFixed(2)):
+                return false;
+            case (rowData.c_Factor.toFixed(2) !== rowData.b_Factor.toFixed(2)):
+                return false;
+            case (rowData.c_Quantity.toFixed(2) !== rowData.b_Quantity.toFixed(2)):
+                return false;
+            case (rowData.c_Face.toFixed(2) !== rowData.b_CurrentFace.toFixed(2)):
+                return false;
+            case (rowData.c_Principal.toFixed(2) !== rowData.b_Principal.toFixed(2)):
+                return false;
+            default:
+                //console.log("Match!");
+                return true;
+        }
+    }
+    const renderApproveCheckbox = () => {
+        return false;
+    }
+    const handleApproveRowClick = (rowData) => {
+        return false;
+    }
+    const handleApproveAllClick = (columnData) => {
+        if (isPasswordCorrect) {
+            console.log("Clicked Approve All!");
+            changesTempArr = [...vConnConfirmationData];
+            changesTempArr.forEach((row, index) => {
+                row.vConnMatch = true;
+            });
+            console.log("Approve Data: ", changesTempArr);
+            setApprovedAllRows([...changesTempArr]);
+            setApproveAll(!approveAll);
+        } else if (!isPasswordCorrect) {
+            alert(`Please login before making any changes.`);
+            return;
+        }
+        
+    }
+    const handleUnApproveAllClick = (columnData) => {
+        if (isPasswordCorrect) {
+            console.log("Unapproved Click!");
+            changesTempArr = [...vConnConfirmationData];
+            changesTempArr.forEach((row, index) => {
+                row.vConnMatch = false;
+            });
+            console.log("Unapprove Data: ", changesTempArr);
+            setApprovedAllRows([...changesTempArr]);
+            setApproveAll(!approveAll);
+        } else if (!isPasswordCorrect) {
+            alert(`Please login before making any changes.`);
+            return;
+        }
+    }
+    const handleApproveAllHeaderRender = (columnData) => {
+        return (
+            <div id='approve-column-header'>
+                Approve
+                <button id='approve-column-button' className='btn btn-primary btn-sm' type='button' onClick={approveAll ? handleUnApproveAllClick : handleApproveAllClick}>All</button>
+                
+            </div>
+        );
+    }
+
     //LOADS VCONN CONFIRMATION TRADE DATA FOR TODAY'S DATE
     useEffect(() => {loadVConnConfirmation()}, [date]);
 
@@ -237,14 +327,17 @@ export default function VConnConfirmationPage({...props}) {
                     <Paging defaultPageSize={100} />
                     <Pager showPageSizeSelector showNavigationButtons allowedPageSizes={[10, 50, 100, 500, 1000]} showInfo />
                     <Editing
-                        mode='cell' allowUpdating confirmDelete
+                        mode='cell' allowUpdating confirmDelete allowEditing
                     />
                     <Column dataField='fillID' caption='Fill ID' allowEditing={false}/>
-                    <Column caption='AutoFill' fixed type='buttons' allowEditing={false} >
+                    {/*<Column caption='Approve' fixed fixedPosition='left' type='buttons'>
                         <Button type='success' text='YES' stylingMode='contained' onClick={handleYesClick} render={handleAutoFillYesRendering}/>
                         <Button type='danger' text='NO' stylingMode='contained' onClick={handleNoClick} render={handleAutoFillNoRendering}/>
-                    </Column>
-                    <Column dataField='vConnMatch' caption='Match' allowEditing={false}/>
+                    </Column> */}
+                    <Column dataField='vConnMatch' caption='Approve' fixed fixedPosition='left' headerCellRender={handleApproveAllHeaderRender}
+                        allowSorting={false}
+                    />
+                    <Column caption='Match' allowEditing={false} calculateCellValue={renderMatchCellValue} />
                     <Column dataField='c_TradeOrderId' caption='Order ID' allowEditing={false}/>
                     <Column dataField='cusip' caption='Cusip' allowEditing={false}/>
                     <Column dataField='b_TxnType' caption='b_Side' allowEditing={false} />
