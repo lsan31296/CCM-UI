@@ -15,6 +15,7 @@ import "./VConnConfirmationPage.css";
 
 export default function VConnConfirmationPage({...props}) {
     const [vConnConfirmationData, setVConnConfirmationData] = useState(null);
+    const [originalData, setOriginalData] = useState(null);
     const [changedRows, setChangedRows] = useState(null);
     let changesTempArr = [];
     const date = sqlDateToDateString(today());
@@ -102,7 +103,7 @@ export default function VConnConfirmationPage({...props}) {
 
         const response = await getVConnTradeConfirmation({ currDate: date });
         setVConnConfirmationData([...response]);
-
+        setOriginalData(JSON.parse(JSON.stringify(response)));
         return () => abortController.abort();
     }
     //HANDLES WHAT IS TO BE DONE WITH THE SAVED CHANGE
@@ -112,7 +113,7 @@ export default function VConnConfirmationPage({...props}) {
             const savedChanges = e.changes[0].data;
             changesTempArr.push(e.changes[0].data);
             console.log("Changes: ", e.changes[0].data);
-
+            //Actually need to reconstruct data here since this is where it is all being saved. 
             const updatedRow = vConnConfirmationData.find((element, i) => {
                 if (element.fillID === e.changes[0].data.key) {
                     const updatedVConnData = [...vConnConfirmationData];
@@ -140,10 +141,32 @@ export default function VConnConfirmationPage({...props}) {
     const handleSubmitSave = async () => {
         console.log("Current VConnConfirmationData State: ", vConnConfirmationData);
         console.log("Logged In: ", isPasswordCorrect);
+        console.log("original Data: ", originalData);
         if (isPasswordCorrect) {
             if (approvedAllRows.length > 0) {
                 console.log("Saving Approved all rows!", approvedAllRows);
-                const approvedRowsAffected = await saveVConnTrades(approvedAllRows);
+                //Reconstruct rows here
+                const reconstructedData = approvedAllRows.map((row, i) => {
+                    const origRow = originalData.find((origRow) => row.fillID === origRow.fillID);
+                    if (origRow) {
+                        //console.log("Original Row: ", origRow);
+                        return {...row, orig_fillID: origRow.fillID, orig_b_TradeOrderId: origRow.b_TradeOrderId, orig_c_TradeOrderId: origRow.c_TradeOrderId,
+                            orig_cusip: origRow.cusip, orig_vConnMatch: origRow.vConnMatch, orig_b_TradeDate: origRow.b_TradeDate, orig_b_SettleDate: origRow.b_SettleDate,
+                            orig_c_TradeDate: origRow.c_TradeDate, orig_c_SettleDate: origRow.c_SettleDate, orig_b_AccruedInterest: origRow.b_AccruedInterest,
+                            orig_c_AccruedInterest: origRow.c_AccruedInterest, orig_b_Price: origRow.b_Price, orig_c_Price: origRow.c_Price, orig_b_Factor: origRow.b_Factor,
+                            orig_c_Factor: origRow.c_Factor, orig_b_Quantity: origRow.b_Quantity, orig_c_Quantity: origRow.c_Quantity, orig_b_CurrentFace: origRow.b_CurrentFace,
+                            orig_c_Face: origRow.c_Face, orig_b_Principal: origRow.b_Principal, orig_c_Principal: origRow.c_Principal, orig_c_dealerTicker: origRow.orig_c_dealerTicker,
+                            orig_b_dealerTicker: origRow.b_dealerTicker, orig_b_Broker: origRow.b_Broker, orig_b_BrokerName: origRow.b_BrokerName, orig_b_DirAlias: origRow.b_DirAlias,
+                            orig_platform: origRow.platform, orig_app: origRow.app, orig_fileName: origRow.fileName, orig_b_TxnType: origRow.b_TxnType, orig_c_TxnType: origRow.c_TxnType
+                        }
+                    } else {
+                        console.log("Could not find the original row.");
+                    }
+                });
+                console.log("Reconstructed Data: ", reconstructedData);
+                //const approvedRowsAffected = await saveVConnTrades(approvedAllRows);
+                const approvedRowsAffected = await saveVConnTrades(reconstructedData);
+                //const approvedRowsAffected = [];
                 if (approvedRowsAffected > 0) {
                     alert(`${approvedRowsAffected} ${approveAll ? "Approved" : "Unapproved"} row(s) updated!`);
                     return;
@@ -155,7 +178,25 @@ export default function VConnConfirmationPage({...props}) {
             } else {
                 setChangedRows([...changesTempArr]);
                 console.log("changedRows State: ", changesTempArr);
-                const rowsAffected = await saveVConnTrades(changesTempArr);
+                //Reconstruct rows here
+                const reconstructedChangedRows = changesTempArr.map((row, i) => {
+                    const origRow = originalData.find((origRow) => row.fillID === origRow.fillID);
+                    if (origRow) {
+                        //console.log("Original Row: ", origRow);
+                        return {...row, orig_fillID: origRow.fillID, orig_b_TradeOrderId: origRow.b_TradeOrderId, orig_c_TradeOrderId: origRow.c_TradeOrderId,
+                            orig_cusip: origRow.cusip, orig_vConnMatch: origRow.vConnMatch, orig_b_TradeDate: origRow.b_TradeDate, orig_b_SettleDate: origRow.b_SettleDate,
+                            orig_c_TradeDate: origRow.c_TradeDate, orig_c_SettleDate: origRow.c_SettleDate, orig_b_AccruedInterest: origRow.b_AccruedInterest,
+                            orig_c_AccruedInterest: origRow.c_AccruedInterest, orig_b_Price: origRow.b_Price, orig_c_Price: origRow.c_Price, orig_b_Factor: origRow.b_Factor,
+                            orig_c_Factor: origRow.c_Factor, orig_b_Quantity: origRow.b_Quantity, orig_c_Quantity: origRow.c_Quantity, orig_b_CurrentFace: origRow.b_CurrentFace,
+                            orig_c_Face: origRow.c_Face, orig_b_Principal: origRow.b_Principal, orig_c_Principal: origRow.c_Principal, orig_c_dealerTicker: origRow.orig_c_dealerTicker,
+                            orig_b_dealerTicker: origRow.b_dealerTicker, orig_b_Broker: origRow.b_Broker, orig_b_BrokerName: origRow.b_BrokerName, orig_b_DirAlias: origRow.b_DirAlias,
+                            orig_platform: origRow.platform, orig_app: origRow.app, orig_fileName: origRow.fileName, orig_b_TxnType: origRow.b_TxnType, orig_c_TxnType: origRow.c_TxnType
+                        }
+                    } else {
+                        console.log("Could not find the original row.");
+                    }
+                });
+                const rowsAffected = await saveVConnTrades(reconstructedChangedRows);
                 if (rowsAffected > 0) {
                     alert(`${rowsAffected} row(s) updated!`);
                     return;
@@ -250,6 +291,7 @@ export default function VConnConfirmationPage({...props}) {
     const handleApproveAllClick = (columnData) => {
         if (isPasswordCorrect) {
             console.log("Clicked Approve All!");
+            //console.log("Original Data: ", originalData);
             changesTempArr = [...vConnConfirmationData];
             changesTempArr.forEach((row, index) => {
                 row.vConnMatch = true;
