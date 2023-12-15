@@ -112,10 +112,11 @@ export default function VConnConfirmationPage({...props}) {
             console.log("onSaved!: ", e);
             const savedChanges = e.changes[0].data;
             changesTempArr.push(e.changes[0].data);
+            setChangedRows([...changesTempArr]);
             console.log("Changes: ", e.changes[0].data);
             //Actually need to reconstruct data here since this is where it is all being saved. 
             const updatedRow = vConnConfirmationData.find((element, i) => {
-                if (element.fillID === e.changes[0].data.key) {
+                if (element.fillID === e.changes[0].key) {
                     const updatedVConnData = [...vConnConfirmationData];
                     updatedVConnData[i] = savedChanges;
                     console.log("Updated vConnConfirmationDat State: ", updatedVConnData);
@@ -175,11 +176,12 @@ export default function VConnConfirmationPage({...props}) {
                     return;
                 }
                 setApprovedAllRows([]);
+                setOriginalData(JSON.parse(JSON.stringify(await getVConnTradeConfirmation({ currDate: date }) )));//no that changes have been made, sets original data to previous data before change
             } else {
-                setChangedRows([...changesTempArr]);
-                console.log("changedRows State: ", changesTempArr);
+                //setChangedRows([...changesTempArr]);
+                console.log("changedRows State: ", changedRows);
                 //Reconstruct rows here
-                const reconstructedChangedRows = changesTempArr.map((row, i) => {
+                const reconstructedChangedRows = changedRows.map((row, i) => {
                     const origRow = originalData.find((origRow) => row.fillID === origRow.fillID);
                     if (origRow) {
                         //console.log("Original Row: ", origRow);
@@ -196,15 +198,18 @@ export default function VConnConfirmationPage({...props}) {
                         console.log("Could not find the original row.");
                     }
                 });
+                console.log("Reconstructed Changed Rows: ", reconstructedChangedRows);
                 const rowsAffected = await saveVConnTrades(reconstructedChangedRows);
                 if (rowsAffected > 0) {
                     alert(`${rowsAffected} row(s) updated!`);
-                    return;
+                    //return;
                 } else if (rowsAffected === 0) {
                     alert(`No rows were affected. Either because you didn't change anything or you entered the password incorrectly.`)
-                    return;
+                    //return;
                 }
                 changesTempArr = [];
+                setChangedRows([]);
+                setOriginalData(JSON.parse(JSON.stringify(await getVConnTradeConfirmation({ currDate: date }))));//no that changes have been made, sets original data to previous data before change
             }
         } else if (!isPasswordCorrect) {
             
