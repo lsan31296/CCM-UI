@@ -57,7 +57,7 @@ function App() {
     return <h1>Loading...</h1>
   } else {
     return (
-      <>
+      <div>
         <DesktopBar />
         <Header />
 
@@ -76,7 +76,7 @@ function App() {
         </main>
 
         <Footer />
-      </>
+      </div>
 
     );
   }

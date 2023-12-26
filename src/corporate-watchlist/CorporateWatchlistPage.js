@@ -79,7 +79,7 @@ export default function CorporateWatchlistPage({...props}) {
     }
 
     return (
-        <div id="corporate-watchlist-page-container">
+        <div id="corporate-watchlist-page-container" style={{ padding: "1% 1% 1% 1%"}}>
             <div className="row">
                 <h1 className="col">Corporate Watchlist Page</h1>
                 <div id="button container" className="col-1">

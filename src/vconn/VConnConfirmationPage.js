@@ -9,19 +9,22 @@ import DataGrid, { Column, Editing, Paging, HeaderFilter, FilterRow, Pager, Colu
 import { useEffect, useState } from 'react';
 import { getVConnTradeConfirmation, saveVConnTrades } from '../utils/api';
 import { dateFormatter, sqlDateToDateString, today, yesterday } from '../utils/helperFunctions';
-import { Popup } from 'devextreme-react';
+//import { Popup } from 'devextreme-react'; ..Made a reusable PopUp component used for Login Authentication
 import "./VConnConfirmationPage.css";
+import useToken from '../login/useToken';
+import PopUpLogin from '../login/PopUpLogin';
 
 
 export default function VConnConfirmationPage({...props}) {
+    const { token, setToken } = useToken();
     const [vConnConfirmationData, setVConnConfirmationData] = useState(null);
     const [originalData, setOriginalData] = useState(null);
     const [changedRows, setChangedRows] = useState(null);
     let changesTempArr = [];
     const date = sqlDateToDateString(today());
     //const date = sqlDateToDateString(yesterday(today()));
-    let password;
-    let username;
+    //let password;
+    //let username;
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
     const [popUpVisible, setPopUpVisible] = useState(false);
     const [approveAll, setApproveAll] = useState(false);
@@ -218,12 +221,12 @@ export default function VConnConfirmationPage({...props}) {
         }
         //Now create an endpoint that updates the db and create a dependency for a new state variable updatedVConnConfirmationTradeData
     }
-    //HANDLES POP UP LOGIN FORM
+    /*HANDLES POP UP LOGIN FORM
     const handleLogin = (e) => {
         console.log("Logging In!")
         console.log("Today's date: ", sqlDateToDateString(today()));
         e.preventDefault();
-        //if (popUpForm.password === 'ccmisthebest') {
+        //Need to implment token here.
         if(password === 'ccmisthebest') {
             console.log("Successful Login.");
             setIsPasswordCorrect(true);
@@ -242,25 +245,7 @@ export default function VConnConfirmationPage({...props}) {
         //console.log("Pop Up value: ", target.value);
         //setPopUpForm({...popUpForm, [target.name]: target.value})
         target.name === 'password' ? password = target.value : username = target.value;
-    }
-    //HANDLES RENDERING OF THE 'YES' AND 'NO' BUTTONS IN AUTOFILL CELL
-    const handleAutoFillYesRendering = () => {
-        return (
-            <button id='autofill-yes-button' type='button' className='btn btn-sm btn-success'>YES</button>
-        )
-    }
-    const handleAutoFillNoRendering = () => {
-        return (
-            <button id='autofill-no-button' type='button' className='btn btn-sm btn-danger'>NO</button>
-        );
-    }
-    //HANDLES THE 'YES' OR 'NO' CLICK IN AUTOFILL COLUMN. ACCESS ROW/COLUMN DATA.
-    const handleYesClick = (e) => {
-        console.log("Clicked YES!", e.row);
-    }
-    const handleNoClick = (e) => {
-        console.log("Clicked NO!", e.row);
-    }
+    } */
     const renderMatchCellValue = (rowData) => {
         //console.log("renderMatchCellValue", rowData);
         switch (true) {
@@ -286,12 +271,6 @@ export default function VConnConfirmationPage({...props}) {
                 //console.log("Match!");
                 return true;
         }
-    }
-    const renderApproveCheckbox = () => {
-        return false;
-    }
-    const handleApproveRowClick = (rowData) => {
-        return false;
     }
     const handleApproveAllClick = (columnData) => {
         if (isPasswordCorrect) {
@@ -348,22 +327,27 @@ export default function VConnConfirmationPage({...props}) {
                 </div>
             </div>
             <div id='vconn-data-grid-container'>
+                {/* 
                 <Popup visible={popUpVisible} onHiding={() => setPopUpVisible(false)} dragEnabled width={600}
                     height={600} title='Login Credentials'
                 >
                     <form id="pop-up-body-form" onSubmit={handleLogin}>
                         <div id='username-input-container'>
                             <label htmlFor="username" className="form-label">Username</label>
-                            <input className="form-control" name='username' id="username" /*value={username}*/ onChange={handlePopUpInputChange} />
+                            <input className="form-control" name='username' id="username" onChange={handlePopUpInputChange} />
                         </div>
                         <div>
                             <label htmlFor="password" className="form-label">Password</label>
-                            <input className="form-control" id="password" name='password' type='password' /*value={password}*/ onChange={handlePopUpInputChange} />
+                            <input className="form-control" id="password" name='password' type='password' onChange={handlePopUpInputChange} />
                         </div>
                         <button className="btn btn-primary btn-sm" type="submit">Submit</button>
                         <button className="btn btn-danger btn-sm" type="button" onClick={handleLoginCancel}>Cancel</button>
                     </form>
                 </Popup>
+                 */}
+                <PopUpLogin popUpVisible={popUpVisible} setPopUpVisible={setPopUpVisible} setIsPasswordCorrect={setIsPasswordCorrect} 
+                    setToken={setToken}
+                />
                 <DataGrid dataSource={vConnConfirmationData} showBorders showRowLines showColumnLines hoverStateEnabled
                     keyExpr="fillID" allowColumnResizing columnAutoWidth height="83vh"
                     onCellPrepared={handleCellUnMatchingStyles} onSaved={handleSaved} onSaving={handleEnteringSave}
@@ -382,7 +366,7 @@ export default function VConnConfirmationPage({...props}) {
                         <Button type='danger' text='NO' stylingMode='contained' onClick={handleNoClick} render={handleAutoFillNoRendering}/>
                     </Column> */}
                     <Column dataField='vConnMatch' caption='Approve' fixed fixedPosition='left' headerCellRender={handleApproveAllHeaderRender}
-                        allowSorting={false}
+                        allowSorting={false} allowEditing={isPasswordCorrect}
                     />
                     <Column caption='Match' allowEditing={false} calculateCellValue={renderMatchCellValue} />
                     <Column dataField='c_TradeOrderId' caption='Order ID' allowEditing={false}/>
@@ -393,18 +377,18 @@ export default function VConnConfirmationPage({...props}) {
                     <Column dataField='b_SettleDate' caption='b_SettleDate' allowEditing={false} calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.b_SettleDate))} />
                     <Column dataField='c_TradeDate' caption='c_TradeDate' allowEditing={false} calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.c_TradeDate))} />
                     <Column dataField='c_SettleDate' caption='c_SettleDate' allowEditing={false} calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.c_SettleDate))} />
-                    <Column dataField='b_AccruedInterest' caption='b_Accrued' allowEditing={false}/>
-                    <Column dataField='c_AccruedInterest' caption='c_Accrued'/>
-                    <Column dataField='b_Price' caption='b_Price' allowEditing={false}/>
-                    <Column dataField='c_Price' caption='c_Price' />
+                    <Column dataField='b_AccruedInterest' caption='b_Accrued' allowEditing={false} format={{ type: "currency", precision: 4 }}/>
+                    <Column dataField='c_AccruedInterest' caption='c_Accrued'allowEditing={isPasswordCorrect} format={{ type: "currency", precision: 4 }}/>
+                    <Column dataField='b_Price' caption='b_Price' allowEditing={false} format={{ type: "currency", precision: 6 }}/>
+                    <Column dataField='c_Price' caption='c_Price' allowEditing={isPasswordCorrect} format={{ type: "currency", precision: 6 }}/>
                     <Column dataField='b_Factor' caption='b_Factor' allowEditing={false}/>
-                    <Column dataField='c_Factor' caption='c_Factor' />
-                    <Column dataField='b_Quantity' caption='b_Quantity' allowEditing={false}/>
-                    <Column dataField='c_Quantity' caption='c_Quantity' />
-                    <Column dataField='b_CurrentFace' caption='b_CurrentFace' allowEditing={false}/>
-                    <Column dataField='c_Face' caption='c_Face' allowEditing={false}/>
-                    <Column dataField='b_Principal' caption='b_Principal' allowEditing={false}/>
-                    <Column dataField='c_Principal' caption='c_Principal' allowEditing={false}/>
+                    <Column dataField='c_Factor' caption='c_Factor' allowEditing={isPasswordCorrect}/>
+                    <Column dataField='b_Quantity' caption='b_Quantity' allowEditing={false} format={{ type: "currency", precision: 2 }}/>
+                    <Column dataField='c_Quantity' caption='c_Quantity' allowEditing={isPasswordCorrect} format={{ type: "currency", precision: 2 }}/>
+                    <Column dataField='b_CurrentFace' caption='b_CurrentFace' allowEditing={false} format={{ type: "currency", precision: 2 }}/>
+                    <Column dataField='c_Face' caption='c_Face' allowEditing={false} format={{ type: "currency", precision: 2 }}/>
+                    <Column dataField='b_Principal' caption='b_Principal' allowEditing={false} format={{ type: "currency", precision: 2 }}/>
+                    <Column dataField='c_Principal' caption='c_Principal' allowEditing={false} format={{ type: "currency", precision: 2 }}/>
                     <Column dataField='b_dealerTicker' caption='b_DealerTicker' allowEditing={false}/>
                     <Column dataField='c_dealerTicker' caption='c_DealerTicker' allowEditing={false}/>
                     <Column dataField='b_Broker' caption='b_Broker' allowEditing={false}/>
