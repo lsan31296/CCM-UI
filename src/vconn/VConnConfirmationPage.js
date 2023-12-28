@@ -107,8 +107,13 @@ export default function VConnConfirmationPage({...props}) {
         const response = await getVConnTradeConfirmation({ currDate: date });
         setVConnConfirmationData([...response]);
         setOriginalData(JSON.parse(JSON.stringify(response)));
+        if (token) {
+            console.log("Token: ", token)
+            setIsPasswordCorrect(true);
+        }
         return () => abortController.abort();
     }
+    
     //HANDLES WHAT IS TO BE DONE WITH THE SAVED CHANGE
     const handleSaved = (e) => {
         if (isPasswordCorrect) {

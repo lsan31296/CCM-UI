@@ -9,21 +9,24 @@
 
 import { Popup } from "devextreme-react";
 import { sqlDateToDateString, today } from "../utils/helperFunctions";
+import { getWebUser } from "../utils/api";
 
 export default function PopUpLogin({...props}) {
     const {popUpVisible, setPopUpVisible, setIsPasswordCorrect, setToken} = props;
     let password;
     let username;
     //HANDLES POP UP LOGIN FORM
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         console.log("Logging In!")
         console.log("Today's date: ", sqlDateToDateString(today()));
         e.preventDefault();
         //Need to implment token here.
-        if(password === 'ccmisthebest') {
-            console.log(`Successful Login with User: ${username}`);
+        const response = await getWebUser({username: username, password: password});
+        if(response.length === 1) {
+            console.log(`Successful Login with User: ${response[0].userName}`, response[0]);
             setIsPasswordCorrect(true);
             setPopUpVisible(false);
+            setToken(response[0].userName);
         } else {
             console.log("Unsuccessful Login.");
             setIsPasswordCorrect(false);

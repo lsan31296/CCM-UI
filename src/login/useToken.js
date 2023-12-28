@@ -10,16 +10,16 @@ import { useState } from "react";
 export default function useToken() {
 
     const getToken = () => {
-        const tokenString = localStorage.getItem('token');//retrieves password/username token from
+        const tokenString = sessionStorage.getItem('token');//retrieves password/username token from
         const userToken = JSON.parse(tokenString);//converts token json into a JS object
-        return userToken?.token;//returns token if it exists
+        return userToken;//returns token if it exists
     }
 
     const [token, setToken] = useState(getToken());
 
     const saveToken = userToken => {
-        localStorage.setItem('token', JSON.stringify(userToken));
-        setToken(userToken.token);
+        sessionStorage.setItem('token', JSON.stringify(userToken));
+        setToken(userToken);
     };
 
     return {
