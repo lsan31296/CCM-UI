@@ -317,3 +317,11 @@ export async function getWebUser(params, signal) {
     });
     return await fetchJson(url, {headers}, []);
 }
+
+export async function updateWebUserLoginTime(params, signal) {
+    const url = new URL(`${API_BASE_URL}/update-webuser-login-time`);
+    Object.entries(params).forEach(([key, value]) => {
+        url.searchParams.append(key, value.toString())
+    });
+    return await fetchJson(url, {headers}, []);
+}
