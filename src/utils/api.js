@@ -1,7 +1,7 @@
 /* This file represents the API we would be using to fetch our data from */
 // API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000"
-//const API_BASE_URL = "http://localhost:5000";
-const API_BASE_URL = "http://ccm-web01:5000";
+const API_BASE_URL = "http://localhost:5000";
+//const API_BASE_URL = "http://ccm-web01:5000";
 
 //Defines the default headers for these function to work with 'json-server'
 const headers = new Headers();
@@ -326,8 +326,23 @@ export async function updateWebUserLoginTime(params, signal) {
     return await fetchJson(url, {headers}, []);
 }
 
+/**
+ * Changes the password of an existing web user account. Must know original password.
+ * @param {*} params
+ * Parameters include an object with the following keys: username, currentPassword, newPassword 
+ * @param {*} signal 
+ * Optional abort signal used to cancel async operation. Typically used inside of a useEffect React Hook
+ * @returns 
+ * Returns a 1 if the proper row was affected, -1 if no match exists due to incorrect username or password.
+ */
+export async function updateWebUserPassword(params, signal) {
+    const url = new URL(`${API_BASE_URL}/update-webuser-password`);
+    Object.entries(params).forEach(([key,value]) => {
+        url.searchParams.append(key, value.toString())
+    });
+    return await fetchJson(url, {headers}, []);
+}
+
 /*
- * Deploy first. 
- * Make a password change api. And a button inside pop up window. Alex Alario, Andy Kaufman, Elliot Gilfarb need ids for table. 
  * Implement time change for data change, log timestamp and payload itself. In WebLog table.
  */

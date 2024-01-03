@@ -16,7 +16,7 @@ import PopUpLogin from '../login/PopUpLogin';
 
 
 export default function VConnConfirmationPage({...props}) {
-    const { token, setToken } = useToken();
+    const { token, setToken, removeToken } = useToken();
     const [vConnConfirmationData, setVConnConfirmationData] = useState(null);
     const [originalData, setOriginalData] = useState(null);
     const [changedRows, setChangedRows] = useState(null);
@@ -29,6 +29,7 @@ export default function VConnConfirmationPage({...props}) {
     const [popUpVisible, setPopUpVisible] = useState(false);
     const [approveAll, setApproveAll] = useState(false);
     const [approvedAllRows, setApprovedAllRows] = useState([]);
+    //const [successfulLogin, setSuccessfulLogin] = useState(false);
 
     //HANDLES CONDITIONAL RENDERING
     const handleCellUnMatchingStyles = (e) => {
@@ -110,6 +111,7 @@ export default function VConnConfirmationPage({...props}) {
         if (token) {
             console.log("Token: ", token)
             setIsPasswordCorrect(true);
+            //setSuccessfulLogin(true);
         }
         return () => abortController.abort();
     }
@@ -318,6 +320,11 @@ export default function VConnConfirmationPage({...props}) {
             </div>
         );
     }
+    const handleLogout = () => {
+        console.log("Clicked Logout button!");
+        removeToken();
+        setIsPasswordCorrect(false);
+    }
 
     //LOADS VCONN CONFIRMATION TRADE DATA FOR TODAY'S DATE
     useEffect(() => {loadVConnConfirmation()}, [date]);
@@ -328,7 +335,12 @@ export default function VConnConfirmationPage({...props}) {
                 <h1 className='col'>Bloomberg Trade Confirmation Page</h1>
                 <div className='col-1'>
                     <button style={{ float: "right" }} id='submit-bloomber-confirmation-edits-button' className='btn btn-sm btn-primary' type='button' onClick={handleSubmitSave}>Save</button>
-                    <button style={{ float: "right" }} id='login-bloomber-confirmation-edits-button' className='btn btn-sm btn-success' type='button' onClick={() => isPasswordCorrect ? alert(`You're already logged in.`) : setPopUpVisible(true)}>Login</button>
+                    {
+                        isPasswordCorrect ?
+                        <button style={{ float: "right" }} id='logout-bloomberg-confirmation-edits-button' className='btn btn-sm btn-danger' type='button' onClick={handleLogout}>Logout</button>
+                        :
+                        <button style={{ float: "right" }} id='login-bloomberg-confirmation-edits-button' className='btn btn-sm btn-success' type='button' onClick={() => isPasswordCorrect ? alert(`You're already logged in.`) : setPopUpVisible(true)}>Login</button>
+                    }
                 </div>
             </div>
             <div id='vconn-data-grid-container'>
