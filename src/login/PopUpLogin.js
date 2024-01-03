@@ -34,6 +34,7 @@ export default function PopUpLogin({...props}) {
             setToken(response[0].userName);
             const loginTimeUpdated = await updateWebUserLoginTime({username: username});
             console.log(`Login User Time Update: ${loginTimeUpdated}, ${username}`);
+            setPassword("");
         } else {
             console.log("Unsuccessful Login.");
             setIsPasswordCorrect(false);
@@ -80,8 +81,12 @@ export default function PopUpLogin({...props}) {
             setNewPassword("");
         } else if (passwordResetResponse === 0) {
             alert(`An account was matched but the update query failed.`);
+            setCurrentPassword("");
+            setNewPassword("");
         } else if (passwordResetResponse === 1) {
-            alert(`Your password has been updated succesfully! You may now log in with your new password.`)
+            alert(`Your password has been updated succesfully! You may now log in with your new password.`);
+            setCurrentPassword("");
+            setNewPassword("");
         }
     }
 
