@@ -126,9 +126,19 @@ export function landingPageLinksData2(previousBD) {
                         </div>,
                         link: `/bloomberg-confirmation`,
                         id: "#landing-page-bloomberg-confirmation",
+                    },
+                    {
+                        name: "Rerporting Tool Page",
+                        description: <div>
+                            <p>A reporting tool that will be used to generically</p>
+                            <p>display data for any particular payload given to it.</p>
+                            <p>Much like a CERES data visualization tool.</p>
+                        </div>,
+                        link: `/reporting-tool`,
+                        id: "#reporting-tool"
                     }
                 ],
-                overallCount: 4
+                overallCount: 5
             }
         ]
     );
