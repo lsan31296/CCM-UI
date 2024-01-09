@@ -5,13 +5,13 @@
  *  Trade Date, Look Back, CUSIP(s), Account(s)
  */
 import "./TradeHistoryLandingPage.css"
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import MultiSelectMenu from "../components/MultiSelectMenu";
 import { accountLabelNameSorter, calcDateByLookBack, calcLookBackDaysByDate, compositeNameSorter, removeUnwanteds, smartURLSearch } from "../utils/helperFunctions";
 import { Button } from 'devextreme-react/button';
 import DropDownBoxDataGrid from "../components/DropDownBoxDataGrid";
 import DataGrid, { Column, Selection, Paging, FilterRow, HeaderFilter, Pager, GroupItem, SortByGroupSummaryInfo, Summary } from 'devextreme-react/data-grid';
-import { getAllAccountscomposites, getTradeHistoryLanding } from "../utils/api";
+import { getTradeHistoryLanding } from "../utils/api";
 import ExportCSV from "../components/ExportCSV";
 import { Popup } from "devextreme-react";
 
@@ -89,7 +89,7 @@ export default function TradeHistoryLandingPage({...props}) {
             accountsMultiSelectRows.unshift(
                 { 
                     value: {
-                        id: composite.label, 
+                        id: composite.label.slice(8), 
                         name: composite.label, 
                         apx_portfolio_code: composite.label, 
                         ticker: composite.label
@@ -154,6 +154,7 @@ export default function TradeHistoryLandingPage({...props}) {
     }
     const handleSelectMenuClose = async(values, actionMeta) => {
         console.log("Menu Closed!", formState);
+        console.log("Accounts Dropdown Data: ", accountsMultiSelectRows);
     }
     const handleCusipDropDownDataGridMultiChange = async(event) => {
         console.log("Cusip Drop Down Data Grid!", event.selectedRowKeys);

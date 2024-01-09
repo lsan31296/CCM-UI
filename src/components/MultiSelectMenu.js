@@ -5,6 +5,7 @@ export default function MultiSelectMenu({ selectStyles ,rowsForSelect, handleMul
     return (
         <Select 
             isMulti
+            hideSelectedOptions
             name="issuers"
             options={rowsForSelect}
             classNamePrefix="select"
@@ -23,6 +24,7 @@ export default function MultiSelectMenu({ selectStyles ,rowsForSelect, handleMul
             closeMenuOnSelect={false}
             onMenuClose={handleSelectMenuClose}
             placeholder={placeHolderString}
+            
         />
     )
 }
