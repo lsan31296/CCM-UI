@@ -728,6 +728,14 @@ export const accountLabelNameSorter = (rowA, rowB) => {
     return ('' + a).localeCompare(b);
 }
 
+//For Trade History Landing Page, sorts in descending order based on composite name
+export const compositeNameSorter = (rowA, rowB) => {
+    const a = (rowA.label);
+    const b = (rowB.label);
+
+    return ('' + b).localeCompare(a);
+}
+
 export function omitNullColumns(data, columns) {
     const allColNames = Object.keys(data[0]); //Array of all column names
     const emptyColNames = []; //Array of arrays, each array represent 

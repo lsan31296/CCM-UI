@@ -6,7 +6,7 @@ import DesktopBar from './layout/DesktopBar';
 import Header from './layout/Header';
 import Footer from './layout/Footer';
 import Dashboard from './dashboard/Dashboard';
-import { getAllAccounts, getBusinessDay, getSecurities } from './utils/api';
+import { getAllAccounts, getAllAccountscomposites, getBusinessDay, getSecurities } from './utils/api';
 import { today } from './utils/helperFunctions';
 import { useEffect, useState } from 'react';
 import ShareHolders from './shareholders/ShareHolders';
@@ -22,6 +22,7 @@ function App() {
   const [previousBD, setPreviousBD] = useState(null);
   const [accountsInfo, setAccountsInfo] = useState(null);
   const [securities, setSecurities] = useState(null);
+  const [composites, setComposites] = useState(null);
 
   async function loadDate() {
     console.log("Loading Date");
@@ -49,12 +50,23 @@ function App() {
     setSecurities(response);
     return () => abortController.abort();
   }
+
+  async function loadComposites() {
+    console.log("Loaded Composites!");
+    const abortController = new AbortController();
+
+    const response = await getAllAccountscomposites({effectiveDate: "2023-12-31"} ,abortController.signal);
+    setComposites(response);
+    return () => abortController.abort();
+  }
+
   useEffect(() => {loadDate()}, []);
   useEffect(() => {loadAccounts()}, []);
   useEffect(() => {loadSecurities()}, []);
+  useEffect(() => {loadComposites()}, []);
 
 
-  if (!previousBD || !accountsInfo || !securities) {
+  if (!previousBD || !accountsInfo || !securities || !composites) {
     return <h1>Loading...</h1>
   } else {
     return (
@@ -69,7 +81,7 @@ function App() {
             <Route exact path='/risk/:aoDate/:positionView/:accounts/:aggregateRows/:cusip' element={<CusipRiskHoldings accountsInfo={accountsInfo} />} />
             <Route path='/risk/:aoDate/:positionView/:accounts/:aggregateRows' element={<RiskHoldings accountsInfo={accountsInfo}/>} />
             <Route path='/shareholders' element={<ShareHolders />} />
-            <Route path='/trade-history' element={<TradeHistoryLandingPage previousBD={previousBD} accountsInfo={accountsInfo} securities={securities}/> } />
+            <Route path='/trade-history' element={<TradeHistoryLandingPage composites={composites} previousBD={previousBD} accountsInfo={accountsInfo} securities={securities}/> } />
             <Route path='/portfolio-targets' element={<PortfolioTargetsPage />} />
             <Route path='/bloomberg-confirmation' element={<VConnConfirmationPage previousBD={previousBD} accountsInfo={accountsInfo} securities={securities}/>}  />
             <Route path='/corporate-watchlist' element={<CorporateWatchlistPage />} />

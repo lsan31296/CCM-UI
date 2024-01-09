@@ -5,19 +5,19 @@
  *  Trade Date, Look Back, CUSIP(s), Account(s)
  */
 import "./TradeHistoryLandingPage.css"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MultiSelectMenu from "../components/MultiSelectMenu";
-import { accountLabelNameSorter, calcDateByLookBack, calcLookBackDaysByDate, removeUnwanteds, smartURLSearch } from "../utils/helperFunctions";
+import { accountLabelNameSorter, calcDateByLookBack, calcLookBackDaysByDate, compositeNameSorter, removeUnwanteds, smartURLSearch } from "../utils/helperFunctions";
 import { Button } from 'devextreme-react/button';
 import DropDownBoxDataGrid from "../components/DropDownBoxDataGrid";
 import DataGrid, { Column, Selection, Paging, FilterRow, HeaderFilter, Pager, GroupItem, SortByGroupSummaryInfo, Summary } from 'devextreme-react/data-grid';
-import { getTradeHistoryLanding } from "../utils/api";
+import { getAllAccountscomposites, getTradeHistoryLanding } from "../utils/api";
 import ExportCSV from "../components/ExportCSV";
 import { Popup } from "devextreme-react";
 
 export default function TradeHistoryLandingPage({...props}) {
     //console.log("Props: ", props);
-    const { previousBD, accountsInfo, securities } = props;
+    const { previousBD, accountsInfo, securities, composites } = props;
     const cusipDataRows = securities.map((security) => {
         const updatedRow = { 
             ID: security.id,
@@ -73,6 +73,33 @@ export default function TradeHistoryLandingPage({...props}) {
         return newAccount;
     });
     accountsMultiSelectRows = accountsMultiSelectRows.sort(accountLabelNameSorter);
+    
+    let compositeMultiSelectRows = composites.map((composite) => {
+        const newComposite = {
+            value: {...composite},
+            label: composite.composite
+        };
+        return newComposite;
+    });
+
+    compositeMultiSelectRows = compositeMultiSelectRows.sort(compositeNameSorter);
+
+    compositeMultiSelectRows.forEach((composite) => {
+        if(composite.label !== "Composite") {
+            accountsMultiSelectRows.unshift(
+                { 
+                    value: {
+                        id: composite.label, 
+                        name: composite.label, 
+                        apx_portfolio_code: composite.label, 
+                        ticker: composite.label
+                    },
+                    label: "Composite - " + composite.label.slice(8)
+                }
+            );
+        }
+    });
+
     accountsMultiSelectRows.unshift(
         { 
             value: {
@@ -84,6 +111,8 @@ export default function TradeHistoryLandingPage({...props}) {
             label: "~all_accounts~" 
         }
     );
+
+    //setModifiedComposites(compositeMultiSelectRows);
 
     //console.log("Rows: ", accountsMultiSelectRows);
 
@@ -168,6 +197,7 @@ export default function TradeHistoryLandingPage({...props}) {
         }
 
         if (typeof(formState.cusips) === "string") {
+            console.log("Cusips/Securities list was a string!")
             const cusipsFormatted = formState.cusips.replace(/ /g,'').split(",");
             newFormState.cusips = [...cusipsFormatted];
         }
