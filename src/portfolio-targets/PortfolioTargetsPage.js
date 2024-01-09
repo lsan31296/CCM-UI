@@ -5,9 +5,14 @@
 
 import { useEffect, useState } from "react"
 import { getPreviousPortfolioTargets, savePortfolioTargets } from "../utils/api";
+import useToken from "../login/useToken";
+import PopUpLogin from "../login/PopUpLogin";
 
 export default function PortfolioTargetsPage({...props}) {
     //DECLARE STATE VARIABLES
+    const { token, setToken, removeToken } = useToken();
+    const [isPasswordCorrect, setIsPasswordCorrect] = useState(true);
+    const [popUpVisible, setPopUpVisible] = useState(false);
     const initialFormState = {
         activeOADTarget: "",
         activeOADMinTolerance: "",
@@ -208,49 +213,54 @@ export default function PortfolioTargetsPage({...props}) {
         generateOnLoad();
     }
     const handleGenerateClick = () => {
-        const activeOADTargetValue = calcActiveOADTarget(formState);
+        if (isPasswordCorrect) {
+            const activeOADTargetValue = calcActiveOADTarget(formState);
 
-        const calculatedFormState = {
-            ...formState,
-            activeOADTarget: activeOADTargetValue,
-            activeOADMin: calcActiveOADMin(activeOADTargetValue, formState.activeOADMinTolerance),
-            activeOADMax: calcActiveOADMax(activeOADTargetValue, formState.activeOADMaxTolerance),
-            activeKRDMin6M: calcActiveKRDMinOrMax(formState.activeKRDTarget6M, formState.activeKRDMinTolerance6M),
-            activeKRDMin1Y: calcActiveKRDMinOrMax(formState.activeKRDTarget1Y, formState.activeKRDMinTolerance1Y),
-            activeKRDMin2Y: calcActiveKRDMinOrMax(formState.activeKRDTarget2Y, formState.activeKRDMinTolerance2Y),
-            activeKRDMin3Y: calcActiveKRDMinOrMax(formState.activeKRDTarget3Y, formState.activeKRDMinTolerance3Y),
-            activeKRDMin5Y: calcActiveKRDMinOrMax(formState.activeKRDTarget5Y, formState.activeKRDMinTolerance5Y),
-            activeKRDMin7Y: calcActiveKRDMinOrMax(formState.activeKRDTarget7Y, formState.activeKRDMinTolerance7Y),
-            activeKRDMin10Y: calcActiveKRDMinOrMax(formState.activeKRDTarget10Y, formState.activeKRDMinTolerance10Y),
-            activeKRDMin20Y: calcActiveKRDMinOrMax(formState.activeKRDTarget20Y, formState.activeKRDMinTolerance20Y),
-            activeKRDMin30Y: calcActiveKRDMinOrMax(formState.activeKRDTarget30Y, formState.activeKRDMinTolerance30Y),
-            activeKRDMax6M: calcActiveKRDMinOrMax(formState.activeKRDTarget6M, formState.activeKRDMaxTolerance6M),
-            activeKRDMax1Y: calcActiveKRDMinOrMax(formState.activeKRDTarget1Y, formState.activeKRDMaxTolerance1Y),
-            activeKRDMax2Y: calcActiveKRDMinOrMax(formState.activeKRDTarget2Y, formState.activeKRDMaxTolerance2Y),
-            activeKRDMax3Y: calcActiveKRDMinOrMax(formState.activeKRDTarget3Y, formState.activeKRDMaxTolerance3Y),
-            activeKRDMax5Y: calcActiveKRDMinOrMax(formState.activeKRDTarget5Y, formState.activeKRDMaxTolerance5Y),
-            activeKRDMax7Y: calcActiveKRDMinOrMax(formState.activeKRDTarget7Y, formState.activeKRDMaxTolerance7Y),
-            activeKRDMax10Y: calcActiveKRDMinOrMax(formState.activeKRDTarget10Y, formState.activeKRDMaxTolerance10Y),
-            activeKRDMax20Y: calcActiveKRDMinOrMax(formState.activeKRDTarget20Y, formState.activeKRDMaxTolerance20Y),
-            activeKRDMax30Y: calcActiveKRDMinOrMax(formState.activeKRDTarget30Y, formState.activeKRDMaxTolerance30Y),
-            sectorAllocationTotal: calcSectorAllocationTotal(formState),
-            sectorAllocationMinABS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetABS, formState.sectorAllocationMinToleranceABS),
-            sectorAllocationMinCash: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCash, formState.sectorAllocationMinToleranceCash),
-            sectorAllocationMinCorporate: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCorporate, formState.sectorAllocationMinToleranceCorporate),
-            sectorAllocationMinGovt: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetGovt, formState.sectorAllocationMinToleranceGovt),
-            sectorAllocationMinMultiFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMultiFamMBS, formState.sectorAllocationMinToleranceMultiFamMBS),
-            sectorAllocationMinMuni: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMuni, formState.sectorAllocationMinToleranceMuni),
-            sectorAllocationMinSingleFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetSingleFamMBS, formState.sectorAllocationMinToleranceSingleFamMBS),
-            sectorAllocationMaxABS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetABS, formState.sectorAllocationMaxToleranceABS),
-            sectorAllocationMaxCash: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCash, formState.sectorAllocationMaxToleranceCash),
-            sectorAllocationMaxCorporate: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCorporate, formState.sectorAllocationMaxToleranceCorporate),
-            sectorAllocationMaxGovt: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetGovt, formState.sectorAllocationMaxToleranceGovt),
-            sectorAllocationMaxMultiFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMultiFamMBS, formState.sectorAllocationMaxToleranceMultiFamMBS),
-            sectorAllocationMaxMuni: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMuni, formState.sectorAllocationMaxToleranceMuni),
-            sectorAllocationMaxSingleFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetSingleFamMBS, formState.sectorAllocationMaxToleranceSingleFamMBS),
+            const calculatedFormState = {
+                ...formState,
+                activeOADTarget: activeOADTargetValue,
+                activeOADMin: calcActiveOADMin(activeOADTargetValue, formState.activeOADMinTolerance),
+                activeOADMax: calcActiveOADMax(activeOADTargetValue, formState.activeOADMaxTolerance),
+                activeKRDMin6M: calcActiveKRDMinOrMax(formState.activeKRDTarget6M, formState.activeKRDMinTolerance6M),
+                activeKRDMin1Y: calcActiveKRDMinOrMax(formState.activeKRDTarget1Y, formState.activeKRDMinTolerance1Y),
+                activeKRDMin2Y: calcActiveKRDMinOrMax(formState.activeKRDTarget2Y, formState.activeKRDMinTolerance2Y),
+                activeKRDMin3Y: calcActiveKRDMinOrMax(formState.activeKRDTarget3Y, formState.activeKRDMinTolerance3Y),
+                activeKRDMin5Y: calcActiveKRDMinOrMax(formState.activeKRDTarget5Y, formState.activeKRDMinTolerance5Y),
+                activeKRDMin7Y: calcActiveKRDMinOrMax(formState.activeKRDTarget7Y, formState.activeKRDMinTolerance7Y),
+                activeKRDMin10Y: calcActiveKRDMinOrMax(formState.activeKRDTarget10Y, formState.activeKRDMinTolerance10Y),
+                activeKRDMin20Y: calcActiveKRDMinOrMax(formState.activeKRDTarget20Y, formState.activeKRDMinTolerance20Y),
+                activeKRDMin30Y: calcActiveKRDMinOrMax(formState.activeKRDTarget30Y, formState.activeKRDMinTolerance30Y),
+                activeKRDMax6M: calcActiveKRDMinOrMax(formState.activeKRDTarget6M, formState.activeKRDMaxTolerance6M),
+                activeKRDMax1Y: calcActiveKRDMinOrMax(formState.activeKRDTarget1Y, formState.activeKRDMaxTolerance1Y),
+                activeKRDMax2Y: calcActiveKRDMinOrMax(formState.activeKRDTarget2Y, formState.activeKRDMaxTolerance2Y),
+                activeKRDMax3Y: calcActiveKRDMinOrMax(formState.activeKRDTarget3Y, formState.activeKRDMaxTolerance3Y),
+                activeKRDMax5Y: calcActiveKRDMinOrMax(formState.activeKRDTarget5Y, formState.activeKRDMaxTolerance5Y),
+                activeKRDMax7Y: calcActiveKRDMinOrMax(formState.activeKRDTarget7Y, formState.activeKRDMaxTolerance7Y),
+                activeKRDMax10Y: calcActiveKRDMinOrMax(formState.activeKRDTarget10Y, formState.activeKRDMaxTolerance10Y),
+                activeKRDMax20Y: calcActiveKRDMinOrMax(formState.activeKRDTarget20Y, formState.activeKRDMaxTolerance20Y),
+                activeKRDMax30Y: calcActiveKRDMinOrMax(formState.activeKRDTarget30Y, formState.activeKRDMaxTolerance30Y),
+                sectorAllocationTotal: calcSectorAllocationTotal(formState),
+                sectorAllocationMinABS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetABS, formState.sectorAllocationMinToleranceABS),
+                sectorAllocationMinCash: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCash, formState.sectorAllocationMinToleranceCash),
+                sectorAllocationMinCorporate: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCorporate, formState.sectorAllocationMinToleranceCorporate),
+                sectorAllocationMinGovt: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetGovt, formState.sectorAllocationMinToleranceGovt),
+                sectorAllocationMinMultiFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMultiFamMBS, formState.sectorAllocationMinToleranceMultiFamMBS),
+                sectorAllocationMinMuni: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMuni, formState.sectorAllocationMinToleranceMuni),
+                sectorAllocationMinSingleFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetSingleFamMBS, formState.sectorAllocationMinToleranceSingleFamMBS),
+                sectorAllocationMaxABS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetABS, formState.sectorAllocationMaxToleranceABS),
+                sectorAllocationMaxCash: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCash, formState.sectorAllocationMaxToleranceCash),
+                sectorAllocationMaxCorporate: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCorporate, formState.sectorAllocationMaxToleranceCorporate),
+                sectorAllocationMaxGovt: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetGovt, formState.sectorAllocationMaxToleranceGovt),
+                sectorAllocationMaxMultiFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMultiFamMBS, formState.sectorAllocationMaxToleranceMultiFamMBS),
+                sectorAllocationMaxMuni: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMuni, formState.sectorAllocationMaxToleranceMuni),
+                sectorAllocationMaxSingleFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetSingleFamMBS, formState.sectorAllocationMaxToleranceSingleFamMBS),
+            }
+            console.log("Form State after calculation: ", calculatedFormState)
+            setFormState({ ...calculatedFormState })
+        } else {
+            alert(`You must first login to make changes to this page.`);
         }
-        console.log("Form State after calculation: ",calculatedFormState)
-        setFormState({...calculatedFormState})
+
     }
     const handleInputChange = ({target}) => {
         console.log(`${target.name} = ${target.value}`);
@@ -283,10 +293,20 @@ export default function PortfolioTargetsPage({...props}) {
     async function generateOnLoad() {
         console.log("Generating on function call not click!");
         document.getElementById('generate-button').click();
+        setIsPasswordCorrect(false);
+    }
+
+    async function checkToken() {
+        console.log("Retrieving Token!");
+        if (token) {
+            console.log("Token Found: ", token);
+            setIsPasswordCorrect(true);
+        }
     }
 
     useEffect(() => {loadPreviousPortfolioTargets()}, []);
     useEffect(() => {generateOnLoad()}, [firstRenderFormState]);
+    useEffect(() => {checkToken()}, []);
 
     return (
         <div id="portfolio-targets-page-container" style={{ padding: "0% 1% 0% 1%" }}>
