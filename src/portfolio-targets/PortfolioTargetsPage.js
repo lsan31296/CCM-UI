@@ -11,7 +11,7 @@ import PopUpLogin from "../login/PopUpLogin";
 export default function PortfolioTargetsPage({...props}) {
     //DECLARE STATE VARIABLES
     const { token, setToken, removeToken } = useToken();
-    const [isPasswordCorrect, setIsPasswordCorrect] = useState(true);
+    const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
     const [popUpVisible, setPopUpVisible] = useState(false);
     const initialFormState = {
         activeOADTarget: "",
@@ -195,71 +195,72 @@ export default function PortfolioTargetsPage({...props}) {
     //DECLARE EVENT HANDLER FUNCTIONS
     const handleSave = async (event) => {
         event.preventDefault();
-        console.log("Form State: ", formState)
-        //Turn data into decimal numbers
-        const formattedInputs = {...formState};
-        for (const property in formState) {
-            if(typeof(formState[property]) === "string") {
-                formattedInputs[property] = Number(formattedInputs[property])
+        if (isPasswordCorrect) {
+            console.log("Form State: ", formState)
+            //Turn data into decimal numbers
+            const formattedInputs = { ...formState };
+            for (const property in formState) {
+                if (typeof (formState[property]) === "string") {
+                    formattedInputs[property] = Number(formattedInputs[property])
+                }
+                if (property.includes("sector")) {
+                    formattedInputs[property] = formattedInputs[property] / 100;
+                }
             }
-            if(property.includes("sector")) {
-                formattedInputs[property] = formattedInputs[property] / 100;
-            }
+            console.log("Formatted formState: ", formattedInputs)
+            //NEED TO CREATE A POST REQUEST THAT SENDS OVER ALL THE USER INPUTS UPON HITTING THE SAVE BUTTON. EVENTUALLY IT SHOULD RETURN TRADES USER SHOULD EXECUTE IN ORDER TO INCREASE PORTFOLIO NUMBERS
+            await savePortfolioTargets(formattedInputs);
+            console.log("Saved Portfolio Inputs to database.");
+            generateOnLoad();
+        } else {
+            alert('You must login before making/saving any changes.');
         }
-        console.log("Formatted formState: ", formattedInputs)
-        //NEED TO CREATE A POST REQUEST THAT SENDS OVER ALL THE USER INPUTS UPON HITTING THE SAVE BUTTON. EVENTUALLY IT SHOULD RETURN TRADES USER SHOULD EXECUTE IN ORDER TO INCREASE PORTFOLIO NUMBERS
-        await savePortfolioTargets(formattedInputs);
-        console.log("Saved Portfolio Inputs to database.");
-        generateOnLoad();
+        
     }
     const handleGenerateClick = () => {
-        if (isPasswordCorrect) {
-            const activeOADTargetValue = calcActiveOADTarget(formState);
+        const activeOADTargetValue = calcActiveOADTarget(formState);
 
-            const calculatedFormState = {
-                ...formState,
-                activeOADTarget: activeOADTargetValue,
-                activeOADMin: calcActiveOADMin(activeOADTargetValue, formState.activeOADMinTolerance),
-                activeOADMax: calcActiveOADMax(activeOADTargetValue, formState.activeOADMaxTolerance),
-                activeKRDMin6M: calcActiveKRDMinOrMax(formState.activeKRDTarget6M, formState.activeKRDMinTolerance6M),
-                activeKRDMin1Y: calcActiveKRDMinOrMax(formState.activeKRDTarget1Y, formState.activeKRDMinTolerance1Y),
-                activeKRDMin2Y: calcActiveKRDMinOrMax(formState.activeKRDTarget2Y, formState.activeKRDMinTolerance2Y),
-                activeKRDMin3Y: calcActiveKRDMinOrMax(formState.activeKRDTarget3Y, formState.activeKRDMinTolerance3Y),
-                activeKRDMin5Y: calcActiveKRDMinOrMax(formState.activeKRDTarget5Y, formState.activeKRDMinTolerance5Y),
-                activeKRDMin7Y: calcActiveKRDMinOrMax(formState.activeKRDTarget7Y, formState.activeKRDMinTolerance7Y),
-                activeKRDMin10Y: calcActiveKRDMinOrMax(formState.activeKRDTarget10Y, formState.activeKRDMinTolerance10Y),
-                activeKRDMin20Y: calcActiveKRDMinOrMax(formState.activeKRDTarget20Y, formState.activeKRDMinTolerance20Y),
-                activeKRDMin30Y: calcActiveKRDMinOrMax(formState.activeKRDTarget30Y, formState.activeKRDMinTolerance30Y),
-                activeKRDMax6M: calcActiveKRDMinOrMax(formState.activeKRDTarget6M, formState.activeKRDMaxTolerance6M),
-                activeKRDMax1Y: calcActiveKRDMinOrMax(formState.activeKRDTarget1Y, formState.activeKRDMaxTolerance1Y),
-                activeKRDMax2Y: calcActiveKRDMinOrMax(formState.activeKRDTarget2Y, formState.activeKRDMaxTolerance2Y),
-                activeKRDMax3Y: calcActiveKRDMinOrMax(formState.activeKRDTarget3Y, formState.activeKRDMaxTolerance3Y),
-                activeKRDMax5Y: calcActiveKRDMinOrMax(formState.activeKRDTarget5Y, formState.activeKRDMaxTolerance5Y),
-                activeKRDMax7Y: calcActiveKRDMinOrMax(formState.activeKRDTarget7Y, formState.activeKRDMaxTolerance7Y),
-                activeKRDMax10Y: calcActiveKRDMinOrMax(formState.activeKRDTarget10Y, formState.activeKRDMaxTolerance10Y),
-                activeKRDMax20Y: calcActiveKRDMinOrMax(formState.activeKRDTarget20Y, formState.activeKRDMaxTolerance20Y),
-                activeKRDMax30Y: calcActiveKRDMinOrMax(formState.activeKRDTarget30Y, formState.activeKRDMaxTolerance30Y),
-                sectorAllocationTotal: calcSectorAllocationTotal(formState),
-                sectorAllocationMinABS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetABS, formState.sectorAllocationMinToleranceABS),
-                sectorAllocationMinCash: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCash, formState.sectorAllocationMinToleranceCash),
-                sectorAllocationMinCorporate: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCorporate, formState.sectorAllocationMinToleranceCorporate),
-                sectorAllocationMinGovt: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetGovt, formState.sectorAllocationMinToleranceGovt),
-                sectorAllocationMinMultiFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMultiFamMBS, formState.sectorAllocationMinToleranceMultiFamMBS),
-                sectorAllocationMinMuni: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMuni, formState.sectorAllocationMinToleranceMuni),
-                sectorAllocationMinSingleFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetSingleFamMBS, formState.sectorAllocationMinToleranceSingleFamMBS),
-                sectorAllocationMaxABS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetABS, formState.sectorAllocationMaxToleranceABS),
-                sectorAllocationMaxCash: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCash, formState.sectorAllocationMaxToleranceCash),
-                sectorAllocationMaxCorporate: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCorporate, formState.sectorAllocationMaxToleranceCorporate),
-                sectorAllocationMaxGovt: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetGovt, formState.sectorAllocationMaxToleranceGovt),
-                sectorAllocationMaxMultiFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMultiFamMBS, formState.sectorAllocationMaxToleranceMultiFamMBS),
-                sectorAllocationMaxMuni: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMuni, formState.sectorAllocationMaxToleranceMuni),
-                sectorAllocationMaxSingleFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetSingleFamMBS, formState.sectorAllocationMaxToleranceSingleFamMBS),
-            }
-            console.log("Form State after calculation: ", calculatedFormState)
-            setFormState({ ...calculatedFormState })
-        } else {
-            alert(`You must first login to make changes to this page.`);
+        const calculatedFormState = {
+            ...formState,
+            activeOADTarget: activeOADTargetValue,
+            activeOADMin: calcActiveOADMin(activeOADTargetValue, formState.activeOADMinTolerance),
+            activeOADMax: calcActiveOADMax(activeOADTargetValue, formState.activeOADMaxTolerance),
+            activeKRDMin6M: calcActiveKRDMinOrMax(formState.activeKRDTarget6M, formState.activeKRDMinTolerance6M),
+            activeKRDMin1Y: calcActiveKRDMinOrMax(formState.activeKRDTarget1Y, formState.activeKRDMinTolerance1Y),
+            activeKRDMin2Y: calcActiveKRDMinOrMax(formState.activeKRDTarget2Y, formState.activeKRDMinTolerance2Y),
+            activeKRDMin3Y: calcActiveKRDMinOrMax(formState.activeKRDTarget3Y, formState.activeKRDMinTolerance3Y),
+            activeKRDMin5Y: calcActiveKRDMinOrMax(formState.activeKRDTarget5Y, formState.activeKRDMinTolerance5Y),
+            activeKRDMin7Y: calcActiveKRDMinOrMax(formState.activeKRDTarget7Y, formState.activeKRDMinTolerance7Y),
+            activeKRDMin10Y: calcActiveKRDMinOrMax(formState.activeKRDTarget10Y, formState.activeKRDMinTolerance10Y),
+            activeKRDMin20Y: calcActiveKRDMinOrMax(formState.activeKRDTarget20Y, formState.activeKRDMinTolerance20Y),
+            activeKRDMin30Y: calcActiveKRDMinOrMax(formState.activeKRDTarget30Y, formState.activeKRDMinTolerance30Y),
+            activeKRDMax6M: calcActiveKRDMinOrMax(formState.activeKRDTarget6M, formState.activeKRDMaxTolerance6M),
+            activeKRDMax1Y: calcActiveKRDMinOrMax(formState.activeKRDTarget1Y, formState.activeKRDMaxTolerance1Y),
+            activeKRDMax2Y: calcActiveKRDMinOrMax(formState.activeKRDTarget2Y, formState.activeKRDMaxTolerance2Y),
+            activeKRDMax3Y: calcActiveKRDMinOrMax(formState.activeKRDTarget3Y, formState.activeKRDMaxTolerance3Y),
+            activeKRDMax5Y: calcActiveKRDMinOrMax(formState.activeKRDTarget5Y, formState.activeKRDMaxTolerance5Y),
+            activeKRDMax7Y: calcActiveKRDMinOrMax(formState.activeKRDTarget7Y, formState.activeKRDMaxTolerance7Y),
+            activeKRDMax10Y: calcActiveKRDMinOrMax(formState.activeKRDTarget10Y, formState.activeKRDMaxTolerance10Y),
+            activeKRDMax20Y: calcActiveKRDMinOrMax(formState.activeKRDTarget20Y, formState.activeKRDMaxTolerance20Y),
+            activeKRDMax30Y: calcActiveKRDMinOrMax(formState.activeKRDTarget30Y, formState.activeKRDMaxTolerance30Y),
+            sectorAllocationTotal: calcSectorAllocationTotal(formState),
+            sectorAllocationMinABS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetABS, formState.sectorAllocationMinToleranceABS),
+            sectorAllocationMinCash: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCash, formState.sectorAllocationMinToleranceCash),
+            sectorAllocationMinCorporate: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCorporate, formState.sectorAllocationMinToleranceCorporate),
+            sectorAllocationMinGovt: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetGovt, formState.sectorAllocationMinToleranceGovt),
+            sectorAllocationMinMultiFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMultiFamMBS, formState.sectorAllocationMinToleranceMultiFamMBS),
+            sectorAllocationMinMuni: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMuni, formState.sectorAllocationMinToleranceMuni),
+            sectorAllocationMinSingleFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetSingleFamMBS, formState.sectorAllocationMinToleranceSingleFamMBS),
+            sectorAllocationMaxABS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetABS, formState.sectorAllocationMaxToleranceABS),
+            sectorAllocationMaxCash: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCash, formState.sectorAllocationMaxToleranceCash),
+            sectorAllocationMaxCorporate: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetCorporate, formState.sectorAllocationMaxToleranceCorporate),
+            sectorAllocationMaxGovt: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetGovt, formState.sectorAllocationMaxToleranceGovt),
+            sectorAllocationMaxMultiFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMultiFamMBS, formState.sectorAllocationMaxToleranceMultiFamMBS),
+            sectorAllocationMaxMuni: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetMuni, formState.sectorAllocationMaxToleranceMuni),
+            sectorAllocationMaxSingleFamMBS: calcSectorAllocationMinOrMax(formState.sectorAllocationTargetSingleFamMBS, formState.sectorAllocationMaxToleranceSingleFamMBS),
         }
+        console.log("Form State after calculation: ", calculatedFormState)
+        setFormState({ ...calculatedFormState })
 
     }
     const handleInputChange = ({target}) => {
@@ -293,7 +294,6 @@ export default function PortfolioTargetsPage({...props}) {
     async function generateOnLoad() {
         console.log("Generating on function call not click!");
         document.getElementById('generate-button').click();
-        setIsPasswordCorrect(false);
     }
 
     async function checkToken() {
@@ -303,6 +303,11 @@ export default function PortfolioTargetsPage({...props}) {
             setIsPasswordCorrect(true);
         }
     }
+    const handleLogout = () => {
+        console.log("Clicked Logout button!");
+        removeToken();
+        setIsPasswordCorrect(false);
+    }
 
     useEffect(() => {loadPreviousPortfolioTargets()}, []);
     useEffect(() => {generateOnLoad()}, [firstRenderFormState]);
@@ -311,10 +316,19 @@ export default function PortfolioTargetsPage({...props}) {
     return (
         <div id="portfolio-targets-page-container" style={{ padding: "0% 1% 0% 1%" }}>
             <h1>Portfolio Targets</h1>
+            <PopUpLogin popUpVisible={popUpVisible} setPopUpVisible={setPopUpVisible} setIsPasswordCorrect={setIsPasswordCorrect}
+                setToken={setToken}
+            />
             <form id="portfolio-targets-form" onSubmit={handleSave}>
 
                 {/*<div className="container">*/}
                 <div id="portfolio-target-button-container" style={{ float: "right" }}>
+                    {
+                        isPasswordCorrect ?
+                            <button /*style={{ float: "right" }}*/ id='logout-bloomberg-confirmation-edits-button' className='btn btn-sm btn-danger' type='button' onClick={handleLogout}>Logout</button>
+                            :
+                            <button /*style={{ float: "right" }}*/ id='login-bloomberg-confirmation-edits-button' className='btn btn-sm btn-success' type='button' onClick={() => isPasswordCorrect ? alert(`You're already logged in.`) : setPopUpVisible(true)}>Login</button>
+                    }
                     <button id="generate-button" className="btn btn-primary btn-sm" type="button" onClick={handleGenerateClick}>Generate</button>
                     <button id="save-button" className="btn btn-secondary btn-sm" type="submit">Save</button>
                 </div>
@@ -369,39 +383,39 @@ export default function PortfolioTargetsPage({...props}) {
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDTarget6M" name="activeKRDTarget6M" placeholder="Ex 0.00" onChange={handleInputChange} value={formState.activeKRDTarget6M}/>
+                        <input className="form-control" id="activeKRDTarget6M" name="activeKRDTarget6M" placeholder="Ex 0.00" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDTarget6M} />
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDTarget1Y" name="activeKRDTarget1Y" placeholder="4" onChange={handleInputChange} value={formState.activeKRDTarget1Y}/>
+                        <input className="form-control" id="activeKRDTarget1Y" name="activeKRDTarget1Y" placeholder="4" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDTarget1Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDTarget2Y" name="activeKRDTarget2Y" placeholder="5" onChange={handleInputChange} value={formState.activeKRDTarget2Y}/>
+                        <input className="form-control" id="activeKRDTarget2Y" name="activeKRDTarget2Y" placeholder="5" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDTarget2Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDTarget3Y" name="activeKRDTarget3Y" placeholder="6" onChange={handleInputChange} value={formState.activeKRDTarget3Y}/>
+                        <input className="form-control" id="activeKRDTarget3Y" name="activeKRDTarget3Y" placeholder="6" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDTarget3Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDTarget5Y" name="activeKRDTarget5Y" placeholder="7" onChange={handleInputChange} value={formState.activeKRDTarget5Y}/>
+                        <input className="form-control" id="activeKRDTarget5Y" name="activeKRDTarget5Y" placeholder="7" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDTarget5Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDTarget7Y" name="activeKRDTarget7Y" placeholder="8" onChange={handleInputChange} value={formState.activeKRDTarget7Y}/>
+                        <input className="form-control" id="activeKRDTarget7Y" name="activeKRDTarget7Y" placeholder="8" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDTarget7Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDTarget10Y" name="activeKRDTarget10Y" placeholder="9" onChange={handleInputChange} value={formState.activeKRDTarget10Y}/>
+                        <input className="form-control" id="activeKRDTarget10Y" name="activeKRDTarget10Y" placeholder="9" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDTarget10Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDTarget20Y" name="activeKRDTarget20Y" placeholder="10" onChange={handleInputChange} value={formState.activeKRDTarget20Y}/>
+                        <input className="form-control" id="activeKRDTarget20Y" name="activeKRDTarget20Y" placeholder="10" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDTarget20Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDTarget30Y" name="activeKRDTarget30Y" placeholder="11" onChange={handleInputChange} value={formState.activeKRDTarget30Y}/>
+                        <input className="form-control" id="activeKRDTarget30Y" name="activeKRDTarget30Y" placeholder="11" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDTarget30Y}/>
                     </div>
 
                 </div>
@@ -409,43 +423,43 @@ export default function PortfolioTargetsPage({...props}) {
                 <div className="row" id="min-tolerance-row">
                     <label htmlFor="activeOADMinTolerance" className="col-form-label col-1 ps-3">Min Tolerance</label>
                     <div className="col-1">
-                        <input className="form-control" id="activeAodMinTolerance" name="activeOADMinTolerance" placeholder="Ex -0.03" onChange={handleInputChange} value={formState.activeOADMinTolerance}/>
+                        <input className="form-control" id="activeAodMinTolerance" name="activeOADMinTolerance" placeholder="Ex -0.03" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeOADMinTolerance}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMinTolerance6M" name="activeKRDMinTolerance6M" placeholder="Ex -0.03" onChange={handleInputChange} value={formState.activeKRDMinTolerance6M}/>
+                        <input className="form-control" id="activeKRDMinTolerance6M" name="activeKRDMinTolerance6M" placeholder="Ex -0.03" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMinTolerance6M}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMinTolerance1Y" name="activeKRDMinTolerance1Y" placeholder="4" onChange={handleInputChange} value={formState.activeKRDMinTolerance1Y}/>
+                        <input className="form-control" id="activeKRDMinTolerance1Y" name="activeKRDMinTolerance1Y" placeholder="4" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMinTolerance1Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMinTolerance2Y" name="activeKRDMinTolerance2Y" placeholder="5" onChange={handleInputChange} value={formState.activeKRDMinTolerance2Y}/>
+                        <input className="form-control" id="activeKRDMinTolerance2Y" name="activeKRDMinTolerance2Y" placeholder="5" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMinTolerance2Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMinTolerance3Y" name="activeKRDMinTolerance3Y" placeholder="6" onChange={handleInputChange} value={formState.activeKRDMinTolerance3Y}/>
+                        <input className="form-control" id="activeKRDMinTolerance3Y" name="activeKRDMinTolerance3Y" placeholder="6" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMinTolerance3Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMinTolerance5Y" name="activeKRDMinTolerance5Y" placeholder="7" onChange={handleInputChange} value={formState.activeKRDMinTolerance5Y}/>
+                        <input className="form-control" id="activeKRDMinTolerance5Y" name="activeKRDMinTolerance5Y" placeholder="7" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMinTolerance5Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMinTolerance7Y" name="activeKRDMinTolerance7Y" placeholder="8" onChange={handleInputChange} value={formState.activeKRDMinTolerance7Y}/>
+                        <input className="form-control" id="activeKRDMinTolerance7Y" name="activeKRDMinTolerance7Y" placeholder="8" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMinTolerance7Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMinTolerance10Y" name="activeKRDMinTolerance10Y" placeholder="9" onChange={handleInputChange} value={formState.activeKRDMinTolerance10Y}/>
+                        <input className="form-control" id="activeKRDMinTolerance10Y" name="activeKRDMinTolerance10Y" placeholder="9" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMinTolerance10Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMinTolerance20Y" name="activeKRDMinTolerance20Y" placeholder="10" onChange={handleInputChange} value={formState.activeKRDMinTolerance20Y}/>
+                        <input className="form-control" id="activeKRDMinTolerance20Y" name="activeKRDMinTolerance20Y" placeholder="10" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMinTolerance20Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMinTolerance30Y" name="activeKRDMinTolerance30Y" placeholder="11" onChange={handleInputChange} value={formState.activeKRDMinTolerance30Y}/>
+                        <input className="form-control" id="activeKRDMinTolerance30Y" name="activeKRDMinTolerance30Y" placeholder="11" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMinTolerance30Y}/>
                     </div>
 
                 </div>
@@ -453,43 +467,43 @@ export default function PortfolioTargetsPage({...props}) {
                 <div className="row" id="max-tolerance-row">
                     <label htmlFor="activeOADMaxTolerance" className="col-form-label col-1 ps-3">Max Tolerance</label>
                     <div className="col-1">
-                        <input className="form-control" id="activeAodMaxTolerance" name="activeOADMaxTolerance" placeholder="Ex 0.03" onChange={handleInputChange} value={formState.activeOADMaxTolerance}/>
+                        <input className="form-control" id="activeAodMaxTolerance" name="activeOADMaxTolerance" placeholder="Ex 0.03" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeOADMaxTolerance}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMaxTolerance6M" name="activeKRDMaxTolerance6M" placeholder="Ex 0.03" onChange={handleInputChange} value={formState.activeKRDMaxTolerance6M}/>
+                        <input className="form-control" id="activeKRDMaxTolerance6M" name="activeKRDMaxTolerance6M" placeholder="Ex 0.03" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMaxTolerance6M}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMaxTolerance1Y" name="activeKRDMaxTolerance1Y" placeholder="4" onChange={handleInputChange} value={formState.activeKRDMaxTolerance1Y}/>
+                        <input className="form-control" id="activeKRDMaxTolerance1Y" name="activeKRDMaxTolerance1Y" placeholder="4" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMaxTolerance1Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMaxTolerance2Y" name="activeKRDMaxTolerance2Y" placeholder="5" onChange={handleInputChange} value={formState.activeKRDMaxTolerance2Y}/>
+                        <input className="form-control" id="activeKRDMaxTolerance2Y" name="activeKRDMaxTolerance2Y" placeholder="5" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMaxTolerance2Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMaxTolerance3Y" name="activeKRDMaxTolerance3Y" placeholder="6" onChange={handleInputChange} value={formState.activeKRDMaxTolerance3Y}/>
+                        <input className="form-control" id="activeKRDMaxTolerance3Y" name="activeKRDMaxTolerance3Y" placeholder="6" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMaxTolerance3Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMaxTolerance5Y" name="activeKRDMaxTolerance5Y" placeholder="7" onChange={handleInputChange} value={formState.activeKRDMaxTolerance5Y}/>
+                        <input className="form-control" id="activeKRDMaxTolerance5Y" name="activeKRDMaxTolerance5Y" placeholder="7" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMaxTolerance5Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMaxTolerance7Y" name="activeKRDMaxTolerance7Y" placeholder="8" onChange={handleInputChange} value={formState.activeKRDMaxTolerance7Y}/>
+                        <input className="form-control" id="activeKRDMaxTolerance7Y" name="activeKRDMaxTolerance7Y" placeholder="8" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMaxTolerance7Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMaxTolerance10Y" name="activeKRDMaxTolerance10Y" placeholder="9" onChange={handleInputChange} value={formState.activeKRDMaxTolerance10Y}/>
+                        <input className="form-control" id="activeKRDMaxTolerance10Y" name="activeKRDMaxTolerance10Y" placeholder="9" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMaxTolerance10Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMaxTolerance20Y" name="activeKRDMaxTolerance20Y" placeholder="10" onChange={handleInputChange} value={formState.activeKRDMaxTolerance20Y}/>
+                        <input className="form-control" id="activeKRDMaxTolerance20Y" name="activeKRDMaxTolerance20Y" placeholder="10" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMaxTolerance20Y}/>
                     </div>
 
                     <div className="col-1">
-                        <input className="form-control" id="activeKRDMaxTolerance30Y" name="activeKRDMaxTolerance30Y" placeholder="11" onChange={handleInputChange} value={formState.activeKRDMaxTolerance30Y}/>
+                        <input className="form-control" id="activeKRDMaxTolerance30Y" name="activeKRDMaxTolerance30Y" placeholder="11" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.activeKRDMaxTolerance30Y}/>
                     </div>
 
                 </div>
@@ -625,43 +639,43 @@ export default function PortfolioTargetsPage({...props}) {
                      */}
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationTargetABS" name="sectorAllocationTargetABS" placeholder="Ex 5%" onChange={handleInputChange} value={formState.sectorAllocationTargetABS} />
+                            <input className="form-control" id="sectorAllocationTargetABS" name="sectorAllocationTargetABS" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationTargetABS} />
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationTargetCash" name="sectorAllocationTargetCash" placeholder="Ex 5%" onChange={handleInputChange} value={formState.sectorAllocationTargetCash} />
+                            <input className="form-control" id="sectorAllocationTargetCash" name="sectorAllocationTargetCash" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationTargetCash} />
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationTargetCorporate" name="sectorAllocationTargetCorporate" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetCorporate}/>
+                            <input className="form-control" id="sectorAllocationTargetCorporate" name="sectorAllocationTargetCorporate" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationTargetCorporate}/>
                             <div className="input-group-text">%</div>
                         </div> 
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationTargetGovt" name="sectorAllocationTargetGovt" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetGovt}/>
+                            <input className="form-control" id="sectorAllocationTargetGovt" name="sectorAllocationTargetGovt" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationTargetGovt}/>
                             <div className="input-group-text">%</div>
                         </div> 
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationTargetMultiFamMBS" name="sectorAllocationTargetMultiFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetMultiFamMBS}/>
+                            <input className="form-control" id="sectorAllocationTargetMultiFamMBS" name="sectorAllocationTargetMultiFamMBS" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationTargetMultiFamMBS}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationTargetMuni" name="sectorAllocationTargetMuni" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetMuni}/>
+                            <input className="form-control" id="sectorAllocationTargetMuni" name="sectorAllocationTargetMuni" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationTargetMuni}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationTargetSingleFamMBS" name="sectorAllocationTargetSingleFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationTargetSingleFamMBS}/>
+                            <input className="form-control" id="sectorAllocationTargetSingleFamMBS" name="sectorAllocationTargetSingleFamMBS" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationTargetSingleFamMBS}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
@@ -682,43 +696,43 @@ export default function PortfolioTargetsPage({...props}) {
                     */}
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationMinToleranceABS" name="sectorAllocationMinToleranceABS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceABS}/>
+                            <input className="form-control" id="sectorAllocationMinToleranceABS" name="sectorAllocationMinToleranceABS" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationMinToleranceABS}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationMinToleranceCash" name="sectorAllocationMinToleranceCash" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceCash}/>
+                            <input className="form-control" id="sectorAllocationMinToleranceCash" name="sectorAllocationMinToleranceCash" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationMinToleranceCash}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationMinToleranceCorporate" name="sectorAllocationMinToleranceCorporate" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceCorporate}/>
+                            <input className="form-control" id="sectorAllocationMinToleranceCorporate" name="sectorAllocationMinToleranceCorporate" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationMinToleranceCorporate}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationMinToleranceGovt" name="sectorAllocationMinToleranceGovt" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceGovt}/>
+                            <input className="form-control" id="sectorAllocationMinToleranceGovt" name="sectorAllocationMinToleranceGovt" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationMinToleranceGovt}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationMinToleranceMultiFamMBS" name="sectorAllocationMinToleranceMultiFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceMultiFamMBS}/>
+                            <input className="form-control" id="sectorAllocationMinToleranceMultiFamMBS" name="sectorAllocationMinToleranceMultiFamMBS" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationMinToleranceMultiFamMBS}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationMinToleranceMuni" name="sectorAllocationMinToleranceMuni" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceMuni}/>
+                            <input className="form-control" id="sectorAllocationMinToleranceMuni" name="sectorAllocationMinToleranceMuni" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationMinToleranceMuni}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationMinToleranceSingleFamMBS" name="sectorAllocationMinToleranceSingleFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMinToleranceSingleFamMBS}/>
+                            <input className="form-control" id="sectorAllocationMinToleranceSingleFamMBS" name="sectorAllocationMinToleranceSingleFamMBS" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationMinToleranceSingleFamMBS}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
@@ -733,43 +747,43 @@ export default function PortfolioTargetsPage({...props}) {
                     */}
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationMaxToleranceABS" name="sectorAllocationMaxToleranceABS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceABS}/>
+                            <input className="form-control" id="sectorAllocationMaxToleranceABS" name="sectorAllocationMaxToleranceABS" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceABS}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationMaxToleranceCash" name="sectorAllocationMaxToleranceCash" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceCash}/>
+                            <input className="form-control" id="sectorAllocationMaxToleranceCash" name="sectorAllocationMaxToleranceCash" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceCash}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationMaxToleranceCorporate" name="sectorAllocationMaxToleranceCorporate" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceCorporate}/>
+                            <input className="form-control" id="sectorAllocationMaxToleranceCorporate" name="sectorAllocationMaxToleranceCorporate" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceCorporate}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationMaxToleranceGovt" name="sectorAllocationMaxToleranceGovt" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceGovt}/>
+                            <input className="form-control" id="sectorAllocationMaxToleranceGovt" name="sectorAllocationMaxToleranceGovt" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceGovt}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationMaxToleranceMultiFamMBS" name="sectorAllocationMaxToleranceMultiFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceMultiFamMBS}/>
+                            <input className="form-control" id="sectorAllocationMaxToleranceMultiFamMBS" name="sectorAllocationMaxToleranceMultiFamMBS" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceMultiFamMBS}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationMaxToleranceMuni" name="sectorAllocationMaxToleranceMuni" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceMuni}/>
+                            <input className="form-control" id="sectorAllocationMaxToleranceMuni" name="sectorAllocationMaxToleranceMuni" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceMuni}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
                     <div className="col-1">
                         <div className="input-group">
-                            <input className="form-control" id="sectorAllocationMaxToleranceSingleFamMBS" name="sectorAllocationMaxToleranceSingleFamMBS" placeholder="Ex 5%"onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceSingleFamMBS}/>
+                            <input className="form-control" id="sectorAllocationMaxToleranceSingleFamMBS" name="sectorAllocationMaxToleranceSingleFamMBS" placeholder="Ex 5%" disabled={!isPasswordCorrect} onChange={handleInputChange} value={formState.sectorAllocationMaxToleranceSingleFamMBS}/>
                             <div className="input-group-text">%</div>
                         </div>
                     </div>
