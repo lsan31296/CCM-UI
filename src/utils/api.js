@@ -351,6 +351,17 @@ export async function getAllAccountscomposites(params, signal) {
     return await fetchJson(url, {headers}, []);
 }
 
+export async function getImpactTradeActivity(params, signal) {
+    const url = new URL(`${API_BASE_URL}/get-impact-trade-activity`);
+    const options = {
+        method: "POST",
+        headers,
+        body: JSON.stringify(params),
+        signal,
+    }
+    return await fetchJson(url, options);
+}
+
 /*
  * Implement time change for data change, log timestamp and payload itself. In WebLog table.
  */

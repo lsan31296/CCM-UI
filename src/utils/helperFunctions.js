@@ -128,7 +128,7 @@ export function landingPageLinksData2(previousBD) {
                         id: "#landing-page-bloomberg-confirmation",
                     },
                     {
-                        name: "Rerporting Tool Page",
+                        name: "Reporting Tool Page",
                         description: <div>
                             <p>A reporting tool that will be used to generically</p>
                             <p>display data for any particular payload given to it.</p>
