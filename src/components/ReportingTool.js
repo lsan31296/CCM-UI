@@ -4,13 +4,16 @@
  * Adding formatting and things of that nature will take a backseat as this is meant to merely show the data.
  */
 
+import "./ReportingTool.css";
 import { useParams } from "react-router"
 import { isApxPortfolioCode, removeUnwanteds } from "../utils/helperFunctions";
 import MultiSelectMenu from "./MultiSelectMenu";
 import { useState } from "react";
 import { getImpactTradeActivity } from "../utils/api";
 import { DataGrid } from "devextreme-react";
-import { FilterRow, HeaderFilter, Pager, Paging } from "devextreme-react/data-grid";
+import { ColumnChooser, ColumnChooserSearch, ColumnChooserSelection, FilterRow, HeaderFilter, Pager, Paging, Position } from "devextreme-react/data-grid";
+import DataGridColumComponentBuilder from "./DataGridColumnComponentBuilder";
+
 
 export default function ReportingTool({...props}) {
     const {accountsInfo, previousBD} = props;
@@ -23,6 +26,7 @@ export default function ReportingTool({...props}) {
     };
     const [formState, setFormState] = useState({...initialFormState});//Form data that will be sent as API request body
     const [dataSource, setDataSource] = useState(null);
+    const [columns, setColumns] = useState(null);
     
     let accountsMultiSelectRows = removeUnwanteds(accountsInfo).map((account) => {
         const newAccount = {
@@ -72,6 +76,7 @@ export default function ReportingTool({...props}) {
         console.log("Submitted Reporting Tool");
         const response = await getImpactTradeActivity({...formState});
         setDataSource(response);
+        setColumns(DataGridColumComponentBuilder(response));
     }
 
     if (!previousBD || !accountsInfo) {
@@ -104,11 +109,17 @@ export default function ReportingTool({...props}) {
                         allowColumnResizing showColumnLines showRowLines rowAlternationEnabled hoverStateEnabled
                         height="72vh" //selectedRowKeys={selectedTradeHistoryRows} onSelectionChanged={handleSelectedTradeHistoryRowChange}
                     >
+                        <ColumnChooser enabled mode="dragAndDrop">
+                            <Position my={"right top"} at={"right bottom"} of={".dx-datagrid-column-chooser-button"}/>
+                            <ColumnChooserSearch enabled editorOptions={{ placeholder: "Search Column"}} />
+                            <ColumnChooserSelection allowSelectAll recursive />
+                        </ColumnChooser>
                         <HeaderFilter visible={true} />
                         <FilterRow visible={true} />
                         {/* <Scrolling mode="virtual"/>*/}
                         <Paging defaultPageSize={100} />
                         <Pager showPageSizeSelector showNavigationButtons allowedPageSizes={[10, 50, 100, 500, 1000]} showInfo/>
+                        {columns}
                     </DataGrid>
                 </div>
             </div>
