@@ -35,6 +35,21 @@ export default function ReportingTool({...props}) {
         }
         return newAccount;
     });
+    let reportMultiSelectRows = [
+        {
+            value: {
+                name: "Impact Trade Activity",
+                parameters: {
+                    aoDate: "some date",
+                    accounts: ["some array of accounts"],
+                    someOtherParams: "some other value"
+                }
+            },
+            label: "Impact Trade Activity",
+        },
+
+    ]
+    
     const accountMultiSelectStyles = {
         control: (baseStyles, state) => ({
             ...baseStyles,
@@ -67,6 +82,21 @@ export default function ReportingTool({...props}) {
             setFormState({ ...formState, portfolioBaseCodes: [...apxPortCodeArr] });
         }
     }
+    const handleReportMultiSelectChange = async(values, actionMeta) => {
+        console.log("Report Multi Select: ", values);
+        //Needs logic implemented once we know the shape of the data.
+        /*if (values) {
+            const nameArr = values.map((value) => {
+                if (value.value.apx_portfolio_code === "CRAIX") {
+                    return value.value.ticker;
+                } else {
+                    return value.value.apx_portfolio_code;
+                }
+            });
+            
+            setFormState({ ...formState, portfolioBaseCodes: [...apxPortCodeArr] });
+        }*/
+    }
     const handleDateChange = ({target}) => {
         console.log("Date: ", target.value);
         setFormState({...formState, tradeDate: target.value});
@@ -96,7 +126,11 @@ export default function ReportingTool({...props}) {
                             required rowsForSelect={accountsMultiSelectRows} handleSelectMenuClose={handleSelectMenuClose} handleMultiSelectChange={handleAccountMultiSelectChange}
                             selectStyles={accountMultiSelectStyles}
                         />
-                        <div id="empty-space-1" style={{ visibility: "hidden" }} className="input-group-text col-6"></div>
+                        <MultiSelectMenu name="reportMultiSelect" classNames={"basic-multi-select input-group-text col-3"} placeHolderString={"Select Report..."}
+                            required rowsForSelect={reportMultiSelectRows} handleSelectMenuClose={handleSelectMenuClose} handleMultiSelectChange={handleReportMultiSelectChange}
+                            selectStyles={accountMultiSelectStyles}
+                        />
+                        <div id="empty-space-1" style={{ visibility: "hidden" }} className="input-group-text col-3"></div>
                         <div className="input-group-text col-1" style={{ display:"flex", justifyContent: "space-evenly" }}>
                             <button className="btn btn-sm btn-primary" type="submit">Submit</button>
                         </div>
