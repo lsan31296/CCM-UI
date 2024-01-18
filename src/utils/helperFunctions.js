@@ -130,15 +130,26 @@ export function landingPageLinksData2(previousBD) {
                     {
                         name: "Reporting Tool Page",
                         description: <div>
+                            <p>IN TESTING/DEVELOPMENT</p>
                             <p>A reporting tool that will be used to generically</p>
                             <p>display data for any particular payload given to it.</p>
                             <p>Much like a CERES data visualization tool.</p>
                         </div>,
                         link: `/reporting-tool`,
                         id: "#reporting-tool"
+                    },
+                    {
+                        name: "File Uploading Page",
+                        description: <div>
+                            <p>IN TESTING/DEVELOPMENT</p>
+                            <p>Uploading page that will only momentarily be available for</p>
+                            <p>the purpose of developing and testing a file uploading component.</p>
+                        </div>,
+                        link: `/file-uploading`,
+                        id: "#file-uploading"
                     }
                 ],
-                overallCount: 5
+                overallCount: 6
             }
         ]
     );

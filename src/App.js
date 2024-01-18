@@ -17,6 +17,7 @@ import PortfolioTargetsPage from './portfolio-targets/PortfolioTargetsPage';
 import VConnConfirmationPage from './vconn/VConnConfirmationPage';
 import CorporateWatchlistPage from './corporate-watchlist/CorporateWatchlistPage';
 import ReportingTool from './components/ReportingTool';
+import FileUploadingPage from './file-uploader/FileUploadingPage';
 
 function App() {
   const [previousBD, setPreviousBD] = useState(null);
@@ -86,6 +87,7 @@ function App() {
             <Route path='/bloomberg-confirmation' element={<VConnConfirmationPage previousBD={previousBD} accountsInfo={accountsInfo} securities={securities}/>}  />
             <Route path='/corporate-watchlist' element={<CorporateWatchlistPage />} />
             <Route path='/reporting-tool' element={<ReportingTool accountsInfo={accountsInfo} previousBD={previousBD}  />} />
+            <Route path='/file-uploading' element={ <FileUploadingPage /> } />
           </Routes>
         </main>
 
