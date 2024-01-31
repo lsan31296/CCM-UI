@@ -5,7 +5,7 @@
  *  Trade Date, Look Back, CUSIP(s), Account(s)
  */
 import "./TradeHistoryLandingPage.css"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MultiSelectMenu from "../components/MultiSelectMenu";
 import { accountLabelNameSorter, calcDateByLookBack, calcLookBackDaysByDate, compositeNameSorter, removeUnwanteds, smartURLSearch } from "../utils/helperFunctions";
 import { Button } from 'devextreme-react/button';
@@ -52,6 +52,8 @@ export default function TradeHistoryLandingPage({...props}) {
     const [aggregateByAccount, setAggregateByAccount] = useState(false);//Toggle aggregation
     const [aggregateByCusip, setAggregateByCusip] = useState(false);//Toggle aggregation
     const [daysBackDateChange, setDaysBackDateChange] = useState(calcDateByLookBack(formState.startDate, formState.lookBack));//Date calculated by end date and days back
+    const [cusipDxGroupCellExists, setCusipDxGroupCellExists] = useState(false);
+    const [accountDxGroupCellExists, setAccountDxGroupCellExists] = useState(false);
 
     const accountMultiSelectStyles = {
         control: (baseStyles, state) => ({
@@ -242,7 +244,7 @@ export default function TradeHistoryLandingPage({...props}) {
                 setAggregateByAccount(false);
                 setAggregateByCusip(true);
             }
-            console.log("Agg Value: ", target.value);
+            //console.log("Agg Value: ", target.value);
         }
     }
     const handleDaysBackDateChange = async({target}) => {
@@ -250,6 +252,58 @@ export default function TradeHistoryLandingPage({...props}) {
         setDaysBackDateChange(target.value);
         setFormState({...formState, lookBack: calcLookBackDaysByDate(target.value, formState.startDate)});
     }
+    const initiateAccountDxGroupCellClass = () => {
+        /*
+        const dxGroupCells = document.getElementsByClassName("dx-group-cell");
+        //console.log(`Group Cells: ${dxGroupCells}`);
+            //aggregateByAccount
+            for (let i = 0; i < dxGroupCells.length; i++) {
+                const colonIndex = dxGroupCells[i].innerHTML.indexOf(":");
+                console.log("Index of Agg By Account Colon: ", colonIndex);
+                console.log(dxGroupCells[i].innerHTML);
+            }
+        */
+        //setAccountDxGroupCellExists(true);
+        setCusipDxGroupCellExists(false);
+        return 0;
+    }
+    const initiateCusipDxGroupCellClass = () => {
+        /*
+        const dxGroupCells = document.getElementsByClassName("dx-group-cell");
+         //console.log(`Group Cells: ${dxGroupCells}`);
+            //aggregateByAccount
+            for (let i = 0; i < dxGroupCells.length; i++) {
+                const colonIndex = dxGroupCells[i].innerHTML.indexOf(":");
+                console.log("Index of Agg By Account Colon: ", colonIndex);
+                console.log(dxGroupCells[i].innerHTML);
+            }
+        */
+        setCusipDxGroupCellExists(true);
+        //setAccountDxGroupCellExists(false);
+        return 0;
+    }
+
+    function loadDXGroupCellRender() {
+        if (cusipDxGroupCellExists) {
+                console.log("Cusip DX Group Cell!");
+                const dxGroupCells = document.getElementsByClassName("dx-group-cell");
+                for (let i = 0; i < dxGroupCells.length; i++) {
+                    const colonIndex = dxGroupCells[i].innerHTML.indexOf(":");
+                    console.log("Index of Agg By Account Colon: ", colonIndex);
+                    console.log(dxGroupCells[i].innerHTML);
+                }
+            } else {
+                console.log("Account DX Group Cell!");
+                const dxGroupCells = document.getElementsByClassName("dx-group-cell");
+                for (let i = 0; i < dxGroupCells.length; i++) {
+                    const colonIndex = dxGroupCells[i].innerHTML.indexOf(":");
+                    console.log("Index of Agg By Account Colon: ", colonIndex);
+                    console.log(dxGroupCells[i].innerHTML);
+                }
+            }
+    }
+
+    useEffect(() => {loadDXGroupCellRender()} ,[cusipDxGroupCellExists])
 
     if (!previousBD || !accountsInfo || !securities) {
         return <h1>Loading...</h1>
@@ -347,11 +401,11 @@ export default function TradeHistoryLandingPage({...props}) {
                         {/* <Scrolling mode="virtual"/>*/}
                         <Paging defaultPageSize={100} />
                         <Pager showPageSizeSelector showNavigationButtons allowedPageSizes={[10, 50, 100, 500, 1000]} showInfo/>
-                        <Column dataField="account" caption="Account" groupIndex={aggregateByAccount ? 0 : null}/>
+                        <Column dataField="account" caption="Account" groupIndex={aggregateByAccount ? initiateAccountDxGroupCellClass() : null}/>
                         <Column dataField="securityGroup" caption="Group"/>
                         <Column dataField="securityType" caption="Type"/>
                         <Column dataField="securitySector" caption="Sector"/>
-                        <Column dataField="cusip" caption="Cusip" groupIndex={aggregateByCusip ? 0 : null} />
+                        <Column dataField="cusip" caption="Cusip" groupIndex={aggregateByCusip ? initiateCusipDxGroupCellClass() : null} />
                         <Column dataField="trade_date" caption="Trade Date" dataType="date" />
                         <Column dataField="settle_date" caption="Settle Date" dataType="date" />
                         <Column dataField="trans_type" caption="Trans Type" />
@@ -368,14 +422,14 @@ export default function TradeHistoryLandingPage({...props}) {
                         {/* Make sure all summaries are collapsed */}
 
                         <Summary>
-                            { aggregateByAccount && <GroupItem column="cusip" summaryType="count" displayFormat="{0} trades" /> }
-                            { aggregateByCusip && <GroupItem column="account" summaryType="count" displayFormat="{0} accounts" />}
+                            { /*aggregateByAccount && <GroupItem column="cusip" summaryType="count" />*/ }
+                            { /*aggregateByCusip && <GroupItem column="account" />*/ }
                             <GroupItem column="orig_face" summaryType="sum" valueFormat="currency" alignByColumn displayFormat="{0}"/>
                             <GroupItem column="curr_face" summaryType="sum" valueFormat="currency" alignByColumn displayFormat="{0}"/>
                             <GroupItem column="net_money" summaryType="sum" valueFormat={{ type: "currency", precision: 2 }} alignByColumn displayFormat="{0}"/>
                             <GroupItem column="duration_contribution" summaryType="sum" valueFormat={{ type: "fixedPoint", precision: 6 }} alignByColumn displayFormat="{0}"/>
                         </Summary>
-                        <SortByGroupSummaryInfo summaryItem="count" />
+                        {/*<SortByGroupSummaryInfo summaryItem="count" />*/}
                     </DataGrid>
                 </div>
 
