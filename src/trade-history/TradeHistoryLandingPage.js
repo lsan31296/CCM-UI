@@ -368,8 +368,8 @@ export default function TradeHistoryLandingPage({...props}) {
                         {/* Make sure all summaries are collapsed */}
 
                         <Summary>
-                            { aggregateByAccount && <GroupItem column="cusip" summaryType="count" displayFormat="{0} trades" /> }
-                            { aggregateByCusip && <GroupItem column="account" summaryType="count" displayFormat="{0} accounts" />}
+                            {/* aggregateByAccount && <GroupItem column="cusip" summaryType="count" displayFormat="{0} trades" /> */}
+                            {/* aggregateByCusip && <GroupItem column="account" summaryType="count" displayFormat="{0} accounts" /> */}
                             <GroupItem column="orig_face" summaryType="sum" valueFormat="currency" alignByColumn displayFormat="{0}"/>
                             <GroupItem column="curr_face" summaryType="sum" valueFormat="currency" alignByColumn displayFormat="{0}"/>
                             <GroupItem column="net_money" summaryType="sum" valueFormat={{ type: "currency", precision: 2 }} alignByColumn displayFormat="{0}"/>
