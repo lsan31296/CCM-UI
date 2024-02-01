@@ -19,3 +19,20 @@ SELECTS THE HEAD ROW THAT IS A CHILD OF THE TRADE HISTORY DATA GRID CONTAINER
 .form-check .form-check-input {
     float: none !important;
 }
+
+/* RESPONSIBLE FOR STYLES OF GROUPBYINDEX COLUMNS */
+.dx-group-cell {
+    color: black;
+}
+
+/* RESPONSIBLE FOR SUMMARY ITEM STYLES LIKE SUM, COUNT, ETC*/
+div.dx-datagrid-summary-item {
+    text-align: center !important;
+    color: black;
+}
+
+/* RESPONSIBLE FOR STYLES OF GENERL GROUP ROW */
+tr.dx-group-row {
+    background-color: #c3c4c7 !important;
+    
+}

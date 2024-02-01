@@ -195,6 +195,8 @@ export default function TradeHistoryLandingPage({...props}) {
             });
             console.log("newAccounts matched: ", newAccounts);
             newFormState.accounts = [...newAccounts];
+        } else if(formState.accounts.length === 0) {
+            newFormState.accounts = ['~all_accounts~'];
         }
 
         if (typeof(formState.cusips) === "string") {
