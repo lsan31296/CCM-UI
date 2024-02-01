@@ -201,6 +201,8 @@ export default function TradeHistoryLandingPage({...props}) {
             console.log("Cusips/Securities list was a string!")
             const cusipsFormatted = formState.cusips.replace(/ /g,'').split(",");
             newFormState.cusips = [...cusipsFormatted];
+        } else if(formState.cusips.length === 0) {
+            newFormState.cusips = ['~all_securities~'];
         }
         //Else use the original formState
         const response = await getTradeHistoryLanding({...newFormState});
@@ -249,6 +251,10 @@ export default function TradeHistoryLandingPage({...props}) {
         console.log("Days Back Date Change: ", target.value)
         setDaysBackDateChange(target.value);
         setFormState({...formState, lookBack: calcLookBackDaysByDate(target.value, formState.startDate)});
+    }
+    const groupCellTitle = (e) => {
+        //console.log(e);
+        return <b>{e.displayValue}</b>;
     }
 
     if (!previousBD || !accountsInfo || !securities) {
@@ -347,11 +353,11 @@ export default function TradeHistoryLandingPage({...props}) {
                         {/* <Scrolling mode="virtual"/>*/}
                         <Paging defaultPageSize={100} />
                         <Pager showPageSizeSelector showNavigationButtons allowedPageSizes={[10, 50, 100, 500, 1000]} showInfo/>
-                        <Column dataField="account" caption="Account" groupIndex={aggregateByAccount ? 0 : null}/>
+                        <Column dataField="account" caption="Account" groupIndex={aggregateByAccount ? 0 : null} groupCellRender={groupCellTitle}/>
                         <Column dataField="securityGroup" caption="Group"/>
                         <Column dataField="securityType" caption="Type"/>
                         <Column dataField="securitySector" caption="Sector"/>
-                        <Column dataField="cusip" caption="Cusip" groupIndex={aggregateByCusip ? 0 : null} />
+                        <Column dataField="cusip" caption="Cusip" groupIndex={aggregateByCusip ? 0 : null} groupCellRender={groupCellTitle}/>
                         <Column dataField="trade_date" caption="Trade Date" dataType="date" />
                         <Column dataField="settle_date" caption="Settle Date" dataType="date" />
                         <Column dataField="trans_type" caption="Trans Type" />
