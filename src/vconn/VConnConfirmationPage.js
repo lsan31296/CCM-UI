@@ -204,7 +204,8 @@ export default function VConnConfirmationPage({...props}) {
                             orig_c_Factor: origRow.c_Factor, orig_b_Quantity: origRow.b_Quantity, orig_c_Quantity: origRow.c_Quantity, orig_b_CurrentFace: origRow.b_CurrentFace,
                             orig_c_Face: origRow.c_Face, orig_b_Principal: origRow.b_Principal, orig_c_Principal: origRow.c_Principal, orig_c_dealerTicker: origRow.c_dealerTicker,
                             orig_b_dealerTicker: origRow.b_dealerTicker, orig_b_Broker: origRow.b_Broker, orig_b_BrokerName: origRow.b_BrokerName, orig_b_DirAlias: origRow.b_DirAlias,
-                            orig_Platform: origRow.platform, orig_App: origRow.app, orig_fileName: origRow.fileName, orig_b_TxnType: origRow.b_TxnType, orig_c_TxnType: origRow.c_TxnType
+                            orig_Platform: origRow.platform, orig_App: origRow.app, orig_fileName: origRow.fileName, orig_b_TxnType: origRow.b_TxnType, orig_c_TxnType: origRow.c_TxnType,
+                            orig_securityType: origRow.securityType
                         }
                     } else {
                         console.log("Could not find the original row.");

@@ -80,6 +80,7 @@ export default function MatchedVConnConfirmationPage({...props}) {
                     <Column caption='Match'  calculateCellValue={renderMatchCellValue} />
                     <Column dataField='c_TradeOrderId' caption='Order ID' />
                     <Column dataField='cusip' caption='Cusip' />
+                    <Column dataField='securityType' caption='Security Type' />
                     <Column dataField='b_TxnType' caption='b_Side'  />
                     <Column dataField='c_TxnType' caption='c_Side' />
                     <Column dataField='b_TradeDate' caption='b_TradeDate'  calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.b_TradeDate))} />
