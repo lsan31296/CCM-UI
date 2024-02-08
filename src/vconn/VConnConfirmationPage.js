@@ -5,9 +5,9 @@
  * styling will be used to determine quickly if an account is a match to the BBG data. Note that BBG is read only
  * whereas Carlton is the data we can change through the editable fields of the DataGrid.
  */
-import DataGrid, { Column, Editing, Paging, HeaderFilter, FilterRow, Pager, ColumnFixing, Button } from 'devextreme-react/data-grid';
+import DataGrid, { Column, Editing, Paging, HeaderFilter, FilterRow, Pager, ColumnFixing, Button, Lookup } from 'devextreme-react/data-grid';
 import { useEffect, useState } from 'react';
-import { getVConnTradeConfirmation, saveVConnTrades } from '../utils/api';
+import { getDealerData, getVConnTradeConfirmation, saveVConnTrades } from '../utils/api';
 import { dateFormatter, sqlDateToDateString, today, yesterday } from '../utils/helperFunctions';
 //import { Popup } from 'devextreme-react'; ..Made a reusable PopUp component used for Login Authentication
 import "./VConnConfirmationPage.css";
@@ -29,6 +29,7 @@ export default function VConnConfirmationPage({...props}) {
     const [popUpVisible, setPopUpVisible] = useState(false);
     const [approveAll, setApproveAll] = useState(false);
     const [approvedAllRows, setApprovedAllRows] = useState([]);
+    const [dealerData, setDealerData] = useState(null);
     //const [successfulLogin, setSuccessfulLogin] = useState(false);
 
     //HANDLES CONDITIONAL RENDERING
@@ -105,14 +106,35 @@ export default function VConnConfirmationPage({...props}) {
         console.log("Loading VConn Confirmation trades!");
         const abortController = new AbortController();
 
-        const response = await getVConnTradeConfirmation({ currDate: date });
-        setVConnConfirmationData([...response]);
+        //const response = await getVConnTradeConfirmation({ currDate: date });
+        const response = await getVConnTradeConfirmation({ currDate: '01/04/2024' });
+        
+
+        //Traverse through data and assigned new fillId for those that do not have one
+        response.forEach((trade, i) => {
+            if(trade.fillID === 0 || trade.fillID === null) {
+                trade.fillID = i;
+            }
+        })
         setOriginalData(JSON.parse(JSON.stringify(response)));
+        setVConnConfirmationData([...response]);
+        
         if (token) {
             console.log("Token: ", token)
             setIsPasswordCorrect(true);
             //setSuccessfulLogin(true);
         }
+        return () => abortController.abort();
+    }
+
+    async function loadDealerData() {
+        console.log("Loading Dealer Data!");
+        const abortController = new AbortController();
+
+        const response = await getDealerData(abortController.signal);
+        //console.log("Dealer Data:", response);
+        setDealerData([...response]);
+        
         return () => abortController.abort();
     }
     
@@ -125,9 +147,10 @@ export default function VConnConfirmationPage({...props}) {
             setChangedRows([...changesTempArr]);
             console.log("Changes: ", e.changes[0].data);
             //Actually need to reconstruct data here since this is where it is all being saved. 
+            const updatedVConnData = [...vConnConfirmationData];
             const updatedRow = vConnConfirmationData.find((element, i) => {
                 if (element.fillID === e.changes[0].key) {
-                    const updatedVConnData = [...vConnConfirmationData];
+                    
                     updatedVConnData[i] = savedChanges;
                     console.log("Updated vConnConfirmationDat State: ", updatedVConnData);
 
@@ -136,16 +159,29 @@ export default function VConnConfirmationPage({...props}) {
                     ]);
                 }
             });
+
+            //Filter all approved rows and stick them in approvedAllRows array
+            const approvedRows = updatedVConnData.filter((element) => element.vConnMatch === true);
+            setApprovedAllRows([...approvedRows]);
         } 
     }
     //HANDLES CHANGE REJECTION IF USER IS NOT LOGGED IN
     const handleEnteringSave = (e) => {
-        console.log("Entering Save: ", e)
+        console.log("Entering Save: ")
         if (!isPasswordCorrect) {
             e.cancel = true;
             e.changes = [];
             alert(`Please revert your changes and login.`);
             return;
+        } else {
+            console.log(e);
+            if(e.changes.length === 0) {
+                console.log("Entering save changes is empty");
+                e.cancel = true;
+            } else {
+                //Fill in apprrovedAllRows Array
+                console.log("Entering save ending.");
+            }
         }
     }
     //HANDLES AND KEEPS TRACK OF ALL CHANGES MADE IN ONE SESSION
@@ -160,15 +196,15 @@ export default function VConnConfirmationPage({...props}) {
                 const reconstructedData = approvedAllRows.map((row, i) => {
                     const origRow = originalData.find((origRow) => row.fillID === origRow.fillID);
                     if (origRow) {
-                        //console.log("Original Row: ", origRow);
-                        return {...row, orig_fillID: origRow.fillID, orig_b_TradeOrderId: origRow.b_TradeOrderId, orig_c_TradeOrderId: origRow.c_TradeOrderId,
-                            orig_cusip: origRow.cusip, orig_vConnMatch: origRow.vConnMatch, orig_b_TradeDate: origRow.b_TradeDate, orig_b_SettleDate: origRow.b_SettleDate,
+                        console.log("Original Row: ", origRow);
+                        return {...row, orig_FillID: origRow.fillID, orig_b_TradeOrderId: origRow.b_TradeOrderId, orig_c_TradeOrderId: origRow.c_TradeOrderId,
+                            orig_Cusip: origRow.cusip, orig_VConnMatch: origRow.vConnMatch, orig_b_TradeDate: origRow.b_TradeDate, orig_b_SettleDate: origRow.b_SettleDate,
                             orig_c_TradeDate: origRow.c_TradeDate, orig_c_SettleDate: origRow.c_SettleDate, orig_b_AccruedInterest: origRow.b_AccruedInterest,
                             orig_c_AccruedInterest: origRow.c_AccruedInterest, orig_b_Price: origRow.b_Price, orig_c_Price: origRow.c_Price, orig_b_Factor: origRow.b_Factor,
                             orig_c_Factor: origRow.c_Factor, orig_b_Quantity: origRow.b_Quantity, orig_c_Quantity: origRow.c_Quantity, orig_b_CurrentFace: origRow.b_CurrentFace,
-                            orig_c_Face: origRow.c_Face, orig_b_Principal: origRow.b_Principal, orig_c_Principal: origRow.c_Principal, orig_c_dealerTicker: origRow.orig_c_dealerTicker,
+                            orig_c_Face: origRow.c_Face, orig_b_Principal: origRow.b_Principal, orig_c_Principal: origRow.c_Principal, orig_c_dealerTicker: origRow.c_dealerTicker,
                             orig_b_dealerTicker: origRow.b_dealerTicker, orig_b_Broker: origRow.b_Broker, orig_b_BrokerName: origRow.b_BrokerName, orig_b_DirAlias: origRow.b_DirAlias,
-                            orig_platform: origRow.platform, orig_app: origRow.app, orig_fileName: origRow.fileName, orig_b_TxnType: origRow.b_TxnType, orig_c_TxnType: origRow.c_TxnType
+                            orig_Platform: origRow.platform, orig_App: origRow.app, orig_fileName: origRow.fileName, orig_b_TxnType: origRow.b_TxnType, orig_c_TxnType: origRow.c_TxnType
                         }
                     } else {
                         console.log("Could not find the original row.");
@@ -177,7 +213,7 @@ export default function VConnConfirmationPage({...props}) {
                 console.log("Reconstructed Data: ", reconstructedData);
                 //const approvedRowsAffected = await saveVConnTrades(approvedAllRows);
                 const approvedRowsAffected = await saveVConnTrades(reconstructedData);
-                //const approvedRowsAffected = [];
+                //const approvedRowsAffected = [reconstructedData];//for testing
                 if (approvedRowsAffected > 0) {
                     alert(`${approvedRowsAffected} ${approveAll ? "Approved" : "Unapproved"} row(s) updated!`);
                     return;
@@ -188,7 +224,10 @@ export default function VConnConfirmationPage({...props}) {
                 setApprovedAllRows([]);
                 setOriginalData(JSON.parse(JSON.stringify(await getVConnTradeConfirmation({ currDate: date }) )));//no that changes have been made, sets original data to previous data before change
             } else {
+                //Nothing has been approved, do not allow user to submit
+                alert(`Nothing has been approved, you may not update without approving.`);
                 //setChangedRows([...changesTempArr]);
+                /*
                 console.log("changedRows State: ", changedRows);
                 //Reconstruct rows here
                 const reconstructedChangedRows = changedRows.map((row, i) => {
@@ -209,7 +248,8 @@ export default function VConnConfirmationPage({...props}) {
                     }
                 });
                 console.log("Reconstructed Changed Rows: ", reconstructedChangedRows);
-                const rowsAffected = await saveVConnTrades(reconstructedChangedRows);
+                //const rowsAffected = await saveVConnTrades(reconstructedChangedRows);
+                const rowsAffected = reconstructedChangedRows.length;
                 if (rowsAffected > 0) {
                     alert(`${rowsAffected} row(s) updated!`);
                     //return;
@@ -217,9 +257,11 @@ export default function VConnConfirmationPage({...props}) {
                     alert(`No rows were affected. Either because you didn't change anything or you entered the password incorrectly.`)
                     //return;
                 }
+                
                 changesTempArr = [];
                 setChangedRows([]);
-                setOriginalData(JSON.parse(JSON.stringify(await getVConnTradeConfirmation({ currDate: date }))));//no that changes have been made, sets original data to previous data before change
+                //setOriginalData(JSON.parse(JSON.stringify(await getVConnTradeConfirmation({ currDate: date }))));//no that changes have been made, sets original data to previous data before change
+                */
             }
         } else if (!isPasswordCorrect) {
             
@@ -327,7 +369,10 @@ export default function VConnConfirmationPage({...props}) {
     }
 
     //LOADS VCONN CONFIRMATION TRADE DATA FOR TODAY'S DATE
-    useEffect(() => {loadVConnConfirmation()}, [date]);
+    useEffect(() => {
+        loadVConnConfirmation();
+        loadDealerData();
+    }, [date]);
 
     return (
         <div id='vconn-confirmation-page-container' style={{ padding: "0% 1% 0% 1%"}} >
@@ -387,7 +432,7 @@ export default function VConnConfirmationPage({...props}) {
                     />
                     <Column caption='Match' allowEditing={false} calculateCellValue={renderMatchCellValue} />
                     <Column dataField='c_TradeOrderId' caption='Order ID' allowEditing={false}/>
-                    <Column dataField='cusip' caption='Cusip' allowEditing={false}/>
+                    <Column dataField='cusip' caption='Cusip' allowEditing={isPasswordCorrect}/>
                     <Column dataField='b_TxnType' caption='b_Side' allowEditing={false} />
                     <Column dataField='c_TxnType' caption='c_Side' allowEditing={false}/>
                     <Column dataField='b_TradeDate' caption='b_TradeDate' allowEditing={false} calculateDisplayValue={(data) => sqlDateToDateString(dateFormatter(data.b_TradeDate))} />
@@ -403,11 +448,13 @@ export default function VConnConfirmationPage({...props}) {
                     <Column dataField='b_Quantity' caption='b_Quantity' allowEditing={false} format={{ type: "currency", precision: 2 }}/>
                     <Column dataField='c_Quantity' caption='c_Quantity' allowEditing={isPasswordCorrect} format={{ type: "currency", precision: 2 }}/>
                     <Column dataField='b_CurrentFace' caption='b_CurrentFace' allowEditing={false} format={{ type: "currency", precision: 2 }}/>
-                    <Column dataField='c_Face' caption='c_Face' allowEditing={false} format={{ type: "currency", precision: 2 }}/>
+                    <Column dataField='c_Face' caption='c_Face' allowEditing={isPasswordCorrect} format={{ type: "currency", precision: 2 }}/>
                     <Column dataField='b_Principal' caption='b_Principal' allowEditing={false} format={{ type: "currency", precision: 2 }}/>
-                    <Column dataField='c_Principal' caption='c_Principal' allowEditing={false} format={{ type: "currency", precision: 2 }}/>
+                    <Column dataField='c_Principal' caption='c_Principal' allowEditing={isPasswordCorrect} format={{ type: "currency", precision: 2 }}/>
                     <Column dataField='b_dealerTicker' caption='b_DealerTicker' allowEditing={false}/>
-                    <Column dataField='c_dealerTicker' caption='c_DealerTicker' allowEditing={false}/>
+                    <Column dataField='c_dealerTicker' caption='c_DealerTicker' allowEditing={isPasswordCorrect}>
+                        <Lookup dataSource={dealerData} displayExpr="name" valueExpr="id" />
+                    </Column>
                     <Column dataField='b_Broker' caption='b_Broker' allowEditing={false}/>
                     <Column dataField='b_BrokerName' caption='b_BrokerName' allowEditing={false}/>
                     <Column dataField='b_DirAlias' caption='b_DirAlias' allowEditing={false}/>

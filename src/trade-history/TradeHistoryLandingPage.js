@@ -372,7 +372,7 @@ export default function TradeHistoryLandingPage({...props}) {
                         <Column dataField="net_money" caption="Net Money" dataType="number" format={{ type: "currency", precision: 2 }}/> {/*NEEDS 2 DECIMALS */}
                         <Column dataField="dealer" caption="Dealer" />
                         <Column dataField="duration" caption="Duration" dataType="number" />
-                        <Column dataField="duration_contribution" caption="Dur Cont" dataType="number" />
+                        <Column dataField="duration_contribution" caption="Dur Cont" dataType="number" format={{ type: "fixedPoint", precision: 3 }}/>
                         {/* Make sure all summaries are collapsed */}
 
                         <Summary>

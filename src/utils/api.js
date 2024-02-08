@@ -362,6 +362,11 @@ export async function getImpactTradeActivity(params, signal) {
     return await fetchJson(url, options);
 }
 
+export async function getDealerData(signal) {
+    const url = new URL(`${API_BASE_URL}/get-dealers`);
+    return await fetchJson(url, signal);
+}
+
 /*
  * Implement time change for data change, log timestamp and payload itself. In WebLog table.
  */
