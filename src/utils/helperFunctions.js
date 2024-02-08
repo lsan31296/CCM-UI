@@ -119,13 +119,24 @@ export function landingPageLinksData2(previousBD) {
                     {
                         name: "Bloomberg Confirmation Page",
                         description: <div>
-                            <p>Sample: '/vconn-confirmation'</p>
-                            <p>Page which displays whether BBG and Carlton trades</p>
-                            <p>are a confirmed match. Trades are editable if such a case</p>
+                            <p>Sample: '/bloomberg-confirmation'</p>
+                            <p>Page which displays BBG and Carlton trades</p>
+                            <p>that are unmatched. Trades are editable if such a case</p>
                             <p>occurs.</p>
                         </div>,
                         link: `/bloomberg-confirmation`,
                         id: "#landing-page-bloomberg-confirmation",
+                    },
+                    {
+                        name: "Matched Bloomberg Trades Page",
+                        description: <div>
+                            <p>Sample: '/matched-bloomberg-confirmation'</p>
+                            <p>Page which displays whether BBG and Carlton trades</p>
+                            <p>are a confirmed match. Trades are editable if such a case</p>
+                            <p>occurs.</p>
+                        </div>,
+                        link: `/matched-bloomberg-confirmation`,
+                        id: "#landing-page-matched-bloomberg-confirmation",
                     },
                     {
                         name: "Reporting Tool Page",

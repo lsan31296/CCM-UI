@@ -106,8 +106,8 @@ export default function VConnConfirmationPage({...props}) {
         console.log("Loading VConn Confirmation trades!");
         const abortController = new AbortController();
 
-        //const response = await getVConnTradeConfirmation({ currDate: date });
-        const response = await getVConnTradeConfirmation({ currDate: '01/04/2024' });
+        const response = await getVConnTradeConfirmation({ currDate: date });
+        //const response = await getVConnTradeConfirmation({ currDate: '01/04/2024' });
         
 
         //Traverse through data and assigned new fillId for those that do not have one

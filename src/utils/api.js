@@ -250,6 +250,14 @@ export async function getVConnTradeConfirmation(params, signal) {
     return await fetchJson(url, {headers}, []);
 }
 
+export async function getMatchingVConnTradeConfirmation(params, signal) {
+    const url = new URL(`${API_BASE_URL}/get-matching-vconn-trade-confirmation`);
+    Object.entries(params).forEach(([key, value]) => {
+        url.searchParams.append(key, value.toString())
+    });
+    return await fetchJson(url, {headers}, []);
+}
+
 export async function saveVConnTrades(params, signal) {
     const url = new URL(`${API_BASE_URL}/update-vconn-trade-confirmation`);
     const options = {
@@ -366,6 +374,7 @@ export async function getDealerData(signal) {
     const url = new URL(`${API_BASE_URL}/get-dealers`);
     return await fetchJson(url, signal);
 }
+
 
 /*
  * Implement time change for data change, log timestamp and payload itself. In WebLog table.
