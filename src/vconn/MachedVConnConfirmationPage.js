@@ -1,5 +1,5 @@
 import DataGrid, { Column, Paging, HeaderFilter, FilterRow, Pager, ColumnFixing } from 'devextreme-react/data-grid';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getMatchingVConnTradeConfirmation } from '../utils/api';
 import { dateFormatter, sqlDateToDateString, today } from '../utils/helperFunctions';
 
@@ -7,7 +7,7 @@ export default function MatchedVConnConfirmationPage({...props}) {
     const date = sqlDateToDateString(today());
     const [ vConnConfirmationData, setVConnConfirmationData ] = useState(null);
 
-
+    /* HOOK FUNCTIONS AND useEffect */
     async function loadMatchedVConnConfirmation() {
         console.log("Loading Matched VConnConfirmation Trades!");
         const abortController = new AbortController();
@@ -16,14 +16,14 @@ export default function MatchedVConnConfirmationPage({...props}) {
         setVConnConfirmationData(response);
         if (response.length === 0) {
             alert(`There are not trades for ${date}`);
-            //setVConnConfirmationData([]);
         }
         return () => abortController.abort();
     }
 
     useEffect(() => {loadMatchedVConnConfirmation()}, [date]);
+
     /*CONDITIONAL RENDERING/FORMATTING OD CELLS OR CELL STYLES */
-    const renderMatchCellValue = (rowData) => {
+    const renderMatchCellValue = useCallback((rowData) => {
         //console.log("renderMatchCellValue", rowData);
         switch (true) {
             case (rowData.c_TxnType !== rowData.b_TxnType):
@@ -48,8 +48,9 @@ export default function MatchedVConnConfirmationPage({...props}) {
                 //console.log("Match!");
                 return true;
         }
-    }
-    const handleApproveAllHeaderRender = (columnData) => {
+    })
+    const handleApproveAllHeaderRender = useCallback((columnData) => {
+        //console.log("handleApproveAllHeaderRender: ", columnData)
         return (
             <div id='approve-column-header'>
                 Approve
@@ -57,7 +58,7 @@ export default function MatchedVConnConfirmationPage({...props}) {
                 
             </div>
         );
-    }
+    })
 
     return (
         <div id="matched-vconn-confirmation-page-container">

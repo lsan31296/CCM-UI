@@ -39,7 +39,7 @@ export default function TradeHistoryLandingPage({...props}) {
     //DEFINE CONSTANTS/STATE VARIABLES
     const initialFormState = {
         startDate: previousBD, //Ex: 2023-09-26
-        lookBack: "1",
+        lookBack: "0",
         cusips: [], //synonymous with 'Security' dropdown in Carlton
         accounts: [], //synonymous with 'Funds' checkbox in Carlton
     };
@@ -145,8 +145,8 @@ export default function TradeHistoryLandingPage({...props}) {
     const handleLookBackChange = ({target}) => {
         //console.log("Look Back: ", target.value);
         //console.log("Data Type: ", typeof(target.value))
-        if(target.value === "0") {
-            alert("Look Back Days must be at least 1.");
+        if(target.value === "-1") {
+            alert("Look Back Days must be a positive number or day of (0).");
             return;
         }
         setFormState({ ...formState, lookBack: target.value });

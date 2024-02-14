@@ -15,7 +15,9 @@ import useToken from '../login/useToken';
 import PopUpLogin from '../login/PopUpLogin';
 
 
+
 export default function VConnConfirmationPage({...props}) {
+    const url = window.location.href;
     const { token, setToken, removeToken } = useToken();
     const [vConnConfirmationData, setVConnConfirmationData] = useState(null);
     const [originalData, setOriginalData] = useState(null);
@@ -103,10 +105,15 @@ export default function VConnConfirmationPage({...props}) {
         }
     };
     async function loadVConnConfirmation() {
-        console.log("Loading VConn Confirmation trades!");
+        //console.log("Loading VConn Confirmation trades!", url);
         const abortController = new AbortController();
 
         const response = await getVConnTradeConfirmation({ currDate: date });
+        if (response.length === 0 ) {
+            const lastForwardSlashIndex = url.lastIndexOf('/');
+            const basePath = url.slice(0, lastForwardSlashIndex);
+            alert(`Currently there are no unmatched trades. Please check '${basePath}/matched-bloomberg-confirmation' if you are looking for an executed trade.`)
+        }
         //const response = await getVConnTradeConfirmation({ currDate: '01/04/2024' });
         
 
