@@ -7,7 +7,7 @@
 import "./TradeHistoryLandingPage.css"
 import { useState } from "react";
 import MultiSelectMenu from "../components/MultiSelectMenu";
-import { accountLabelNameSorter, calcDateByLookBack, calcLookBackDaysByDate, compositeNameSorter, removeUnwanteds, smartURLSearch } from "../utils/helperFunctions";
+import { accountLabelNameSorter, calcDateByLookBack, calcLookBackDaysByDate, compositeNameSorter, removeUnwanteds, smartURLSearch, today } from "../utils/helperFunctions";
 import { Button } from 'devextreme-react/button';
 import DropDownBoxDataGrid from "../components/DropDownBoxDataGrid";
 import DataGrid, { Column, Selection, Paging, FilterRow, HeaderFilter, Pager, GroupItem, SortByGroupSummaryInfo, Summary } from 'devextreme-react/data-grid';
@@ -38,7 +38,7 @@ export default function TradeHistoryLandingPage({...props}) {
 
     //DEFINE CONSTANTS/STATE VARIABLES
     const initialFormState = {
-        startDate: previousBD, //Ex: 2023-09-26
+        startDate: today() , //Ex: 2023-09-26
         lookBack: "0",
         cusips: [], //synonymous with 'Security' dropdown in Carlton
         accounts: [], //synonymous with 'Funds' checkbox in Carlton
