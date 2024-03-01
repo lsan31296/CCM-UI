@@ -375,6 +375,13 @@ export async function getDealerData(signal) {
     return await fetchJson(url, signal);
 }
 
+export async function getAccumulatedExposure(params, signal) {
+    const url = new URL(`${API_BASE_URL}/get-accumulated-impact-exposure`);
+    Object.entries(params).forEach(([key, value]) => {
+        url.searchParams.append(key, value.toString())
+    });
+    return await fetchJson(url, {headers}, []);
+}
 
 /*
  * Implement time change for data change, log timestamp and payload itself. In WebLog table.

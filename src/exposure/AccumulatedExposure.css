@@ -1,0 +1,26 @@
+/* RESPONSIBLE FOR SPACE IN BETWEEN INPUT(radio/switch) AND LABEL */
+.form-switch .form-check-label {
+    /*float: none !important; */
+    margin-right: 0.5em !important;
+}
+/*
+SELECTS THE HEAD ROW THAT IS A CHILD OF THE TRADE HISTORY DATA GRID CONTAINER
+*/
+#accumulated-exposure-data-grid-container .dx-header-row {
+    background-color: darkblue !important;/* SETS THE BACKGROUND COLOR */
+    color: white !important;/* SETS FONT COLOR */
+}
+
+/*
+SELECTS THE ALTERNATE ROW CELLS
+*/
+tr.dx-row-alt td  {
+    background-color: lightblue !important;
+}
+
+/*
+SELECTS NON ALTERNATE ROW CELLS
+*/
+tr.dx-data-row td {
+    background-color: beige;
+}
