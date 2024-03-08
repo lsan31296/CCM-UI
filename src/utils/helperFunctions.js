@@ -157,8 +157,7 @@ export function landingPageLinksData2(previousBD) {
                         </div>,
                         link: `/accumulated-exposure`,
                         id: "#accumulated-exposure"
-                    },
-                    
+                    }
                 ],
                 overallCount: 8
             }
