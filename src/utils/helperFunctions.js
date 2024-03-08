@@ -147,9 +147,20 @@ export function landingPageLinksData2(previousBD) {
                         </div>,
                         link: `/reporting-tool`,
                         id: "#reporting-tool"
-                    }
+                    },
+                    {
+                        name: "Accumulated Exposure Report",
+                        description: <div>
+                            <p>A reporting tool that will be used to view</p>
+                            <p>the exposure report with accumulated values.</p>
+                            <p>Mirrors the same report in Carlton</p>
+                        </div>,
+                        link: `/accumulated-exposure`,
+                        id: "#accumulated-exposure"
+                    },
+                    
                 ],
-                overallCount: 5
+                overallCount: 8
             }
         ]
     );

@@ -355,24 +355,24 @@ export default function TradeHistoryLandingPage({...props}) {
                         {/* <Scrolling mode="virtual"/>*/}
                         <Paging defaultPageSize={100} />
                         <Pager showPageSizeSelector showNavigationButtons allowedPageSizes={[10, 50, 100, 500, 1000]} showInfo/>
-                        <Column dataField="account" caption="Account" groupIndex={aggregateByAccount ? 0 : null} groupCellRender={groupCellTitle}/>
-                        <Column dataField="securityGroup" caption="Group"/>
-                        <Column dataField="securityType" caption="Type"/>
-                        <Column dataField="securitySector" caption="Sector"/>
-                        <Column dataField="cusip" caption="Cusip" groupIndex={aggregateByCusip ? 0 : null} groupCellRender={groupCellTitle}/>
-                        <Column dataField="trade_date" caption="Trade Date" dataType="date" />
-                        <Column dataField="settle_date" caption="Settle Date" dataType="date" />
-                        <Column dataField="trans_type" caption="Trans Type" />
-                        <Column dataField="sec_name" caption="Security Name" />
-                        <Column dataField="pool_name" caption="Pool Name" />
-                        <Column dataField="orig_face" caption="Original Face" dataType="number" format="currency" />
-                        <Column dataField="curr_face" caption="Current Face" dataType="number" format="currency" />
-                        <Column dataField="price" caption="Price" dataType="number" format={{ type: "currency", precision: 6 }}  /> {/*NEEDS 6 DECIMALS */}
-                        <Column dataField="accrued" caption="Accrued" dataType="number" format={{ type: "currency", precision: 2 }}/> {/*NEEDS 2 DECIMALS */}
-                        <Column dataField="net_money" caption="Net Money" dataType="number" format={{ type: "currency", precision: 2 }}/> {/*NEEDS 2 DECIMALS */}
-                        <Column dataField="dealer" caption="Dealer" />
-                        <Column dataField="duration" caption="Duration" dataType="number" />
-                        <Column dataField="duration_contribution" caption="Dur Cont" dataType="number" format={{ type: "fixedPoint", precision: 3 }}/>
+                        <Column dataField="account" caption="Account" groupIndex={aggregateByAccount ? 0 : null} groupCellRender={groupCellTitle} alignment="center" />
+                        <Column dataField="securityGroup" caption="Group" alignment="center" />
+                        <Column dataField="securityType" caption="Type" alignment="center" />
+                        <Column dataField="securitySector" caption="Sector" alignment="center" />
+                        <Column dataField="cusip" caption="Cusip" groupIndex={aggregateByCusip ? 0 : null} groupCellRender={groupCellTitle} alignment="center" />
+                        <Column dataField="trade_date" caption="Trade Date" dataType="date"  alignment="center" />
+                        <Column dataField="settle_date" caption="Settle Date" dataType="date"  alignment="center" />
+                        <Column dataField="trans_type" caption="Trans Type"  alignment="center" />
+                        <Column dataField="sec_name" caption="Security Name"  alignment="center" />
+                        <Column dataField="pool_name" caption="Pool Name"  alignment="center" />
+                        <Column dataField="orig_face" caption="Original Face" dataType="number" format="currency"  alignment="center" />
+                        <Column dataField="curr_face" caption="Current Face" dataType="number" format="currency"  alignment="center" />
+                        <Column dataField="price" caption="Price" dataType="number" format={{ type: "currency", precision: 6 }}   alignment="center" /> {/*NEEDS 6 DECIMALS */}
+                        <Column dataField="accrued" caption="Accrued" dataType="number" format={{ type: "currency", precision: 2 }} alignment="center" /> {/*NEEDS 2 DECIMALS */}
+                        <Column dataField="net_money" caption="Net Money" dataType="number" format={{ type: "currency", precision: 2 }} alignment="center" /> {/*NEEDS 2 DECIMALS */}
+                        <Column dataField="dealer" caption="Dealer"  alignment="center" />
+                        <Column dataField="duration" caption="Duration" dataType="number"  alignment="center" />
+                        <Column dataField="duration_contribution" caption="Dur Cont" dataType="number" format={{ type: "fixedPoint", precision: 3 }} alignment="center" />
                         {/* Make sure all summaries are collapsed */}
 
                         <Summary>

@@ -14,13 +14,13 @@ SELECTS THE HEAD ROW THAT IS A CHILD OF THE TRADE HISTORY DATA GRID CONTAINER
 /*
 SELECTS THE ALTERNATE ROW CELLS
 */
-tr.dx-row-alt td  {
-    background-color: lightblue !important;
+#accumulated-exposure-data-grid-container tr.dx-row-alt td  {
+    background-color: lightblue !important ;
 }
 
 /*
 SELECTS NON ALTERNATE ROW CELLS
 */
-tr.dx-data-row td {
+#accumulated-exposure-data-grid-container tr.dx-data-row td {
     background-color: beige;
 }
