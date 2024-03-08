@@ -1,9 +1,9 @@
 import "./AccumulatedExposure.css";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { calcDateByLookBack, calcLookBackDaysByDate, today } from "../utils/helperFunctions";
 import { Button, DataGrid } from "devextreme-react";
 import ExportCSV from "../components/ExportCSV";
-import { Column, FilterRow, GroupItem, GroupPanel, Grouping, HeaderFilter, Pager, Paging, Summary, TotalItem } from "devextreme-react/cjs/data-grid";
+import { Column, FilterRow, GroupItem, GroupPanel, Grouping, HeaderFilter, LoadPanel, Pager, Paging, Summary, TotalItem } from "devextreme-react/cjs/data-grid";
 import { getAccumulatedExposure } from "../utils/api";
 
 /**
@@ -24,6 +24,7 @@ export default function AccumulatedExposureReport({...props}) {
     };
     const [formState, setFormState] = useState({...initialFormState});
     const [daysBackDateChange, setDaysBackDateChange] = useState(calcDateByLookBack(formState.startDate, formState.daysBack));
+    const [loadPanelVisible, setLoadPanelVisible] = useState(false);
 
     //EVENT HANDLERS
     const handleDaysBackDateChange = async({target}) => {
@@ -61,6 +62,7 @@ export default function AccumulatedExposureReport({...props}) {
     }
     const handleSubmitClick = async(event) => {
         event.preventDefault();
+        setLoadPanelVisible(true);
         console.log("Hit Generate Button!");
         let newFormState = {
             fundTicker: formState.fundTicker,
@@ -70,6 +72,7 @@ export default function AccumulatedExposureReport({...props}) {
         console.log("Request Body: ", newFormState);
         const response = await getAccumulatedExposure({...newFormState});
         setAccumulatedExposureData([...response]);
+        setLoadPanelVisible(false);
     }
     const calculatePercentDisplay = (dataField, decimal) => {
         return (rowData) => {
@@ -136,7 +139,7 @@ export default function AccumulatedExposureReport({...props}) {
                     <div id="accumulated-exposure-button-group" className="input-group-text col-3" style={{ display: "flex", justifyContent: "space-evenly" }}>
                         <Button id="generate-accumulated-exposure-button" width={75} text="Generate" type="default" stylingMode="contained" onClick={clickSubmitButton} />
                         <Button id="export-button" width={75} text="Export" type="success" stylingMode="contained" onClick={handleExportClick} />
-                        <ExportCSV id={"accumulated-exposure-export"} styleObj={{ display: "none", visibility: "hidden" }} /*csvData={selectedTradeHistoryRows.length > 0 ? selectedTradeHistoryRows : tradeHistoryData} fileName={`TradeHistory_${formState.cusips.toString()}_${formState.accounts.toString()}_${formState.startDate}_${formState.lookBack}`} */ />
+                        <ExportCSV id={"accumulated-exposure-export"} styleObj={{ display: "none", visibility: "hidden" }} csvData={accumulatedExposureData} fileName={ `Accumulated_Exposure_Report_${formState.endDate.toString()}_${formState.startDate.toString()}_${formState.fundTicker}` } />
                         <button id="submit-accumulated-exposure-button" style={{ display: "none", visibility: "hidden" }} type="submit"></button>
                         {/*<Button id="pop-up-body-button" width={93} text="Request Detail" type="default" stylingMode="outlined" onClick={() => setRequestDetailPopUpVisible(true)} /> */}
                     </div>
@@ -147,6 +150,7 @@ export default function AccumulatedExposureReport({...props}) {
                 <DataGrid dataSource={accumulatedExposureData} showBorders allowColumnResizing showColumnLines showRowLines rowAlternationEnabled
                     hoverStateEnabled height="74vh" columnAutoWidth//selectedRowKeys onSelectionChanged
                 >
+                    <LoadPanel visible={loadPanelVisible} text="Loading themes, designations, security, loan and exposure models" height={120}/>
                     <HeaderFilter visible={true}/>
                     <FilterRow visible={true}/>
                     <Paging defaultPageSize={100} />

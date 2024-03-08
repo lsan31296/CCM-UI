@@ -157,6 +157,17 @@ export function landingPageLinksData2(previousBD) {
                         </div>,
                         link: `/accumulated-exposure`,
                         id: "#accumulated-exposure"
+                    },
+                    {
+                        name: "Account Exposure Report",
+                        description: <div>
+                            <p>A reporting tool that will be used to view</p>
+                            <p>the exposure report with by account.</p>
+                            <p>Mirrors the same report in Carlton.</p>
+                            <p>Also known as Fund Exposure report.</p>
+                        </div>,
+                        link: `/account-exposure`,
+                        id: "#account-exposure"
                     }
                 ],
                 overallCount: 8

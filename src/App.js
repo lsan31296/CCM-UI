@@ -19,6 +19,7 @@ import CorporateWatchlistPage from './corporate-watchlist/CorporateWatchlistPage
 import ReportingTool from './components/ReportingTool';
 import MatchedVConnConfirmationPage from './vconn/MachedVConnConfirmationPage';
 import AccumulatedExposureReport from './exposure/AccumulatedExposureReport';
+import AccountExposureReport from './exposure/AccountExposureReport';
 
 function App() {
   const [previousBD, setPreviousBD] = useState(null);
@@ -89,7 +90,8 @@ function App() {
             <Route path='/corporate-watchlist' element={<CorporateWatchlistPage />} />
             <Route path='/reporting-tool' element={<ReportingTool accountsInfo={accountsInfo} previousBD={previousBD}  />} />
             <Route path='/matched-bloomberg-confirmation' element={ <MatchedVConnConfirmationPage previous={previousBD}/> } />
-            <Route path='/accumulated-exposure' element={ <AccumulatedExposureReport composites={composites} previousBD={previousBD} accountsInfo={accountsInfo} securities={securities}/> } />
+            <Route path='/accumulated-exposure' element={ <AccumulatedExposureReport /> } />
+            <Route path='/account-exposure' element={ <AccountExposureReport /> } />
           </Routes>
         </main>
 
