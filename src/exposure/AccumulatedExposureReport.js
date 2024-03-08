@@ -139,7 +139,7 @@ export default function AccumulatedExposureReport({...props}) {
                     <div id="accumulated-exposure-button-group" className="input-group-text col-3" style={{ display: "flex", justifyContent: "space-evenly" }}>
                         <Button id="generate-accumulated-exposure-button" width={75} text="Generate" type="default" stylingMode="contained" onClick={clickSubmitButton} />
                         <Button id="export-button" width={75} text="Export" type="success" stylingMode="contained" onClick={handleExportClick} />
-                        <ExportCSV id={"accumulated-exposure-export"} styleObj={{ display: "none", visibility: "hidden" }} csvData={accumulatedExposureData} fileName={ `Accumulated_Exposure_Report_${formState.endDate.toString()}_${formState.startDate.toString()}_${formState.fundTicker}` } />
+                        <ExportCSV id={"accumulated-exposure-export"} styleObj={{ display: "none", visibility: "hidden" }} csvData={accumulatedExposureData} fileName={ `Accumulated_Exposure_Report_${daysBackDateChange.toString()}_${formState.startDate.toString()}_${formState.fundTicker}` } />
                         <button id="submit-accumulated-exposure-button" style={{ display: "none", visibility: "hidden" }} type="submit"></button>
                         {/*<Button id="pop-up-body-button" width={93} text="Request Detail" type="default" stylingMode="outlined" onClick={() => setRequestDetailPopUpVisible(true)} /> */}
                     </div>
