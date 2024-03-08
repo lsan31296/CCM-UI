@@ -98,7 +98,7 @@ export default function AccumulatedExposureReport({...props}) {
 
     return (
         <div id="accumulated-exposure-report-container">
-            <h1>Accumulated Exposure Report</h1>
+            <h1>(Alpha) Accumulated Exposure Report</h1>
             <form id="accumulated-exposure-report-form" onSubmit={handleSubmitClick}>
 
                 <div id="accumulated-exposure-input-group-1" className="input-group row" style={{ margin: "0% 0%" }}>

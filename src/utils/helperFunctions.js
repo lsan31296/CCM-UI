@@ -149,8 +149,9 @@ export function landingPageLinksData2(previousBD) {
                         id: "#reporting-tool"
                     },
                     {
-                        name: "Accumulated Exposure Report",
+                        name: "(Alpha) Accumulated Exposure Report",
                         description: <div>
+                            <p>Currently in the Alpha stage.</p>
                             <p>A reporting tool that will be used to view</p>
                             <p>the exposure report with accumulated values.</p>
                             <p>Mirrors the same report in Carlton</p>
@@ -159,8 +160,9 @@ export function landingPageLinksData2(previousBD) {
                         id: "#accumulated-exposure"
                     },
                     {
-                        name: "Account Exposure Report",
+                        name: "(Alpha) Account Exposure Report",
                         description: <div>
+                            <p>Currently in the Alpha stage.</p>
                             <p>A reporting tool that will be used to view</p>
                             <p>the exposure report with by account.</p>
                             <p>Mirrors the same report in Carlton.</p>

@@ -1,9 +1,10 @@
+import "./AccountExposureReport.css";
 import { useState } from "react"
 import { today } from "../utils/helperFunctions";
 import { getAccountExposure } from "../utils/api";
 import ExportCSV from "../components/ExportCSV";
 import { Button, DataGrid } from "devextreme-react";
-import { FilterRow, GroupPanel, Grouping, HeaderFilter, Pager, Paging, LoadPanel, Column } from "devextreme-react/cjs/data-grid";
+import { FilterRow, GroupPanel, Grouping, HeaderFilter, Pager, Paging, LoadPanel, Column, Summary, TotalItem } from "devextreme-react/cjs/data-grid";
 
 
 
@@ -56,7 +57,7 @@ export default function AccountExposureReport({...props}) {
 
     return (
         <div id="account-exposure-report-container">
-            <h1>Fund Exposure Report</h1>
+            <h1>(Alpha) Fund Exposure Report</h1>
             <form id="account-exposure-report-form" onSubmit={handleSubmitClick}>
                 <div id="account-exposure-input-group-1" className="input-group row" style={{ margin: "0% 0%" }}>
                     <div className="input-group-text col-4">
@@ -89,7 +90,7 @@ export default function AccountExposureReport({...props}) {
                 </div>
             </form>
 
-            <div id="accunt-exposure-data-grid-container">
+            <div id="account-exposure-data-grid-container">
                 <DataGrid dataSource={accountExposureData} showBorders allowColumnResizing showColumnLines showRowLines rowAlternationEnabled
                     hoverStateEnabled height="74vh" columnAutoWidth
                 >
@@ -199,6 +200,55 @@ export default function AccountExposureReport({...props}) {
                     <Column dataField="non_tmbs_low_income_units" caption="LMI Multifamily Units"/>
                     <Column dataField="tmbs_units_loan_total" caption="Affordable Mortgages Loan Total"/>
                     <Column dataField="non_tmbs_low_income_units_loan_total" caption="LMI Multifamily Units Loan Total"/>
+
+                    <Summary>
+                    <TotalItem column="ahr_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }} displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="ahou_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }} displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="agr_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="art_cul_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="dis_rec_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="ec_inc_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="ed_child_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="ent_dev_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="env_grn_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="gen_lens_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="hea_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="hud_des_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="hcp_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="min_nei_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="revit_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="rural_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="sen_dis_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="tod_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="mcares_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="covid_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="sust_comm_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="human_emp_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+                        <TotalItem column="theme_contribution_total" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
+
+                        <TotalItem column="ahr_weight" summaryType="sum"  customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="ahou_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="agr_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="art_cul_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="dis_rec_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="ec_inc_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="ed_child_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="ent_dev_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="env_grn_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="gen_lens_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="hea_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="hud_des_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="hcp_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="min_nei_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="revit_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="rural_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="sen_dis_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="tod_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="mcares_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="covid_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="sust_comm_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="human_emp_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                    </Summary>
                 </DataGrid>
             </div>
 
