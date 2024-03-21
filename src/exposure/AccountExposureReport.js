@@ -1,6 +1,6 @@
 import "./AccountExposureReport.css";
 import { useState } from "react"
-import { today } from "../utils/helperFunctions";
+import { grandTotalCalculator, today, yesterday } from "../utils/helperFunctions";
 import { getAccountExposure } from "../utils/api";
 import ExportCSV from "../components/ExportCSV";
 import { Button, DataGrid } from "devextreme-react";
@@ -13,10 +13,11 @@ export default function AccountExposureReport({...props}) {
     const [accountExposureData, setAccountExposureData] = useState(null);
     const initialFormState = {
         fund: "CRAFund",
-        asOfDate: today()
+        asOfDate: yesterday(today())
     };
     const [formState, setFormState] = useState({...initialFormState});
     const [loadPanelVisible, setLoadPanelVisible] = useState(false);
+    const [themeContributionGrandTotal, setThemeContributionGrandTotal] = useState(0);
 
     //EVENT HANDLING
     const handleasOfDateChange = ({target}) => {
@@ -41,6 +42,7 @@ export default function AccountExposureReport({...props}) {
         console.log("Hit Generate Button!");
         console.log("Request Body: ", formState);
         const response = await getAccountExposure({...formState});
+        setThemeContributionGrandTotal(grandTotalCalculator("theme_contribution_total", response));
         setAccountExposureData([...response]);
         setLoadPanelVisible(false);
     }
@@ -52,7 +54,8 @@ export default function AccountExposureReport({...props}) {
     }
     const calculateTotalPercentDisplay = (itemInfo) => {
         //Need to divide this value by corresponding theme contribution total.
-        return (itemInfo.value * 100 ).toFixed(2) + "%";
+        //console.log("ItemInfo: ", itemInfo);
+        return (itemInfo.value /  themeContributionGrandTotal * 100).toFixed(2) + "%";
     }
 
     return (
@@ -92,7 +95,7 @@ export default function AccountExposureReport({...props}) {
 
             <div id="account-exposure-data-grid-container">
                 <DataGrid dataSource={accountExposureData} showBorders allowColumnResizing showColumnLines showRowLines rowAlternationEnabled
-                    hoverStateEnabled height="74vh" columnAutoWidth
+                    hoverStateEnabled height="76vh" columnAutoWidth
                 >
                     <LoadPanel visible={loadPanelVisible} text="Loading themes, designations, security, loan and exposure models" height={120}/>
                     <HeaderFilter visible={true}/>
@@ -226,28 +229,29 @@ export default function AccountExposureReport({...props}) {
                         <TotalItem column="human_emp_contribution" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
                         <TotalItem column="theme_contribution_total" summaryType="sum" valueFormat={{ type: "currency", precision:0 }}  displayFormat="{0}" dataType="string" alignment="left"/>
 
-                        <TotalItem column="ahr_weight" summaryType="sum"  customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="ahou_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="agr_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="art_cul_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="dis_rec_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="ec_inc_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="ed_child_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="ent_dev_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="env_grn_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="gen_lens_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="hea_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="hud_des_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="hcp_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="min_nei_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="revit_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="rural_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="sen_dis_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="tod_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="mcares_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="covid_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="sust_comm_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
-                        <TotalItem column="human_emp_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="ahr_contribution" showInColumn="ahr_weight" summaryType="sum"  customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="ahou_contribution" showInColumn="ahou_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="agr_contribution" showInColumn="agr_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="art_cul_contribution" showInColumn="art_cul_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="dis_rec_contribution" showInColumn="dis_rec_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="ec_inc_contribution" showInColumn="ec_inc_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="ed_child_contribution" showInColumn="ed_child_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="ent_dev_contribution" showInColumn="ent_dev_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="env_grn_contribution" showInColumn="env_grn_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="gen_lens_contribution" showInColumn="gen_lens_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="hea_contribution" showInColumn="hea_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="hud_des_contribution" showInColumn="hud_des_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="hcp_contribution" showInColumn="hcp_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="min_nei_contribution" showInColumn="min_nei_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="revit_contribution" showInColumn="revit_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="rural_contribution" showInColumn="rural_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="sen_dis_contribution" showInColumn="sen_dis_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="tod_contribution" showInColumn="tod_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="mcares_contribution" showInColumn="mcares_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="covid_contribution" showInColumn="covid_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="sust_comm_contribution" showInColumn="sust_comm_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                        <TotalItem column="human_emp_contribution" showInColumn="human_emp_weight" summaryType="sum" customizeText={calculateTotalPercentDisplay} dataType="string" alignment="left"/>
+                    
                     </Summary>
                 </DataGrid>
             </div>

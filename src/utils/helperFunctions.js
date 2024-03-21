@@ -849,3 +849,16 @@ export function perfDataConstructor(accountsInfo, perfData) {
     return result;
 }
 
+/**
+ * 
+ * @param {string} fieldName 
+ * The name of the property you wish to total across all objects/accounts
+ * @param {Array.<Object>} dataArray
+ * An array of objects. The properties referenced as fieldName should point to numbers.
+ * @example
+ * grandTotalCalculator("theme_contribution_total", accumulatedExposureReportData)
+ * @returns {number} Single total number for indicated fieldName
+ */
+export function grandTotalCalculator(fieldName, dataArray) {
+    return dataArray.reduce((accumulator, accountObj) => accumulator + accountObj[fieldName], 0);
+}
